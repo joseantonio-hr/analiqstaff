@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnalIQstaff · v1.0 · Operaciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================================
+       RESET & VARIABLES GLOBALES
+    ======================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Paleta principal */
+      --bg-void:        #060710;
+      --bg-surface:     rgba(10, 12, 26, 0.75);
+      --glass:          rgba(255,255,255,0.035);
+      --glass-hover:    rgba(255,255,255,0.06);
+      --border:         rgba(255,255,255,0.07);
+      --border-strong:  rgba(255,255,255,0.13);
+
+      /* Acentos */
+      --cyan:    #00d4ff;
+      --blue:    #4d8eff;
+      --purple:  #a855f7;
+      --amber:   #f59e0b;
+      --green:   #10b981;
+      --red:     #ef4444;
+      --pink:    #ff6b8a;
+
+      /* Texto */
+      --t1: #eef0ff;
+      --t2: #7b83a8;
+      --t3: #38405e;
+
+      /* Tipografía */
+      --sans:  'DM Sans', system-ui, sans-serif;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --mono:  'DM Mono', 'Courier New', monospace;
+
+      /* Radio */
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 18px;
+      --r-xl: 22px;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      color: var(--t1);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========================================================
+       FONDO: AURORA + DOT GRID
+    ======================================================== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 75% 55% at 15% 5%,  rgba(0, 80, 200, 0.13) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 70% at 85% 95%, rgba(100, 30, 200, 0.09) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 35% at 65% 18%, rgba(0, 212, 255, 0.06) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ========================================================
+       HEADER
+    ======================================================== */
+    .app-header {
+      position: relative;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 22px;
+      height: 60px;
+      background: rgba(6, 7, 16, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    /* Scan-line sutil en el header */
+    .app-header::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent);
+      pointer-events: none;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .logo-analiq {
+      font-family: var(--serif);
+      font-size: 21px;
+      color: var(--t1);
+    }
+    .logo-staff {
+      font-family: var(--serif);
+      font-size: 21px;
+      font-style: italic;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Píldora de versión */
+    .version-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      background: rgba(0,212,255,0.07);
+      border: 1px solid rgba(0,212,255,0.18);
+      border-radius: 20px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      color: var(--cyan);
+      letter-spacing: 0.6px;
+      white-space: nowrap;
+    }
+
+    .hdr-sep {
+      width: 1px;
+      height: 28px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    /* KPIs del header */
+    .hdr-kpis {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .kpi-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kpi-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 7px var(--green);
+      animation: pulse-glow 2.2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse-glow {
+      0%,100% { opacity: 1; box-shadow: 0 0 7px var(--green); }
+      50%      { opacity: 0.5; box-shadow: 0 0 14px var(--green); }
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      color: var(--t2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .kpi-value {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--cyan);
+      transition: all 0.35s ease;
+      min-width: 38px;
+    }
+
+    .coverage-bar-wrap {
+      width: 72px;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .coverage-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      border-radius: 3px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 6px rgba(0,212,255,0.5);
+    }
+
+    /* Acciones del header */
+    .hdr-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-hdr {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--t2);
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-hdr:hover {
+      background: var(--glass-hover);
+      color: var(--t1);
+      border-color: var(--border-strong);
+    }
+    .btn-hdr.primary {
+      background: rgba(0,212,255,0.09);
+      border-color: rgba(0,212,255,0.25);
+      color: var(--cyan);
+    }
+    .btn-hdr.primary:hover {
+      background: rgba(0,212,255,0.16);
+    }
+
+    /* ========================================================
+       MAIN: 2 COLUMNAS
+    ======================================================== */
+    .app-main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 43% 57%;
+      overflow: hidden;
+    }
+
+    /* ========================================================
+       PANELES
+    ======================================================== */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-hdr {
+      flex-shrink: 0;
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title {
+      font-family: var(--serif);
+      font-size: 17px;
+      color: var(--t1);
+      line-height: 1.1;
+    }
+
+    .panel-sub {
+      font-size: 10px;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 1px;
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--t3) transparent;
+    }
+    .panel-body::-webkit-scrollbar { width: 4px; }
+    .panel-body::-webkit-scrollbar-track { background: transparent; }
+    .panel-body::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+
+    .panel-badge {
+      padding: 2px 9px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--t2);
+      margin-left: auto;
+    }
+
+    /* ========================================================
+       PANEL IZQUIERDO: ROSTER
+    ======================================================== */
+    .roster-panel {
+      border-right: 1px solid var(--border);
+    }
+
+    /* ========================================================
+       HINT DE SELECCIÓN (abajo del panel izquierdo)
+    ======================================================== */
+    .selection-hint {
+      flex-shrink: 0;
+      padding: 9px 18px;
+      background: rgba(0,212,255,0.06);
+      border-top: 1px solid rgba(0,212,255,0.18);
+      font-size: 11px;
+      color: var(--cyan);
+      text-align: center;
+      display: none;
+      animation: fade-in 0.2s ease;
+    }
+    .selection-hint.visible { display: block; }
+
+    /* ========================================================
+       GRILLA DE CROMOS
+    ======================================================== */
+    .cromo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+
+    /* ========================================================
+       CROMO CARD
+    ======================================================== */
+    .cromo {
+      position: relative;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.22s ease, box-shadow 0.28s ease, border-color 0.25s ease;
+      user-select: none;
+      animation: fade-in 0.3s ease both;
+    }
+
+    .cromo:nth-child(1) { animation-delay: 0.04s; }
+    .cromo:nth-child(2) { animation-delay: 0.08s; }
+    .cromo:nth-child(3) { animation-delay: 0.12s; }
+    .cromo:nth-child(4) { animation-delay: 0.16s; }
+    .cromo:nth-child(5) { animation-delay: 0.20s; }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Reflejo holográfico al hover */
+    .cromo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        110deg,
+        transparent 35%,
+        rgba(255,255,255,0.05) 50%,
+        transparent 65%
+      );
+      background-size: 200% 100%;
+      background-position: 200% 0;
+      transition: background-position 0.55s ease;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .cromo:hover::after { background-position: -100% 0; }
+
+    .cromo:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-strong);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    }
+
+    .cromo.selected {
+      border-color: var(--cyan);
+      box-shadow:
+        0 0 0 1px var(--cyan),
+        0 0 24px rgba(0,212,255,0.2),
+        0 8px 30px rgba(0,0,0,0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Barra de acento superior del cromo */
+    .cromo-accent-bar {
+      height: 3px;
+      background: var(--c-accent, var(--cyan));
+      transition: opacity 0.3s;
+    }
+    .cromo.selected .cromo-accent-bar {
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      box-shadow: 0 0 8px rgba(0,212,255,0.6);
+    }
+
+    /* Número de ficha */
+    .cromo-num {
+      position: absolute;
+      top: 10px;
+      right: 11px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--t3);
+      letter-spacing: 0.5px;
+    }
+
+    .cromo-body {
+      padding: 14px 13px 12px;
+    }
+
+    /* Avatar */
+    .cromo-avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 11px;
+    }
+
+    .cromo-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      background: var(--c-avatar-bg);
+      border: 2px solid var(--c-avatar-border);
+      box-shadow: var(--c-avatar-glow);
+      position: relative;
+      transition: box-shadow 0.3s;
+    }
+
+    .cromo.selected .cromo-avatar {
+      box-shadow: var(--c-avatar-glow), 0 0 20px rgba(0,212,255,0.35);
+    }
+
+    /* Indicador de seleccionado */
+    .cromo-sel-dot {
+      display: none;
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 14px;
+      height: 14px;
+      background: var(--cyan);
+      border-radius: 50%;
+      border: 2px solid var(--bg-void);
+      box-shadow: 0 0 8px var(--cyan);
+      animation: pulse-glow 1s ease-in-out infinite;
+    }
+    .cromo.selected .cromo-sel-dot { display: block; }
+
+    /* Nombre y cargo */
+    .cromo-name {
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--t1);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cromo-cargo {
+      text-align: center;
+      font-size: 9.5px;
+      color: var(--t2);
+      margin-bottom: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Badges de habilitaciones */
+    .cromo-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 6px;
+      border-radius: 20px;
+      font-size: 8.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .badge.tip {
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: var(--green);
+    }
+    .badge.armas {
+      background: rgba(239,68,68,0.11);
+      border: 1px solid rgba(239,68,68,0.28);
+      color: var(--red);
+    }
+    .badge.aeropuertos {
+      background: rgba(168,85,247,0.11);
+      border: 1px solid rgba(168,85,247,0.28);
+      color: var(--purple);
+    }
+
+    /* Divider */
+    .cromo-hr {
+      height: 1px;
+      background: var(--border);
+      margin: 0 -13px 10px;
+    }
+
+    /* Stats */
+    .cromo-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 0 2px;
+    }
+    .stat + .stat {
+      border-left: 1px solid var(--border);
+    }
+
+    .stat-val {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--t1);
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+    .stat-val.accent { color: var(--c-accent, var(--cyan)); }
+
+    .stat-lbl {
+      font-size: 7.5px;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ========================================================
+       PANEL DERECHO: SCHEDULER
+    ======================================================== */
+    .scheduler-panel .panel-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px 18px;
+    }
+
+    /* Date badge del header */
+    .date-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 11px 4px 9px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+    }
+    .date-badge .db-day {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--t1);
+      line-height: 1;
+    }
+    .date-badge .db-month {
+      font-size: 11px;
+      color: var(--t1);
+      line-height: 1.2;
+    }
+    .date-badge .db-year {
+      font-size: 9px;
+      color: var(--t3);
+      line-height: 1;
+    }
+
+    /* Bloque de puesto */
+    .puesto-block {
+      background: rgba(10,12,26,0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
+
+    .puesto-hdr {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .puesto-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+    .puesto-icon.aeropuerto {
+      background: rgba(168,85,247,0.1);
+      border: 1px solid rgba(168,85,247,0.2);
+    }
+    .puesto-icon.armado {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+
+    .puesto-info { flex: 1; min-width: 0; }
+    .puesto-nombre {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t1);
+    }
+    .puesto-lugar {
+      font-size: 10px;
+      color: var(--t2);
+    }
+
+    .puesto-req-badges {
+      display: flex;
+      gap: 4px;
+    }
+
+    /* Grid de turnos */
+    .turnos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    /* Slot de turno */
+    .turno-slot {
+      background: rgba(6,7,16,0.7);
+      padding: 12px;
+      min-height: 96px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .turno-slot.empty {
+      cursor: pointer;
+    }
+    .turno-slot.empty:hover {
+      background: rgba(0,212,255,0.025);
+    }
+
+    /* Cuando hay vigilante seleccionado, los slots vacíos pulsan */
+    .turno-slot.empty.slot-available {
+      animation: slot-pulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes slot-pulse {
+      0%,100% { box-shadow: inset 0 0 0 1px rgba(0,212,255,0.07); }
+      50%      { box-shadow: inset 0 0 0 1px rgba(0,212,255,0.28); }
+    }
+
+    .turno-slot.empty.slot-available:hover {
+      box-shadow: inset 0 0 0 1px rgba(0,212,255,0.5);
+      background: rgba(0,212,255,0.04);
+      animation: none;
+    }
+
+    .turno-hdr-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 5px;
+    }
+
+    .turno-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--t2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .noche-pip {
+      padding: 1px 5px;
+      background: rgba(168,85,247,0.12);
+      border: 1px solid rgba(168,85,247,0.22);
+      border-radius: 4px;
+      font-size: 8px;
+      color: var(--purple);
+      font-family: var(--mono);
+    }
+
+    .turno-horas {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      color: var(--t3);
+      margin-bottom: 8px;
+    }
+
+    /* Estado vacío del slot */
+    .slot-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 7px;
+      border: 1px dashed rgba(255,255,255,0.08);
+      border-radius: 7px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .turno-slot.empty:hover .slot-empty-state,
+    .turno-slot.slot-available .slot-empty-state {
+      border-color: rgba(0,212,255,0.3);
+    }
+
+    .slot-plus {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--t3);
+      transition: all 0.2s;
+    }
+    .turno-slot.empty:hover .slot-plus,
+    .turno-slot.slot-available .slot-plus {
+      border-color: rgba(0,212,255,0.4);
+      color: var(--cyan);
+    }
+    .slot-empty-txt {
+      font-size: 8.5px;
+      color: var(--t3);
+    }
+
+    /* Mini-cromo asignado */
+    .mini-cromo {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 7px;
+      padding: 6px 7px;
+      transition: background 0.2s;
+    }
+    .mini-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 500;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .mini-info { flex: 1; min-width: 0; }
+    .mini-nombre {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--t1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mini-cargo {
+      font-size: 8.5px;
+      color: var(--t2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mini-remove {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: var(--red);
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.18s;
+      line-height: 1;
+    }
+    .mini-remove:hover {
+      background: rgba(239,68,68,0.25);
+      border-color: rgba(239,68,68,0.5);
+    }
+
+    /* ========================================================
+       FOOTER: PANEL DE NÓMINA
+    ======================================================== */
+    .payroll-footer {
+      position: relative;
+      z-index: 10;
+      flex-shrink: 0;
+      height: 0;
+      overflow: hidden;
+      transition: height 0.38s cubic-bezier(0.4,0,0.2,1);
+      border-top: 1px solid transparent;
+      background: rgba(6,7,16,0.93);
+    }
+
+    .payroll-footer.visible {
+      height: 178px;
+      border-top-color: var(--border);
+    }
+
+    .payroll-inner {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      height: 100%;
+    }
+
+    .payroll-col {
+      padding: 14px 18px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow: hidden;
+    }
+    .payroll-col:last-child { border-right: none; }
+
+    .payroll-col-title {
+      font-size: 8.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--t3);
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Columna 1: Empleado */
+    .pay-employee-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .pay-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .pay-emp-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t1);
+      line-height: 1.2;
+    }
+    .pay-emp-cargo {
+      font-size: 10px;
+      color: var(--t2);
+    }
+
+    /* Filas de nómina */
+    .pay-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2.5px 0;
+    }
+    .pay-lbl {
+      font-size: 10.5px;
+      color: var(--t2);
+    }
+    .pay-val {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--t1);
+    }
+    .pay-val.green  { color: var(--green); }
+    .pay-val.amber  { color: var(--amber); }
+    .pay-val.dim    { color: var(--t2); }
+
+    .pay-hr {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+
+    .pay-subtotal-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pay-subtotal-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--t1);
+    }
+    .pay-subtotal-val {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--t1);
+    }
+
+    /* Total grande */
+    .pay-total-block {
+      margin-top: auto;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+    .pay-total-lbl {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--t2);
+    }
+    .pay-total-val {
+      font-family: var(--mono);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.1;
+    }
+    .pay-total-sub {
+      font-size: 8.5px;
+      color: var(--t3);
+    }
+
+    /* Estado vacío del footer */
+    .payroll-empty-state {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--t3);
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    /* ========================================================
+       UTILIDADES
+    ======================================================== */
+    .flex         { display: flex; }
+    .items-center { align-items: center; }
+    .gap-2        { gap: 8px; }
+    .ml-auto      { margin-left: auto; }
+
+    /* Scrollbar del scheduler */
+    .scheduler-panel .panel-body {
+      scrollbar-width: thin;
+      scrollbar-color: var(--t3) transparent;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ====================================================
+     HEADER
+===================================================== -->
+<header class="app-header">
+  <!-- Logo -->
+  <div class="logo">
+    <span class="logo-analiq">AnalIQ</span><span class="logo-staff">staff</span>
+  </div>
+
+  <!-- Versión -->
+  <div class="version-pill">● v1.0 · OPERACIONES</div>
+
+  <div class="hdr-sep"></div>
+
+  <!-- KPIs -->
+  <div class="hdr-kpis">
+    <div class="kpi-chip">
+      <div class="kpi-dot" id="kpi-dot"></div>
+      <span class="kpi-label">Cobertura</span>
+      <span class="kpi-value" id="coverage-pct">0%</span>
+      <div class="coverage-bar-wrap">
+        <div class="coverage-bar-fill" id="coverage-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="hdr-sep" style="height:20px"></div>
+
+    <div class="kpi-chip">
+      <span class="kpi-label">Turnos cubiertos</span>
+      <span class="kpi-value" style="font-size:13px">
+        <span id="filled-count">0</span><span style="color:var(--t3);font-size:11px">&thinsp;/ 6</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="hdr-actions">
+    <button class="btn-hdr" onclick="clearAll()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.38"/></svg>
+      Reiniciar
+    </button>
+    <button class="btn-hdr primary">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar Cuadrante
+    </button>
+  </div>
+</header>
+
+<!-- ====================================================
+     MAIN: DOS COLUMNAS
+===================================================== -->
+<main class="app-main">
+
+  <!-- COLUMNA IZQUIERDA: ROSTER -->
+  <section class="panel roster-panel">
+    <div class="panel-hdr">
+      <div>
+        <div class="panel-title">Plantilla de Vigilantes</div>
+        <div class="panel-sub">Álbum de cromos · selecciona para asignar</div>
+      </div>
+      <span class="panel-badge" id="roster-count">5 activos</span>
+    </div>
+    <div class="panel-body">
+      <div class="cromo-grid" id="cromo-grid">
+        <!-- Renderizado por JS -->
+      </div>
+    </div>
+    <div class="selection-hint" id="selection-hint">
+      ↗ Ahora haz clic en un <strong>turno vacío</strong> del cuadrante para asignar
+    </div>
+  </section>
+
+  <!-- COLUMNA DERECHA: CUADRANTE -->
+  <section class="panel scheduler-panel">
+    <div class="panel-hdr">
+      <div>
+        <div class="panel-title">Cuadrante del Día</div>
+        <div class="panel-sub">Simulador de asignación de turnos</div>
+      </div>
+      <div class="date-badge">
+        <div class="db-day" id="hdr-day">21</div>
+        <div>
+          <div class="db-month" id="hdr-month">Jun</div>
+          <div class="db-year"  id="hdr-year">2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body" id="scheduler-body">
+      <!-- Renderizado por JS -->
+    </div>
+  </section>
+
+</main>
+
+<!-- ====================================================
+     FOOTER: NÓMINA EN TIEMPO REAL
+===================================================== -->
+<footer class="payroll-footer" id="payroll-footer">
+  <div class="payroll-inner" id="payroll-inner">
+    <div class="payroll-empty-state">Selecciona un vigilante para ver la previsualización de nómina</div>
+  </div>
+</footer>
+
+
+<!-- ====================================================
+     JAVASCRIPT
+===================================================== -->
+<script>
+/* ======================================================
+   DATOS
+====================================================== */
+const VIGILANTES = [
+  {
+    id: 1,
+    nombre: 'Carlos Medina',
+    cargo: 'Inspector de Servicios',
+    iniciales: 'CM',
+    color: '#00d4ff',
+    hab: ['tip', 'armas', 'aeropuertos'],
+    fiabilidad: 9.4,
+    experiencia: 8,
+    trienios: 2,
+    salarioBase: 1520.00
+  },
+  {
+    id: 2,
+    nombre: 'María Torres',
+    cargo: 'Vigilante de Seguridad',
+    iniciales: 'MT',
+    color: '#a855f7',
+    hab: ['tip', 'aeropuertos'],
+    fiabilidad: 8.9,
+    experiencia: 5,
+    trienios: 1,
+    salarioBase: 1380.00
+  },
+  {
+    id: 3,
+    nombre: 'Javier Ruiz',
+    cargo: 'Vigilante de Seguridad',
+    iniciales: 'JR',
+    color: '#f59e0b',
+    hab: ['tip', 'armas'],
+    fiabilidad: 9.1,
+    experiencia: 6,
+    trienios: 2,
+    salarioBase: 1380.00
+  },
+  {
+    id: 4,
+    nombre: 'Ana Soto',
+    cargo: 'Vigilante de Seguridad',
+    iniciales: 'AS',
+    color: '#10b981',
+    hab: ['tip'],
+    fiabilidad: 7.8,
+    experiencia: 3,
+    trienios: 1,
+    salarioBase: 1380.00
+  },
+  {
+    id: 5,
+    nombre: 'Miguel Castro',
+    cargo: 'Inspector de Servicios',
+    iniciales: 'MC',
+    color: '#ff6b8a',
+    hab: ['tip', 'armas', 'aeropuertos'],
+    fiabilidad: 9.7,
+    experiencia: 12,
+    trienios: 4,
+    salarioBase: 1520.00
+  }
+];
+
+const PUESTOS = [
+  {
+    id: 'p1',
+    nombre: 'Control de Accesos',
+    lugar: 'Aeropuerto AENA · Terminal 2',
+    emoji: '✈',
+    tipo: 'aeropuerto',
+    requiere: ['tip', 'aeropuertos'],
+    armado: false
+  },
+  {
+    id: 'p2',
+    nombre: 'Patrulla Armada',
+    lugar: 'Centro Comercial · Planta Principal',
+    emoji: '🛡',
+    tipo: 'armado',
+    requiere: ['tip', 'armas'],
+    armado: true
+  }
+];
+
+const TURNOS = [
+  { id: 'manana', label: 'Mañana', horas: '06:00 – 14:00', esNoche: false },
+  { id: 'tarde',  label: 'Tarde',  horas: '14:00 – 22:00', esNoche: false },
+  { id: 'noche',  label: 'Noche',  horas: '22:00 – 06:00', esNoche: true  }
+];
+
+const BADGE_DEF = {
+  tip:         { label: '✓ TIP Activa', cls: 'tip' },
+  armas:       { label: '⚑ Lic. Armas', cls: 'armas' },
+  aeropuertos: { label: '✈ Aeropuertos', cls: 'aeropuertos' }
+};
+
+// Constantes económicas (Convenio Colectivo Vigilancia España)
+const PLUS_ARMA        = 0.82;   // €/hora
+const PLUS_NOCTURNIDAD = 1.52;   // €/hora
+const HORAS_TURNO      = 8;
+const SS_PATRONAL      = 0.33;   // 33%
+const TRIENIO_PCT      = 0.03;   // 3% por trienio sobre salario base
+
+/* ======================================================
+   ESTADO
+====================================================== */
+let selectedId = null;  // cromo seleccionado (para asignar)
+let focusedId  = null;  // cromo visible en nómina
+
+// Mapa de asignaciones: assignments[puestoId][turnoId] = vigilanteId | null
+const assignments = {};
+PUESTOS.forEach(p => {
+  assignments[p.id] = {};
+  TURNOS.forEach(t => { assignments[p.id][t.id] = null; });
+});
+
+/* ======================================================
+   UTILIDADES
+====================================================== */
+function getV(id) { return VIGILANTES.find(v => v.id === id); }
+
+function hexRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function fmtEur(n) {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+function countFilled() {
+  let n = 0;
+  PUESTOS.forEach(p => TURNOS.forEach(t => { if (assignments[p.id][t.id]) n++; }));
+  return n;
+}
+
+/* ======================================================
+   RENDER: CROMOS
+====================================================== */
+function renderRoster() {
+  const grid = document.getElementById('cromo-grid');
+  grid.innerHTML = '';
+
+  VIGILANTES.forEach((v, i) => {
+    const rgb = hexRgb(v.color);
+    const sel = v.id === selectedId;
+
+    const card = document.createElement('div');
+    card.className = 'cromo' + (sel ? ' selected' : '');
+    card.dataset.id = v.id;
+
+    // CSS variables locales del cromo
+    card.style.cssText = `
+      --c-accent: ${v.color};
+      --c-avatar-bg: rgba(${rgb},0.16);
+      --c-avatar-border: rgba(${rgb},0.38);
+      --c-avatar-glow: 0 0 14px rgba(${rgb},0.35);
+    `;
+
+    const badgesHTML = v.hab.map(h => {
+      const b = BADGE_DEF[h];
+      return `<span class="badge ${b.cls}">${b.label}</span>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="cromo-accent-bar"></div>
+      <div class="cromo-num">#${String(i+1).padStart(2,'0')}</div>
+      <div class="cromo-body">
+        <div class="cromo-avatar-wrap">
+          <div class="cromo-avatar">
+            ${v.iniciales}
+            <div class="cromo-sel-dot"></div>
+          </div>
+        </div>
+        <div class="cromo-name">${v.nombre}</div>
+        <div class="cromo-cargo">${v.cargo}</div>
+        <div class="cromo-badges">${badgesHTML}</div>
+        <div class="cromo-hr"></div>
+        <div class="cromo-stats">
+          <div class="stat">
+            <div class="stat-val accent">${v.fiabilidad}</div>
+            <div class="stat-lbl">Fiabilidad</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">${v.experiencia}</div>
+            <div class="stat-lbl">Años Exp.</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">${v.trienios > 0 ? '×' + v.trienios : '–'}</div>
+            <div class="stat-lbl">Trienios</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => onCromoClick(v.id));
+    grid.appendChild(card);
+  });
+}
+
+/* ======================================================
+   RENDER: SCHEDULER
+====================================================== */
+function renderScheduler() {
+  const body = document.getElementById('scheduler-body');
+  body.innerHTML = '';
+
+  PUESTOS.forEach(puesto => {
+    const block = document.createElement('div');
+    block.className = 'puesto-block';
+
+    const reqBadges = puesto.requiere.map(r => {
+      const b = BADGE_DEF[r];
+      return `<span class="badge ${b.cls}">${b.label}</span>`;
+    }).join('');
+
+    block.innerHTML = `
+      <div class="puesto-hdr">
+        <div class="puesto-icon ${puesto.tipo}">${puesto.emoji}</div>
+        <div class="puesto-info">
+          <div class="puesto-nombre">${puesto.nombre}</div>
+          <div class="puesto-lugar">${puesto.lugar}</div>
+        </div>
+        <div class="puesto-req-badges">${reqBadges}</div>
+      </div>
+      <div class="turnos-grid" id="tgrid-${puesto.id}"></div>
+    `;
+
+    body.appendChild(block);
+
+    const tGrid = block.querySelector(`#tgrid-${puesto.id}`);
+    TURNOS.forEach(turno => {
+      tGrid.appendChild(buildSlot(puesto, turno));
+    });
+  });
+}
+
+function buildSlot(puesto, turno) {
+  const vid = assignments[puesto.id][turno.id];
+  const hasVigilante = vid !== null;
+  const slot = document.createElement('div');
+  const canHighlight = selectedId !== null && !hasVigilante;
+
+  slot.className = 'turno-slot' + (hasVigilante ? '' : ' empty') + (canHighlight ? ' slot-available' : '');
+  slot.dataset.puesto = puesto.id;
+  slot.dataset.turno  = turno.id;
+
+  const nocheTag = turno.esNoche ? '<span class="noche-pip">🌙</span>' : '';
+
+  let bodyHTML;
+  if (hasVigilante) {
+    const v = getV(vid);
+    const rgb = hexRgb(v.color);
+    bodyHTML = `
+      <div class="mini-cromo" style="background:rgba(${rgb},0.07);border:1px solid rgba(${rgb},0.2)">
+        <div class="mini-avatar" style="background:rgba(${rgb},0.2);border:1px solid rgba(${rgb},0.4);color:${v.color}">
+          ${v.iniciales}
+        </div>
+        <div class="mini-info">
+          <div class="mini-nombre">${v.nombre}</div>
+          <div class="mini-cargo">${v.cargo.split(' ')[0]}</div>
+        </div>
+        <div class="mini-remove" data-puesto="${puesto.id}" data-turno="${turno.id}">✕</div>
+      </div>
+    `;
+  } else {
+    bodyHTML = `
+      <div class="slot-empty-state">
+        <div class="slot-plus">+</div>
+        <div class="slot-empty-txt">Vacío</div>
+      </div>
+    `;
+  }
+
+  slot.innerHTML = `
+    <div class="turno-hdr-row">
+      <span class="turno-label">${turno.label}</span>
+      ${nocheTag}
+    </div>
+    <div class="turno-horas">${turno.horas}</div>
+    ${bodyHTML}
+  `;
+
+  if (!hasVigilante) {
+    slot.addEventListener('click', () => onSlotClick(puesto.id, turno.id));
+  }
+
+  const removeBtn = slot.querySelector('.mini-remove');
+  if (removeBtn) {
+    removeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      onUnassign(puesto.id, turno.id);
+    });
+  }
+
+  return slot;
+}
+
+/* ======================================================
+   RENDER: NÓMINA
+====================================================== */
+function renderPayroll(vid) {
+  const footer = document.getElementById('payroll-footer');
+  const inner  = document.getElementById('payroll-inner');
+
+  if (!vid) {
+    footer.classList.remove('visible');
+    inner.innerHTML = '<div class="payroll-empty-state">Selecciona un vigilante para ver la previsualización de nómina</div>';
+    return;
+  }
+
+  const v   = getV(vid);
+  const rgb = hexRgb(v.color);
+
+  // Calcular pluses del día según asignaciones
+  let plusArmaHoy    = 0;
+  let plusNocheHoy   = 0;
+
+  PUESTOS.forEach(p => {
+    TURNOS.forEach(t => {
+      if (assignments[p.id][t.id] === vid) {
+        if (p.armado)    plusArmaHoy  += PLUS_ARMA        * HORAS_TURNO;
+        if (t.esNoche)   plusNocheHoy += PLUS_NOCTURNIDAD * HORAS_TURNO;
+      }
+    });
+  });
+
+  // Conceptos fijos mensuales
+  const plusAntiguedad  = v.salarioBase * TRIENIO_PCT * v.trienios;
+  const subtotalFijo    = v.salarioBase + plusAntiguedad;
+
+  // Pluses devengados hoy (solo día actual en este prototipo)
+  const plusesHoy       = plusArmaHoy + plusNocheHoy;
+
+  // Totales
+  const brutoBruto      = subtotalFijo + plusesHoy;
+  const ssPatronal      = brutoBruto * SS_PATRONAL;
+  const costeEmpresa    = brutoBruto + ssPatronal;
+
+  footer.classList.add('visible');
+
+  inner.innerHTML = `
+    <!-- Columna 1: Empleado -->
+    <div class="payroll-col">
+      <div class="payroll-col-title">Previsualización Nómina · ${new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'})}</div>
+      <div class="pay-employee-row">
+        <div class="pay-avatar" style="background:rgba(${rgb},0.18);border:2px solid rgba(${rgb},0.4);color:${v.color};box-shadow:0 0 14px rgba(${rgb},0.28)">
+          ${v.iniciales}
+        </div>
+        <div>
+          <div class="pay-emp-name">${v.nombre}</div>
+          <div class="pay-emp-cargo">${v.cargo}</div>
+        </div>
+      </div>
+      <div class="pay-row">
+        <span class="pay-lbl">Trienios consolidados</span>
+        <span class="pay-val" style="color:${v.color}">×${v.trienios}</span>
+      </div>
+      <div class="pay-row">
+        <span class="pay-lbl">Fiabilidad</span>
+        <span class="pay-val green">${v.fiabilidad}/10</span>
+      </div>
+      <div class="pay-row">
+        <span class="pay-lbl">Antigüedad</span>
+        <span class="pay-val dim">${v.experiencia} años</span>
+      </div>
+    </div>
+
+    <!-- Columna 2: Conceptos fijos -->
+    <div class="payroll-col">
+      <div class="payroll-col-title">Conceptos Fijos / Mes</div>
+      <div class="pay-row">
+        <span class="pay-lbl">Salario Base</span>
+        <span class="pay-val">${fmtEur(v.salarioBase)}</span>
+      </div>
+      <div class="pay-row">
+        <span class="pay-lbl">Plus Antigüedad (${v.trienios}×3%)</span>
+        <span class="pay-val green">+${fmtEur(plusAntiguedad)}</span>
+      </div>
+      <div class="pay-hr"></div>
+      <div class="pay-subtotal-row">
+        <span class="pay-subtotal-lbl">Subtotal fijo</span>
+        <span class="pay-subtotal-val">${fmtEur(subtotalFijo)}</span>
+      </div>
+      <div class="pay-total-block">
+        <div class="pay-total-lbl">Base garantizada</div>
+        <div class="pay-total-val" style="color:var(--t1);font-size:17px">${fmtEur(subtotalFijo)}</div>
+        <div class="pay-total-sub">Convenio colectivo vigente</div>
+      </div>
+    </div>
+
+    <!-- Columna 3: Pluses de convenio (hoy) -->
+    <div class="payroll-col">
+      <div class="payroll-col-title">Pluses de Convenio · Hoy</div>
+      <div class="pay-row">
+        <span class="pay-lbl">Plus Arma (${PLUS_ARMA}€/h × 8h)</span>
+        <span class="pay-val ${plusArmaHoy > 0 ? 'green' : 'dim'}">${plusArmaHoy > 0 ? '+' : ''}${fmtEur(plusArmaHoy)}</span>
+      </div>
+      <div class="pay-row">
+        <span class="pay-lbl">Plus Nocturnidad (${PLUS_NOCTURNIDAD}€/h × 8h)</span>
+        <span class="pay-val ${plusNocheHoy > 0 ? 'green' : 'dim'}">${plusNocheHoy > 0 ? '+' : ''}${fmtEur(plusNocheHoy)}</span>
+      </div>
+      <div class="pay-hr"></div>
+      <div class="pay-subtotal-row">
+        <span class="pay-subtotal-lbl">Total pluses día</span>
+        <span class="pay-subtotal-val" style="color:var(--green)">+${fmtEur(plusesHoy)}</span>
+      </div>
+      <div class="pay-total-block">
+        <div class="pay-total-lbl">Bruto mensual estimado</div>
+        <div class="pay-total-val" style="color:var(--cyan)">${fmtEur(brutoBruto)}</div>
+        <div class="pay-total-sub">Base + pluses devengados hoy</div>
+      </div>
+    </div>
+
+    <!-- Columna 4: Coste empresa -->
+    <div class="payroll-col">
+      <div class="payroll-col-title">Coste Total Empresa</div>
+      <div class="pay-row">
+        <span class="pay-lbl">Bruto del trabajador</span>
+        <span class="pay-val">${fmtEur(brutoBruto)}</span>
+      </div>
+      <div class="pay-row">
+        <span class="pay-lbl">SS Patronal (~33%)</span>
+        <span class="pay-val amber">+${fmtEur(ssPatronal)}</span>
+      </div>
+      <div class="pay-hr"></div>
+      <div class="pay-total-block">
+        <div class="pay-total-lbl">Coste empresa / mes</div>
+        <div class="pay-total-val" style="color:var(--pink)">${fmtEur(costeEmpresa)}</div>
+        <div class="pay-total-sub">Nómina bruta + cotización patronal</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ======================================================
+   RENDER: KPI COBERTURA
+====================================================== */
+function updateKPI() {
+  const filled = countFilled();
+  const total  = PUESTOS.length * TURNOS.length; // = 6
+  const pct    = Math.round((filled / total) * 100);
+
+  document.getElementById('coverage-pct').textContent   = pct + '%';
+  document.getElementById('coverage-bar').style.width   = pct + '%';
+  document.getElementById('filled-count').textContent   = filled;
+
+  // El punto parpadea más rápido cuando hay cobertura incompleta
+  const dot = document.getElementById('kpi-dot');
+  dot.style.background    = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--amber)' : 'var(--red)';
+  dot.style.boxShadow     = pct === 100 ? '0 0 7px var(--green)' : pct > 50 ? '0 0 7px var(--amber)' : '0 0 7px var(--red)';
+}
+
+/* ======================================================
+   MANEJADORES DE EVENTOS
+====================================================== */
+function onCromoClick(id) {
+  if (selectedId === id) {
+    // Deseleccionar si clic en el mismo
+    selectedId = null;
+  } else {
+    selectedId = id;
+    focusedId  = id;
+  }
+
+  renderRoster();
+  renderScheduler();
+  renderPayroll(focusedId);
+  updateHint();
+}
+
+function onSlotClick(puestoId, turnoId) {
+  if (!selectedId) return;
+
+  assignments[puestoId][turnoId] = selectedId;
+  focusedId  = selectedId;
+  selectedId = null;
+
+  renderRoster();
+  renderScheduler();
+  renderPayroll(focusedId);
+  updateKPI();
+  updateHint();
+}
+
+function onUnassign(puestoId, turnoId) {
+  assignments[puestoId][turnoId] = null;
+  renderScheduler();
+  updateKPI();
+  if (focusedId) renderPayroll(focusedId);
+}
+
+function clearAll() {
+  PUESTOS.forEach(p => TURNOS.forEach(t => { assignments[p.id][t.id] = null; }));
+  selectedId = null;
+  focusedId  = null;
+  renderRoster();
+  renderScheduler();
+  renderPayroll(null);
+  updateKPI();
+  updateHint();
+}
+
+function updateHint() {
+  const hint = document.getElementById('selection-hint');
+  if (selectedId) {
+    const v = getV(selectedId);
+    hint.innerHTML = `↗ <strong>${v.nombre}</strong> seleccionado/a · Haz clic en un <strong>turno vacío</strong> del cuadrante para asignar`;
+    hint.classList.add('visible');
+  } else {
+    hint.classList.remove('visible');
+  }
+}
+
+/* ======================================================
+   FECHA DE HOY EN EL HEADER
+====================================================== */
+function setDate() {
+  const now    = new Date();
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  document.getElementById('hdr-day').textContent   = now.getDate();
+  document.getElementById('hdr-month').textContent = months[now.getMonth()];
+  document.getElementById('hdr-year').textContent  = now.getFullYear();
+}
+
+/* ======================================================
+   INIT
+====================================================== */
+function init() {
+  setDate();
+  renderRoster();
+  renderScheduler();
+  updateKPI();
+}
+
+init();
+</script>
+</body>
+</html>
