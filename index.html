@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AnalIQstaff · v1.0 · Operaciones</title>
+  <title>AnalIQstaff · v1.1 · Operaciones</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -106,7 +106,6 @@
       flex-shrink: 0;
     }
 
-    /* Scan-line sutil en el header */
     .app-header::after {
       content: '';
       position: absolute;
@@ -116,7 +115,6 @@
       pointer-events: none;
     }
 
-    /* Logo */
     .logo {
       display: flex;
       align-items: baseline;
@@ -139,7 +137,6 @@
       background-clip: text;
     }
 
-    /* Píldora de versión */
     .version-pill {
       display: flex;
       align-items: center;
@@ -162,7 +159,6 @@
       flex-shrink: 0;
     }
 
-    /* KPIs del header */
     .hdr-kpis {
       display: flex;
       align-items: center;
@@ -222,7 +218,6 @@
       box-shadow: 0 0 6px rgba(0,212,255,0.5);
     }
 
-    /* Acciones del header */
     .hdr-actions {
       margin-left: auto;
       display: flex;
@@ -336,7 +331,7 @@
     }
 
     /* ========================================================
-       HINT DE SELECCIÓN (abajo del panel izquierdo)
+       HINT DE SELECCIÓN
     ======================================================== */
     .selection-hint {
       flex-shrink: 0;
@@ -386,7 +381,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Reflejo holográfico al hover */
     .cromo::after {
       content: '';
       position: absolute;
@@ -420,7 +414,6 @@
       transform: translateY(-2px);
     }
 
-    /* Barra de acento superior del cromo */
     .cromo-accent-bar {
       height: 3px;
       background: var(--c-accent, var(--cyan));
@@ -431,7 +424,6 @@
       box-shadow: 0 0 8px rgba(0,212,255,0.6);
     }
 
-    /* Número de ficha */
     .cromo-num {
       position: absolute;
       top: 10px;
@@ -446,7 +438,6 @@
       padding: 14px 13px 12px;
     }
 
-    /* Avatar */
     .cromo-avatar-wrap {
       display: flex;
       justify-content: center;
@@ -475,7 +466,6 @@
       box-shadow: var(--c-avatar-glow), 0 0 20px rgba(0,212,255,0.35);
     }
 
-    /* Indicador de seleccionado */
     .cromo-sel-dot {
       display: none;
       position: absolute;
@@ -491,7 +481,6 @@
     }
     .cromo.selected .cromo-sel-dot { display: block; }
 
-    /* Nombre y cargo */
     .cromo-name {
       text-align: center;
       font-size: 12.5px;
@@ -512,7 +501,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Badges de habilitaciones */
     .cromo-badges {
       display: flex;
       flex-wrap: wrap;
@@ -548,14 +536,12 @@
       color: var(--purple);
     }
 
-    /* Divider */
     .cromo-hr {
       height: 1px;
       background: var(--border);
       margin: 0 -13px 10px;
     }
 
-    /* Stats */
     .cromo-stats {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -595,9 +581,10 @@
       flex-direction: column;
       gap: 16px;
       padding: 16px 18px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--t3) transparent;
     }
 
-    /* Date badge del header */
     .date-badge {
       margin-left: auto;
       display: flex;
@@ -626,7 +613,6 @@
       line-height: 1;
     }
 
-    /* Bloque de puesto */
     .puesto-block {
       background: rgba(10,12,26,0.6);
       border: 1px solid var(--border);
@@ -677,7 +663,6 @@
       gap: 4px;
     }
 
-    /* Grid de turnos */
     .turnos-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -685,7 +670,9 @@
       background: var(--border);
     }
 
-    /* Slot de turno */
+    /* ========================================================
+       SLOT DE TURNO
+    ======================================================== */
     .turno-slot {
       background: rgba(6,7,16,0.7);
       padding: 12px;
@@ -701,20 +688,40 @@
       background: rgba(0,212,255,0.025);
     }
 
-    /* Cuando hay vigilante seleccionado, los slots vacíos pulsan */
-    .turno-slot.empty.slot-available {
+    /* Slot disponible genérico (pulse cyan) */
+    .turno-slot.slot-available {
       animation: slot-pulse 1.8s ease-in-out infinite;
     }
-
     @keyframes slot-pulse {
       0%,100% { box-shadow: inset 0 0 0 1px rgba(0,212,255,0.07); }
       50%      { box-shadow: inset 0 0 0 1px rgba(0,212,255,0.28); }
     }
-
-    .turno-slot.empty.slot-available:hover {
+    .turno-slot.slot-available:hover {
       box-shadow: inset 0 0 0 1px rgba(0,212,255,0.5);
       background: rgba(0,212,255,0.04);
       animation: none;
+    }
+
+    /* Slot COMPATIBLE con el vigilante seleccionado — glow de su color */
+    .turno-slot.slot-compatible {
+      animation: slot-compat-pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes slot-compat-pulse {
+      0%,100% {
+        box-shadow: inset 0 0 0 1px rgba(var(--hl-rgb, 0,212,255), 0.18);
+        background: rgba(var(--hl-rgb, 0,212,255), 0.025);
+      }
+      50% {
+        box-shadow: inset 0 0 0 1.5px rgba(var(--hl-rgb, 0,212,255), 0.55),
+                    0 0 14px rgba(var(--hl-rgb, 0,212,255), 0.12);
+        background: rgba(var(--hl-rgb, 0,212,255), 0.06);
+      }
+    }
+    .turno-slot.slot-compatible:hover {
+      animation: none;
+      box-shadow: inset 0 0 0 1.5px rgba(var(--hl-rgb, 0,212,255), 0.8),
+                  0 0 18px rgba(var(--hl-rgb, 0,212,255), 0.18);
+      background: rgba(var(--hl-rgb, 0,212,255), 0.09);
     }
 
     .turno-hdr-row {
@@ -749,7 +756,6 @@
       margin-bottom: 8px;
     }
 
-    /* Estado vacío del slot */
     .slot-empty-state {
       display: flex;
       flex-direction: column;
@@ -762,8 +768,9 @@
       transition: border-color 0.2s, background 0.2s;
     }
     .turno-slot.empty:hover .slot-empty-state,
-    .turno-slot.slot-available .slot-empty-state {
-      border-color: rgba(0,212,255,0.3);
+    .turno-slot.slot-available .slot-empty-state,
+    .turno-slot.slot-compatible .slot-empty-state {
+      border-color: rgba(var(--hl-rgb, 0,212,255), 0.4);
     }
 
     .slot-plus {
@@ -779,9 +786,10 @@
       transition: all 0.2s;
     }
     .turno-slot.empty:hover .slot-plus,
-    .turno-slot.slot-available .slot-plus {
-      border-color: rgba(0,212,255,0.4);
-      color: var(--cyan);
+    .turno-slot.slot-available .slot-plus,
+    .turno-slot.slot-compatible .slot-plus {
+      border-color: rgba(var(--hl-rgb, 0,212,255), 0.5);
+      color: rgba(var(--hl-rgb, 0,212,255), 1);
     }
     .slot-empty-txt {
       font-size: 8.5px;
@@ -848,7 +856,51 @@
     }
 
     /* ========================================================
-       FOOTER: PANEL DE NÓMINA
+       BADGES DE ALERTA EN SLOT
+    ======================================================== */
+    /* Badge de habilitación faltante */
+    .warn-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 3px 7px;
+      margin-top: 5px;
+      background: rgba(239,68,68,0.14);
+      border: 1px solid rgba(239,68,68,0.4);
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-size: 7.5px;
+      font-weight: 700;
+      color: var(--red);
+      letter-spacing: 0.2px;
+      animation: warn-flash 2s ease-in-out infinite;
+    }
+    @keyframes warn-flash {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.7; }
+    }
+
+    /* Badge de conflicto de convenio */
+    .conflict-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 3px 7px;
+      margin-top: 4px;
+      background: rgba(245,158,11,0.14);
+      border: 1px solid rgba(245,158,11,0.38);
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-size: 7.5px;
+      font-weight: 700;
+      color: var(--amber);
+      letter-spacing: 0.2px;
+    }
+
+    /* ========================================================
+       FOOTER: ANÁLISIS ECONÓMICO DEL CUADRANTE
     ======================================================== */
     .payroll-footer {
       position: relative;
@@ -859,93 +911,105 @@
       transition: height 0.38s cubic-bezier(0.4,0,0.2,1);
       border-top: 1px solid transparent;
       background: rgba(6,7,16,0.93);
+      display: flex;
+      flex-direction: column;
     }
 
     .payroll-footer.visible {
-      height: 178px;
+      height: 215px;
       border-top-color: var(--border);
     }
 
+    /* Franja de título del panel financiero */
+    .payroll-title-strip {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.015);
+    }
+
+    .payroll-title-strip-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--t3);
+      font-family: var(--mono);
+    }
+
+    .payroll-title-strip-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--t1);
+    }
+
+    /* Alerta de conflicto en la franja de título */
+    .strip-alert {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 20px;
+      font-family: var(--mono);
+      font-size: 8.5px;
+      font-weight: 700;
+      color: var(--amber);
+    }
+
     .payroll-inner {
+      flex: 1;
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1fr;
-      height: 100%;
+      grid-template-columns: 1.1fr 1fr 1fr 1fr;
+      min-height: 0;
     }
 
     .payroll-col {
-      padding: 14px 18px;
+      padding: 12px 16px;
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      overflow: hidden;
+      gap: 3px;
     }
     .payroll-col:last-child { border-right: none; }
 
     .payroll-col-title {
-      font-size: 8.5px;
+      font-size: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--t3);
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       flex-shrink: 0;
-    }
-
-    /* Columna 1: Empleado */
-    .pay-employee-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .pay-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 500;
-      color: #fff;
-      flex-shrink: 0;
-    }
-    .pay-emp-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--t1);
-      line-height: 1.2;
-    }
-    .pay-emp-cargo {
-      font-size: 10px;
-      color: var(--t2);
     }
 
-    /* Filas de nómina */
     .pay-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 2.5px 0;
+      padding: 2px 0;
     }
     .pay-lbl {
-      font-size: 10.5px;
+      font-size: 10px;
       color: var(--t2);
     }
     .pay-val {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--t1);
     }
     .pay-val.green  { color: var(--green); }
     .pay-val.amber  { color: var(--amber); }
-    .pay-val.dim    { color: var(--t2); }
+    .pay-val.dim    { color: var(--t3); }
 
     .pay-hr {
       height: 1px;
       background: var(--border);
-      margin: 4px 0;
+      margin: 5px 0;
     }
 
     .pay-subtotal-row {
@@ -960,12 +1024,11 @@
     }
     .pay-subtotal-val {
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 500;
       color: var(--t1);
     }
 
-    /* Total grande */
     .pay-total-block {
       margin-top: auto;
       padding-top: 6px;
@@ -979,7 +1042,7 @@
     }
     .pay-total-val {
       font-family: var(--mono);
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 500;
       line-height: 1.1;
     }
@@ -988,15 +1051,28 @@
       color: var(--t3);
     }
 
-    /* Estado vacío del footer */
-    .payroll-empty-state {
-      grid-column: 1 / -1;
+    /* Kpi inline en col 1 */
+    .pay-kpi-row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--t3);
-      font-size: 12px;
-      font-style: italic;
+      gap: 6px;
+      padding: 3px 0;
+    }
+    .pay-kpi-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .pay-kpi-lbl {
+      font-size: 10px;
+      color: var(--t2);
+      flex: 1;
+    }
+    .pay-kpi-val {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--t1);
     }
 
     /* ========================================================
@@ -1006,12 +1082,6 @@
     .items-center { align-items: center; }
     .gap-2        { gap: 8px; }
     .ml-auto      { margin-left: auto; }
-
-    /* Scrollbar del scheduler */
-    .scheduler-panel .panel-body {
-      scrollbar-width: thin;
-      scrollbar-color: var(--t3) transparent;
-    }
   </style>
 </head>
 <body>
@@ -1020,17 +1090,14 @@
      HEADER
 ===================================================== -->
 <header class="app-header">
-  <!-- Logo -->
   <div class="logo">
     <span class="logo-analiq">AnalIQ</span><span class="logo-staff">staff</span>
   </div>
 
-  <!-- Versión -->
-  <div class="version-pill">● v1.0 · OPERACIONES</div>
+  <div class="version-pill">● v1.1 · OPERACIONES</div>
 
   <div class="hdr-sep"></div>
 
-  <!-- KPIs -->
   <div class="hdr-kpis">
     <div class="kpi-chip">
       <div class="kpi-dot" id="kpi-dot"></div>
@@ -1051,7 +1118,6 @@
     </div>
   </div>
 
-  <!-- Acciones -->
   <div class="hdr-actions">
     <button class="btn-hdr" onclick="clearAll()">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.38"/></svg>
@@ -1111,12 +1177,13 @@
 </main>
 
 <!-- ====================================================
-     FOOTER: NÓMINA EN TIEMPO REAL
+     FOOTER: ANÁLISIS ECONÓMICO DEL CUADRANTE
 ===================================================== -->
 <footer class="payroll-footer" id="payroll-footer">
-  <div class="payroll-inner" id="payroll-inner">
-    <div class="payroll-empty-state">Selecciona un vigilante para ver la previsualización de nómina</div>
-  </div>
+  <!-- Franja de título — poblada por JS -->
+  <div class="payroll-title-strip" id="payroll-title-strip" style="display:none"></div>
+  <!-- Columnas financieras — pobladas por JS -->
+  <div class="payroll-inner" id="payroll-inner"></div>
 </footer>
 
 
@@ -1223,18 +1290,26 @@ const BADGE_DEF = {
   aeropuertos: { label: '✈ Aeropuertos', cls: 'aeropuertos' }
 };
 
-// Constantes económicas (Convenio Colectivo Vigilancia España)
-const PLUS_ARMA        = 0.82;   // €/hora
-const PLUS_NOCTURNIDAD = 1.52;   // €/hora
-const HORAS_TURNO      = 8;
-const SS_PATRONAL      = 0.33;   // 33%
-const TRIENIO_PCT      = 0.03;   // 3% por trienio sobre salario base
+// Etiquetas para badges de alerta de habilitación faltante
+const HAB_LABELS = {
+  tip:         'TIP Activa',
+  armas:       'Lic. Armas',
+  aeropuertos: 'Aeropuertos'
+};
+
+/* Constantes económicas — Convenio Colectivo Vigilancia España 2026 */
+const PLUS_ARMA        = 0.82;   // €/hora — Plus Peligrosidad/Arma
+const PLUS_NOCTURNIDAD = 1.52;   // €/hora — Plus Nocturnidad
+const HORAS_TURNO      = 8;      // horas por turno estándar
+const SS_PATRONAL      = 0.33;   // 33% cotización patronal
+const COSTE_HORA_BASE  = 14.50;  // €/hora — coste laboral base estimado
+const TRIENIO_MES      = 28.50;  // €/mes por trienio devengado
+const DIAS_MES         = 30;     // días para proporcionalizar trienios
 
 /* ======================================================
    ESTADO
 ====================================================== */
 let selectedId = null;  // cromo seleccionado (para asignar)
-let focusedId  = null;  // cromo visible en nómina
 
 // Mapa de asignaciones: assignments[puestoId][turnoId] = vigilanteId | null
 const assignments = {};
@@ -1265,6 +1340,88 @@ function countFilled() {
   return n;
 }
 
+/**
+ * Devuelve las habilitaciones que le faltan al vigilante para cubrir el puesto.
+ */
+function getMissingHabs(v, puesto) {
+  return puesto.requiere.filter(h => !v.hab.includes(h));
+}
+
+/**
+ * Devuelve un Set de vids que tienen asignados más de 1 turno en el cuadrante.
+ * Implica exceso de jornada / incumplimiento del descanso de 12h.
+ */
+function getDoubleShifts() {
+  const counts = {};
+  PUESTOS.forEach(p => {
+    TURNOS.forEach(t => {
+      const vid = assignments[p.id][t.id];
+      if (vid !== null) counts[vid] = (counts[vid] || 0) + 1;
+    });
+  });
+  return Object.keys(counts)
+    .filter(vid => counts[+vid] > 1)
+    .map(Number);
+}
+
+/**
+ * Calcula todos los costes del cuadrante actual en tiempo real.
+ */
+function calcCuadrante() {
+  let turnosAsignados = 0;
+  const vigilantesUnicos = new Set();
+  const trieniosPorVigilante = {}; // vid → coste diario trienio (calculado 1 sola vez)
+  let costeBase     = 0;
+  let costeTrienios = 0;
+  let plusNoche     = 0;
+  let plusArma      = 0;
+  let nTurnosNoche  = 0;
+  let nTurnosArma   = 0;
+
+  PUESTOS.forEach(p => {
+    TURNOS.forEach(t => {
+      const vid = assignments[p.id][t.id];
+      if (vid === null) return;
+
+      const v = getV(vid);
+      turnosAsignados++;
+      costeBase += COSTE_HORA_BASE * HORAS_TURNO;
+
+      // Trienio: devengo diario del vigilante (solo 1 vez por vigilante único)
+      if (!vigilantesUnicos.has(vid)) {
+        vigilantesUnicos.add(vid);
+        const costeDiarioTrienio = v.trienios * (TRIENIO_MES / DIAS_MES);
+        trieniosPorVigilante[vid] = costeDiarioTrienio;
+        costeTrienios += costeDiarioTrienio;
+      }
+
+      // Pluses por tipo de turno / puesto
+      if (t.esNoche) { plusNoche += PLUS_NOCTURNIDAD * HORAS_TURNO; nTurnosNoche++; }
+      if (p.armado)  { plusArma  += PLUS_ARMA        * HORAS_TURNO; nTurnosArma++;  }
+    });
+  });
+
+  const plusesTotal = plusNoche + plusArma;
+  const brutoTotal  = costeBase + costeTrienios + plusesTotal;
+  const ssPatronal  = brutoTotal * SS_PATRONAL;
+  const costeTotal  = brutoTotal + ssPatronal;
+
+  return {
+    turnosAsignados,
+    vigilantesUnicos: vigilantesUnicos.size,
+    costeBase,
+    costeTrienios,
+    plusNoche,
+    plusArma,
+    plusesTotal,
+    nTurnosNoche,
+    nTurnosArma,
+    brutoTotal,
+    ssPatronal,
+    costeTotal
+  };
+}
+
 /* ======================================================
    RENDER: CROMOS
 ====================================================== */
@@ -1280,7 +1437,6 @@ function renderRoster() {
     card.className = 'cromo' + (sel ? ' selected' : '');
     card.dataset.id = v.id;
 
-    // CSS variables locales del cromo
     card.style.cssText = `
       --c-accent: ${v.color};
       --c-avatar-bg: rgba(${rgb},0.16);
@@ -1366,25 +1522,54 @@ function renderScheduler() {
   });
 }
 
+/**
+ * Construye un slot de turno con lógica completa de:
+ * - Glow compatible por color del vigilante seleccionado
+ * - Badge de advertencia si hay habilitaciones faltantes
+ * - Badge de conflicto de convenio si hay doble turno
+ */
 function buildSlot(puesto, turno) {
   const vid = assignments[puesto.id][turno.id];
   const hasVigilante = vid !== null;
   const slot = document.createElement('div');
-  const canHighlight = selectedId !== null && !hasVigilante;
-
-  slot.className = 'turno-slot' + (hasVigilante ? '' : ' empty') + (canHighlight ? ' slot-available' : '');
   slot.dataset.puesto = puesto.id;
   slot.dataset.turno  = turno.id;
 
+  // Cabecera común del slot
   const nocheTag = turno.esNoche ? '<span class="noche-pip">🌙</span>' : '';
+  const slotHdr = `
+    <div class="turno-hdr-row">
+      <span class="turno-label">${turno.label}</span>
+      ${nocheTag}
+    </div>
+    <div class="turno-horas">${turno.horas}</div>
+  `;
 
-  let bodyHTML;
   if (hasVigilante) {
+    // ── Slot ocupado ──────────────────────────────────────────
+    slot.className = 'turno-slot';
+
     const v = getV(vid);
     const rgb = hexRgb(v.color);
-    bodyHTML = `
-      <div class="mini-cromo" style="background:rgba(${rgb},0.07);border:1px solid rgba(${rgb},0.2)">
-        <div class="mini-avatar" style="background:rgba(${rgb},0.2);border:1px solid rgba(${rgb},0.4);color:${v.color}">
+
+    // ¿Le faltan habilitaciones para este puesto?
+    const missing = getMissingHabs(v, puesto);
+    const warnHTML = missing.map(h =>
+      `<div class="warn-badge">⚠ Falta ${HAB_LABELS[h]}</div>`
+    ).join('');
+
+    // ¿Tiene más de 1 turno asignado? → conflicto de convenio
+    const doubles = getDoubleShifts();
+    const conflictHTML = doubles.includes(vid)
+      ? `<div class="conflict-badge">⚠ Conflicto Convenio · Exceso jornada / Descanso 12h</div>`
+      : '';
+
+    slot.innerHTML = `
+      ${slotHdr}
+      <div class="mini-cromo"
+           style="background:rgba(${rgb},0.07);border:1px solid rgba(${rgb},0.2)">
+        <div class="mini-avatar"
+             style="background:rgba(${rgb},0.2);border:1px solid rgba(${rgb},0.4);color:${v.color}">
           ${v.iniciales}
         </div>
         <div class="mini-info">
@@ -1393,172 +1578,206 @@ function buildSlot(puesto, turno) {
         </div>
         <div class="mini-remove" data-puesto="${puesto.id}" data-turno="${turno.id}">✕</div>
       </div>
+      ${warnHTML}
+      ${conflictHTML}
     `;
+
+    // Botón de borrar asignación
+    slot.querySelector('.mini-remove').addEventListener('click', e => {
+      e.stopPropagation();
+      onUnassign(puesto.id, turno.id);
+    });
+
   } else {
-    bodyHTML = `
+    // ── Slot vacío ─────────────────────────────────────────────
+    let classes = 'turno-slot empty';
+
+    if (selectedId !== null) {
+      const sv = getV(selectedId);
+      const missing = getMissingHabs(sv, puesto);
+      if (missing.length === 0) {
+        // Completamente compatible: glow del color del vigilante
+        classes += ' slot-compatible';
+        slot.style.setProperty('--hl-rgb', hexRgb(sv.color));
+      } else {
+        // Incompatible (pero sigue siendo asignable para demo)
+        classes += ' slot-available';
+      }
+    }
+
+    slot.className = classes;
+    slot.innerHTML = `
+      ${slotHdr}
       <div class="slot-empty-state">
         <div class="slot-plus">+</div>
         <div class="slot-empty-txt">Vacío</div>
       </div>
     `;
-  }
 
-  slot.innerHTML = `
-    <div class="turno-hdr-row">
-      <span class="turno-label">${turno.label}</span>
-      ${nocheTag}
-    </div>
-    <div class="turno-horas">${turno.horas}</div>
-    ${bodyHTML}
-  `;
-
-  if (!hasVigilante) {
     slot.addEventListener('click', () => onSlotClick(puesto.id, turno.id));
-  }
-
-  const removeBtn = slot.querySelector('.mini-remove');
-  if (removeBtn) {
-    removeBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      onUnassign(puesto.id, turno.id);
-    });
   }
 
   return slot;
 }
 
 /* ======================================================
-   RENDER: NÓMINA
+   RENDER: PANEL FINANCIERO DEL CUADRANTE (footer)
 ====================================================== */
-function renderPayroll(vid) {
-  const footer = document.getElementById('payroll-footer');
-  const inner  = document.getElementById('payroll-inner');
+function renderFinancialPanel() {
+  const footer      = document.getElementById('payroll-footer');
+  const titleStrip  = document.getElementById('payroll-title-strip');
+  const inner       = document.getElementById('payroll-inner');
+  const filled      = countFilled();
 
-  if (!vid) {
+  if (filled === 0) {
     footer.classList.remove('visible');
-    inner.innerHTML = '<div class="payroll-empty-state">Selecciona un vigilante para ver la previsualización de nómina</div>';
+    titleStrip.style.display = 'none';
+    inner.innerHTML = '';
     return;
   }
 
-  const v   = getV(vid);
-  const rgb = hexRgb(v.color);
-
-  // Calcular pluses del día según asignaciones
-  let plusArmaHoy    = 0;
-  let plusNocheHoy   = 0;
-
-  PUESTOS.forEach(p => {
-    TURNOS.forEach(t => {
-      if (assignments[p.id][t.id] === vid) {
-        if (p.armado)    plusArmaHoy  += PLUS_ARMA        * HORAS_TURNO;
-        if (t.esNoche)   plusNocheHoy += PLUS_NOCTURNIDAD * HORAS_TURNO;
-      }
-    });
-  });
-
-  // Conceptos fijos mensuales
-  const plusAntiguedad  = v.salarioBase * TRIENIO_PCT * v.trienios;
-  const subtotalFijo    = v.salarioBase + plusAntiguedad;
-
-  // Pluses devengados hoy (solo día actual en este prototipo)
-  const plusesHoy       = plusArmaHoy + plusNocheHoy;
-
-  // Totales
-  const brutoBruto      = subtotalFijo + plusesHoy;
-  const ssPatronal      = brutoBruto * SS_PATRONAL;
-  const costeEmpresa    = brutoBruto + ssPatronal;
-
   footer.classList.add('visible');
+  titleStrip.style.display = 'flex';
+
+  const data    = calcCuadrante();
+  const doubles = getDoubleShifts();
+
+  // Franja de título con alerta opcional
+  const alertStripHTML = doubles.length > 0
+    ? `<span class="strip-alert">
+         ⚠ Exceso jornada: ${doubles.map(vid => getV(vid).nombre.split(' ')[0]).join(', ')}
+       </span>`
+    : '';
+
+  const now   = new Date();
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const fecha = `${now.getDate()} ${meses[now.getMonth()]} ${now.getFullYear()}`;
+
+  titleStrip.innerHTML = `
+    <span class="payroll-title-strip-label">Análisis Económico del Cuadrante</span>
+    <span style="color:var(--t3);font-size:9px;font-family:var(--mono)">·</span>
+    <span class="payroll-title-strip-name">${fecha}</span>
+    ${alertStripHTML}
+  `;
+
+  // Coste medio por turno
+  const costeMedioTurno = data.turnosAsignados > 0
+    ? data.costeTotal / data.turnosAsignados
+    : 0;
 
   inner.innerHTML = `
-    <!-- Columna 1: Empleado -->
-    <div class="payroll-col">
-      <div class="payroll-col-title">Previsualización Nómina · ${new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'})}</div>
-      <div class="pay-employee-row">
-        <div class="pay-avatar" style="background:rgba(${rgb},0.18);border:2px solid rgba(${rgb},0.4);color:${v.color};box-shadow:0 0 14px rgba(${rgb},0.28)">
-          ${v.iniciales}
-        </div>
-        <div>
-          <div class="pay-emp-name">${v.nombre}</div>
-          <div class="pay-emp-cargo">${v.cargo}</div>
-        </div>
-      </div>
-      <div class="pay-row">
-        <span class="pay-lbl">Trienios consolidados</span>
-        <span class="pay-val" style="color:${v.color}">×${v.trienios}</span>
-      </div>
-      <div class="pay-row">
-        <span class="pay-lbl">Fiabilidad</span>
-        <span class="pay-val green">${v.fiabilidad}/10</span>
-      </div>
-      <div class="pay-row">
-        <span class="pay-lbl">Antigüedad</span>
-        <span class="pay-val dim">${v.experiencia} años</span>
-      </div>
-    </div>
 
-    <!-- Columna 2: Conceptos fijos -->
+    <!-- Columna 1: Resumen del cuadrante -->
     <div class="payroll-col">
-      <div class="payroll-col-title">Conceptos Fijos / Mes</div>
-      <div class="pay-row">
-        <span class="pay-lbl">Salario Base</span>
-        <span class="pay-val">${fmtEur(v.salarioBase)}</span>
+      <div class="payroll-col-title">Resumen del Cuadrante</div>
+
+      <div class="pay-kpi-row">
+        <div class="pay-kpi-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan)"></div>
+        <span class="pay-kpi-lbl">Turnos cubiertos</span>
+        <span class="pay-kpi-val" style="color:var(--cyan)">${data.turnosAsignados} / ${PUESTOS.length * TURNOS.length}</span>
       </div>
-      <div class="pay-row">
-        <span class="pay-lbl">Plus Antigüedad (${v.trienios}×3%)</span>
-        <span class="pay-val green">+${fmtEur(plusAntiguedad)}</span>
+
+      <div class="pay-kpi-row">
+        <div class="pay-kpi-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></div>
+        <span class="pay-kpi-lbl">Agentes desplegados</span>
+        <span class="pay-kpi-val">${data.vigilantesUnicos}</span>
       </div>
-      <div class="pay-hr"></div>
-      <div class="pay-subtotal-row">
-        <span class="pay-subtotal-lbl">Subtotal fijo</span>
-        <span class="pay-subtotal-val">${fmtEur(subtotalFijo)}</span>
+
+      <div class="pay-kpi-row">
+        <div class="pay-kpi-dot" style="background:var(--purple);box-shadow:0 0 5px var(--purple)"></div>
+        <span class="pay-kpi-lbl">Turnos nocturnos</span>
+        <span class="pay-kpi-val ${data.nTurnosNoche > 0 ? '' : 'dim'}">${data.nTurnosNoche}</span>
       </div>
+
+      <div class="pay-kpi-row">
+        <div class="pay-kpi-dot" style="background:var(--red);box-shadow:0 0 5px var(--red)"></div>
+        <span class="pay-kpi-lbl">Turnos armados</span>
+        <span class="pay-kpi-val ${data.nTurnosArma > 0 ? '' : 'dim'}">${data.nTurnosArma}</span>
+      </div>
+
       <div class="pay-total-block">
-        <div class="pay-total-lbl">Base garantizada</div>
-        <div class="pay-total-val" style="color:var(--t1);font-size:17px">${fmtEur(subtotalFijo)}</div>
-        <div class="pay-total-sub">Convenio colectivo vigente</div>
+        <div class="pay-total-lbl">Coste medio / turno</div>
+        <div class="pay-total-val" style="color:var(--blue);font-size:17px">${fmtEur(costeMedioTurno)}</div>
+        <div class="pay-total-sub">Coste empresa por turno asignado</div>
       </div>
     </div>
 
-    <!-- Columna 3: Pluses de convenio (hoy) -->
+    <!-- Columna 2: Coste Base + Trienios -->
     <div class="payroll-col">
-      <div class="payroll-col-title">Pluses de Convenio · Hoy</div>
+      <div class="payroll-col-title">Coste Laboral Base / Día</div>
+
       <div class="pay-row">
-        <span class="pay-lbl">Plus Arma (${PLUS_ARMA}€/h × 8h)</span>
-        <span class="pay-val ${plusArmaHoy > 0 ? 'green' : 'dim'}">${plusArmaHoy > 0 ? '+' : ''}${fmtEur(plusArmaHoy)}</span>
+        <span class="pay-lbl">${fmtEur(COSTE_HORA_BASE)}/h × 8h × ${data.turnosAsignados} turnos</span>
+        <span class="pay-val">${fmtEur(data.costeBase)}</span>
       </div>
+
       <div class="pay-row">
-        <span class="pay-lbl">Plus Nocturnidad (${PLUS_NOCTURNIDAD}€/h × 8h)</span>
-        <span class="pay-val ${plusNocheHoy > 0 ? 'green' : 'dim'}">${plusNocheHoy > 0 ? '+' : ''}${fmtEur(plusNocheHoy)}</span>
+        <span class="pay-lbl">Trienios devengados (${data.vigilantesUnicos} agente${data.vigilantesUnicos !== 1 ? 's' : ''})</span>
+        <span class="pay-val green">+${fmtEur(data.costeTrienios)}</span>
       </div>
+
       <div class="pay-hr"></div>
+
+      <div class="pay-subtotal-row">
+        <span class="pay-subtotal-lbl">Subtotal base</span>
+        <span class="pay-subtotal-val">${fmtEur(data.costeBase + data.costeTrienios)}</span>
+      </div>
+
+      <div class="pay-total-block">
+        <div class="pay-total-lbl">Base garantizada / día</div>
+        <div class="pay-total-val" style="color:var(--t1);font-size:17px">${fmtEur(data.costeBase + data.costeTrienios)}</div>
+        <div class="pay-total-sub">Sin pluses de convenio</div>
+      </div>
+    </div>
+
+    <!-- Columna 3: Pluses de Convenio 2026 -->
+    <div class="payroll-col">
+      <div class="payroll-col-title">Pluses Convenio 2026</div>
+
+      <div class="pay-row">
+        <span class="pay-lbl">🌙 Nocturnidad (+${PLUS_NOCTURNIDAD}€/h × ${data.nTurnosNoche * HORAS_TURNO}h)</span>
+        <span class="pay-val ${data.plusNoche > 0 ? 'green' : 'dim'}">${data.plusNoche > 0 ? '+' : ''}${fmtEur(data.plusNoche)}</span>
+      </div>
+
+      <div class="pay-row">
+        <span class="pay-lbl">🛡 Peligrosidad (+${PLUS_ARMA}€/h × ${data.nTurnosArma * HORAS_TURNO}h)</span>
+        <span class="pay-val ${data.plusArma > 0 ? 'green' : 'dim'}">${data.plusArma > 0 ? '+' : ''}${fmtEur(data.plusArma)}</span>
+      </div>
+
+      <div class="pay-hr"></div>
+
       <div class="pay-subtotal-row">
         <span class="pay-subtotal-lbl">Total pluses día</span>
-        <span class="pay-subtotal-val" style="color:var(--green)">+${fmtEur(plusesHoy)}</span>
+        <span class="pay-subtotal-val" style="color:var(--green)">+${fmtEur(data.plusesTotal)}</span>
       </div>
+
       <div class="pay-total-block">
-        <div class="pay-total-lbl">Bruto mensual estimado</div>
-        <div class="pay-total-val" style="color:var(--cyan)">${fmtEur(brutoBruto)}</div>
-        <div class="pay-total-sub">Base + pluses devengados hoy</div>
+        <div class="pay-total-lbl">Bruto cuadrante / día</div>
+        <div class="pay-total-val" style="color:var(--cyan)">${fmtEur(data.brutoTotal)}</div>
+        <div class="pay-total-sub">Base + trienios + pluses</div>
       </div>
     </div>
 
-    <!-- Columna 4: Coste empresa -->
+    <!-- Columna 4: Coste Total Empresa -->
     <div class="payroll-col">
-      <div class="payroll-col-title">Coste Total Empresa</div>
+      <div class="payroll-col-title">Coste Total Empresa / Día</div>
+
       <div class="pay-row">
-        <span class="pay-lbl">Bruto del trabajador</span>
-        <span class="pay-val">${fmtEur(brutoBruto)}</span>
+        <span class="pay-lbl">Bruto cuadrante</span>
+        <span class="pay-val">${fmtEur(data.brutoTotal)}</span>
       </div>
+
       <div class="pay-row">
-        <span class="pay-lbl">SS Patronal (~33%)</span>
-        <span class="pay-val amber">+${fmtEur(ssPatronal)}</span>
+        <span class="pay-lbl">SS Patronal (33%)</span>
+        <span class="pay-val amber">+${fmtEur(data.ssPatronal)}</span>
       </div>
+
       <div class="pay-hr"></div>
+
       <div class="pay-total-block">
-        <div class="pay-total-lbl">Coste empresa / mes</div>
-        <div class="pay-total-val" style="color:var(--pink)">${fmtEur(costeEmpresa)}</div>
-        <div class="pay-total-sub">Nómina bruta + cotización patronal</div>
+        <div class="pay-total-lbl">Coste empresa · día</div>
+        <div class="pay-total-val" style="color:var(--pink)">${fmtEur(data.costeTotal)}</div>
+        <div class="pay-total-sub">Nómina bruta + cotización SS</div>
       </div>
     </div>
   `;
@@ -1576,40 +1795,29 @@ function updateKPI() {
   document.getElementById('coverage-bar').style.width   = pct + '%';
   document.getElementById('filled-count').textContent   = filled;
 
-  // El punto parpadea más rápido cuando hay cobertura incompleta
   const dot = document.getElementById('kpi-dot');
-  dot.style.background    = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--amber)' : 'var(--red)';
-  dot.style.boxShadow     = pct === 100 ? '0 0 7px var(--green)' : pct > 50 ? '0 0 7px var(--amber)' : '0 0 7px var(--red)';
+  dot.style.background = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--amber)' : 'var(--red)';
+  dot.style.boxShadow  = pct === 100 ? '0 0 7px var(--green)' : pct > 50 ? '0 0 7px var(--amber)' : '0 0 7px var(--red)';
 }
 
 /* ======================================================
    MANEJADORES DE EVENTOS
 ====================================================== */
 function onCromoClick(id) {
-  if (selectedId === id) {
-    // Deseleccionar si clic en el mismo
-    selectedId = null;
-  } else {
-    selectedId = id;
-    focusedId  = id;
-  }
-
+  selectedId = (selectedId === id) ? null : id;
   renderRoster();
   renderScheduler();
-  renderPayroll(focusedId);
   updateHint();
 }
 
 function onSlotClick(puestoId, turnoId) {
   if (!selectedId) return;
-
   assignments[puestoId][turnoId] = selectedId;
-  focusedId  = selectedId;
   selectedId = null;
 
   renderRoster();
   renderScheduler();
-  renderPayroll(focusedId);
+  renderFinancialPanel();
   updateKPI();
   updateHint();
 }
@@ -1617,17 +1825,16 @@ function onSlotClick(puestoId, turnoId) {
 function onUnassign(puestoId, turnoId) {
   assignments[puestoId][turnoId] = null;
   renderScheduler();
+  renderFinancialPanel();
   updateKPI();
-  if (focusedId) renderPayroll(focusedId);
 }
 
 function clearAll() {
   PUESTOS.forEach(p => TURNOS.forEach(t => { assignments[p.id][t.id] = null; }));
   selectedId = null;
-  focusedId  = null;
   renderRoster();
   renderScheduler();
-  renderPayroll(null);
+  renderFinancialPanel();
   updateKPI();
   updateHint();
 }
@@ -1636,7 +1843,7 @@ function updateHint() {
   const hint = document.getElementById('selection-hint');
   if (selectedId) {
     const v = getV(selectedId);
-    hint.innerHTML = `↗ <strong>${v.nombre}</strong> seleccionado/a · Haz clic en un <strong>turno vacío</strong> del cuadrante para asignar`;
+    hint.innerHTML = `↗ <strong>${v.nombre}</strong> seleccionado/a · Slots <span style="color:${v.color}">■ compatibles</span> resaltados en su color · haz clic para asignar`;
     hint.classList.add('visible');
   } else {
     hint.classList.remove('visible');
