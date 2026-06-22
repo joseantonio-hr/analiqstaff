@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AnalIQstaff · v1.1 · Operaciones</title>
+  <title>AnalIQstaff · v1.2 · Operaciones</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -1168,7 +1168,7 @@
     .cromo-busy-badge {
       position: absolute;
       top: 8px;
-      left: 10px;
+      left: 36px;
       padding: 2px 6px;
       background: rgba(0,212,255,0.1);
       border: 1px solid rgba(0,212,255,0.28);
@@ -1182,7 +1182,7 @@
     .cromo-overload-badge {
       position: absolute;
       top: 8px;
-      left: 10px;
+      left: 36px;
       padding: 2px 6px;
       background: rgba(245,158,11,0.14);
       border: 1px solid rgba(245,158,11,0.38);
@@ -1368,6 +1368,186 @@
       border: 1px solid rgba(77,142,255,0.2);
     }
 
+
+    /* ========================================================
+       BOTÓN ESTRELLA (toggle selección cuadrante)
+    ======================================================== */
+    .cromo-star-btn {
+      position: absolute;
+      top: 8px; left: 8px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; cursor: pointer; z-index: 5;
+      transition: all 0.18s; padding: 0;
+      filter: grayscale(1); opacity: 0.55;
+    }
+    .cromo-star-btn:hover {
+      filter: grayscale(0); opacity: 1;
+      border-color: rgba(0,212,255,0.5);
+      background: rgba(0,212,255,0.15);
+      box-shadow: 0 0 8px rgba(0,212,255,0.3);
+    }
+    .cromo.selected .cromo-star-btn {
+      filter: grayscale(0); opacity: 1;
+      background: rgba(0,212,255,0.2);
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0,212,255,0.5);
+    }
+
+    /* ========================================================
+       DRAWER LATERAL
+    ======================================================== */
+    .drawer-backdrop {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+    }
+    .drawer-backdrop.open { opacity: 1; pointer-events: all; }
+    .drawer {
+      position: fixed; top: 60px; right: 0; bottom: 0;
+      width: 370px; max-width: 95vw; z-index: 501;
+      background: rgba(8,10,24,0.98);
+      border-left: 1px solid var(--border-strong);
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: -20px 0 60px rgba(0,0,0,0.55);
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header {
+      flex-shrink: 0; padding: 13px 15px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.015);
+    }
+    .drawer-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 13px; font-weight: 500;
+      color: #fff; flex-shrink: 0;
+    }
+    .drawer-info { flex: 1; min-width: 0; }
+    .drawer-nombre { font-size: 13.5px; font-weight: 600; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .drawer-cargo-lbl { font-size: 10px; color: var(--t2); }
+    .drawer-close {
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: 50%; color: var(--t2); font-size: 11px;
+      cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+    }
+    .drawer-close:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.35); color: var(--red); }
+    .drawer-tabs {
+      flex-shrink: 0; display: flex;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.15);
+    }
+    .drawer-tab {
+      flex: 1; padding: 10px 0; font-size: 10.5px; font-weight: 600;
+      color: var(--t3); text-align: center; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: all 0.18s;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .drawer-tab:hover { color: var(--t2); }
+    .drawer-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .drawer-body {
+      flex: 1; overflow-y: auto; padding: 14px;
+      scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
+    }
+    .drawer-body::-webkit-scrollbar { width: 4px; }
+    .drawer-body::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+
+    .detail-section { margin-bottom: 14px; }
+    .detail-section-title {
+      font-size: 8px; text-transform: uppercase; letter-spacing: 1.1px;
+      color: var(--t3); font-family: var(--mono);
+      margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border);
+    }
+    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; gap: 8px; }
+    .detail-lbl { font-size: 10px; color: var(--t2); white-space: nowrap; }
+    .detail-val { font-family: var(--mono); font-size: 10.5px; color: var(--t1); text-align: right; }
+    .detail-badges-wrap { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+
+    /* ========================================================
+       NÓMINA GLASSMORPHISM
+    ======================================================== */
+    .nomina-wrap { display: flex; flex-direction: column; gap: 11px; }
+    .nomina-header-block {
+      background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.12);
+      border-radius: var(--r-md); padding: 11px 13px;
+    }
+    .nomina-empresa { font-size: 8.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--t3); font-family: var(--mono); }
+    .nomina-empleado { font-size: 14px; font-weight: 600; color: var(--t1); margin: 2px 0; }
+    .nomina-meta { font-size: 9px; color: var(--t2); font-family: var(--mono); }
+    .nomina-periodo { font-size: 9px; color: var(--cyan); font-family: var(--mono); margin-top: 3px; }
+    .nomina-section { background: var(--glass); border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+    .nomina-section-title {
+      padding: 6px 12px; font-size: 8px; text-transform: uppercase;
+      letter-spacing: 1.2px; font-family: var(--mono); font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    .nomina-section-title.devengos    { color: var(--green); background: rgba(16,185,129,0.05); }
+    .nomina-section-title.deducciones { color: var(--red);   background: rgba(239,68,68,0.05); }
+    .nomina-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); gap: 8px;
+    }
+    .nomina-row:last-child { border-bottom: none; }
+    .nomina-row-lbl { font-size: 10px; color: var(--t2); }
+    .nomina-row-sub { font-size: 8px; color: var(--t3); font-family: var(--mono); }
+    .nomina-row-val { font-family: var(--mono); font-size: 10.5px; font-weight: 500; white-space: nowrap; }
+    .nomina-row-val.plus    { color: var(--green); }
+    .nomina-row-val.minus   { color: var(--red); }
+    .nomina-row-val.neutral { color: var(--t1); }
+    .nomina-subtotal {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 12px; background: rgba(255,255,255,0.03); border-top: 1px solid var(--border);
+    }
+    .nomina-subtotal-lbl { font-size: 10px; font-weight: 600; color: var(--t1); }
+    .nomina-subtotal-val { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+    .nomina-subtotal-val.plus  { color: var(--green); }
+    .nomina-subtotal-val.minus { color: var(--red); }
+    .nomina-neto-block {
+      background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(77,142,255,0.05));
+      border: 1px solid rgba(0,212,255,0.2); border-radius: var(--r-md);
+      padding: 14px; text-align: center;
+    }
+    .nomina-neto-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--t2); font-family: var(--mono); margin-bottom: 5px; }
+    .nomina-neto-val { font-family: var(--mono); font-size: 26px; font-weight: 500; color: var(--cyan); line-height: 1.1; }
+    .nomina-neto-sub { font-size: 8.5px; color: var(--t3); margin-top: 4px; font-family: var(--mono); }
+    .nomina-nota { font-size: 8.5px; color: var(--t3); text-align: center; font-style: italic; }
+
+    /* ========================================================
+       TOAST IA
+    ======================================================== */
+    .toast-ia {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      z-index: 2000; background: rgba(8,10,24,0.97);
+      border: 1px solid rgba(0,212,255,0.3); border-radius: var(--r-lg);
+      padding: 11px 20px; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0,212,255,0.1);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease; white-space: nowrap;
+    }
+    .toast-ia.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast-ia-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); animation: pulse-glow 1s ease-in-out infinite; flex-shrink: 0; }
+    .toast-ia-text { font-size: 12px; color: var(--t1); }
+    .toast-ia-sub  { font-size: 9.5px; color: var(--t2); font-family: var(--mono); margin-top: 1px; }
+
+    .btn-import-cv {
+      display: flex; align-items: center; gap: 5px; padding: 5px 11px;
+      background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.22);
+      border-radius: var(--r-sm); color: var(--purple);
+      font-family: var(--sans); font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-import-cv:hover { background: rgba(168,85,247,0.16); border-color: rgba(168,85,247,0.4); }
+
     /* Garantizar que script/style nunca sean visibles como flex-items */
     script, style { display: none !important; visibility: hidden !important; }
   </style>
@@ -1382,7 +1562,7 @@
     <span class="logo-analiq">AnalIQ</span><span class="logo-staff">staff</span>
   </div>
 
-  <div class="version-pill">● v1.1 · OPERACIONES</div>
+  <div class="version-pill">● v1.2 · OPERACIONES</div>
 
   <div class="hdr-sep"></div>
 
@@ -1428,8 +1608,10 @@
     <div class="panel-hdr">
       <div>
         <div class="panel-title">Plantilla de Vigilantes</div>
-        <div class="panel-sub">Álbum de cromos · selecciona para asignar</div>
+        <div class="panel-sub">⭐ asigna · clic en tarjeta = expediente</div>
       </div>
+      <button class="btn-import-cv" onclick="importCV()">📎 Importar CV</button>
+      <input type="file" id="cv-input" accept=".pdf,.txt,.doc,.docx" style="display:none" onchange="onCVSelected(this)">
       <span class="panel-badge" id="roster-count">5 activos</span>
     </div>
     <!-- Barra de búsqueda y filtros -->
@@ -1502,6 +1684,33 @@
 
 
 <!-- ====================================================
+     DRAWER LATERAL: EXPEDIENTE DEL AGENTE
+===================================================== -->
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-avatar" id="drawer-avatar"></div>
+    <div class="drawer-info">
+      <div class="drawer-nombre" id="drawer-nombre"></div>
+      <div class="drawer-cargo-lbl" id="drawer-cargo-lbl"></div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-tabs">
+    <div class="drawer-tab active" data-tab="detalles" onclick="switchDrawerTab('detalles')">📋 Detalles</div>
+    <div class="drawer-tab" data-tab="nomina" onclick="switchDrawerTab('nomina')">💰 Nómina</div>
+  </div>
+  <div class="drawer-body"><div id="drawer-content"></div></div>
+</div>
+<div class="toast-ia" id="toast-ia">
+  <div class="toast-ia-dot"></div>
+  <div>
+    <div class="toast-ia-text">Analizando CV mediante IA y extrayendo credenciales…</div>
+    <div class="toast-ia-sub">Procesando · Identificando habilitaciones</div>
+  </div>
+</div>
+
+<!-- ====================================================
      MODAL: NUEVO PUESTO
 ===================================================== -->
 <div class="modal-overlay" id="modal-overlay" onclick="onOverlayClick(event)">
@@ -1572,66 +1781,21 @@
    DATOS FIJOS — VIGILANTES
 ====================================================== */
 const VIGILANTES = [
-  {
-    id: 1,
-    nombre: 'Carlos Medina',
-    cargo: 'Inspector de Servicios',
-    iniciales: 'CM',
-    color: '#00d4ff',
-    hab: ['tip', 'armas', 'aeropuertos'],
-    fiabilidad: 9.4,
-    experiencia: 8,
-    trienios: 2,
-    salarioBase: 1520.00
-  },
-  {
-    id: 2,
-    nombre: 'María Torres',
-    cargo: 'Vigilante de Seguridad',
-    iniciales: 'MT',
-    color: '#a855f7',
-    hab: ['tip', 'aeropuertos'],
-    fiabilidad: 8.9,
-    experiencia: 5,
-    trienios: 1,
-    salarioBase: 1380.00
-  },
-  {
-    id: 3,
-    nombre: 'Javier Ruiz',
-    cargo: 'Vigilante de Seguridad',
-    iniciales: 'JR',
-    color: '#f59e0b',
-    hab: ['tip', 'armas'],
-    fiabilidad: 9.1,
-    experiencia: 6,
-    trienios: 2,
-    salarioBase: 1380.00
-  },
-  {
-    id: 4,
-    nombre: 'Ana Soto',
-    cargo: 'Vigilante de Seguridad',
-    iniciales: 'AS',
-    color: '#10b981',
-    hab: ['tip'],
-    fiabilidad: 7.8,
-    experiencia: 3,
-    trienios: 1,
-    salarioBase: 1380.00
-  },
-  {
-    id: 5,
-    nombre: 'Miguel Castro',
-    cargo: 'Inspector de Servicios',
-    iniciales: 'MC',
-    color: '#ff6b8a',
-    hab: ['tip', 'armas', 'aeropuertos'],
-    fiabilidad: 9.7,
-    experiencia: 12,
-    trienios: 4,
-    salarioBase: 1520.00
-  }
+  { id:1, nombre:'Carlos Medina',  cargo:'Inspector de Servicios',  iniciales:'CM', color:'#00d4ff',
+    hab:['tip','armas','aeropuertos'], fiabilidad:9.4, experiencia:8,  trienios:2,
+    sueldoBase:1520.00, contratoRef:'CNT-2018-883A', tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa', alta:'12/03/2018' },
+  { id:2, nombre:'María Torres',   cargo:'Vigilante de Seguridad',  iniciales:'MT', color:'#a855f7',
+    hab:['tip','aeropuertos'],         fiabilidad:8.9, experiencia:5,  trienios:1,
+    sueldoBase:1380.00, contratoRef:'CNT-2021-124B', tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa', alta:'05/09/2021' },
+  { id:3, nombre:'Javier Ruiz',    cargo:'Vigilante de Seguridad',  iniciales:'JR', color:'#f59e0b',
+    hab:['tip','armas'],               fiabilidad:9.1, experiencia:6,  trienios:2,
+    sueldoBase:1380.00, contratoRef:'CNT-2020-067C', tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa', alta:'14/01/2020' },
+  { id:4, nombre:'Ana Soto',       cargo:'Vigilante de Seguridad',  iniciales:'AS', color:'#10b981',
+    hab:['tip'],                       fiabilidad:7.8, experiencia:3,  trienios:1,
+    sueldoBase:1380.00, contratoRef:'CNT-2023-211D', tipoContrato:'200 - Fijo Discontinuo',   jornada:'Completa', alta:'07/06/2023' },
+  { id:5, nombre:'Miguel Castro',  cargo:'Inspector de Servicios',  iniciales:'MC', color:'#ff6b8a',
+    hab:['tip','armas','aeropuertos'], fiabilidad:9.7, experiencia:12, trienios:4,
+    sueldoBase:1520.00, contratoRef:'CNT-2014-445E', tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa', alta:'03/11/2014' }
 ];
 
 /* ======================================================
@@ -1939,6 +2103,7 @@ function renderRoster() {
         card.innerHTML = `
           <div class="cromo-accent-bar"></div>
           <div class="cromo-num">#${String(i + 1).padStart(2, '0')}</div>
+          <button class="cromo-star-btn" title="${sel ? 'Quitar modo asignación' : 'Activar modo asignación'}">⭐</button>
           ${occupancyHTML}
           <div class="cromo-body">
             <div class="cromo-avatar-wrap">
@@ -1968,7 +2133,13 @@ function renderRoster() {
           </div>
         `;
 
-        card.addEventListener('click', () => onCromoClick(v.id));
+        /* Estrella → toggle selección para cuadrante */
+        card.querySelector('.cromo-star-btn').addEventListener('click', e => {
+          e.stopPropagation();
+          onToggleSelect(v.id);
+        });
+        /* Cuerpo → abrir drawer de expediente */
+        card.addEventListener('click', () => openDrawer(v.id));
         grid.appendChild(card);
       });
     }
@@ -2303,11 +2474,252 @@ function saveNewPuesto() {
 /* ======================================================
    MANEJADORES DE EVENTOS
 ====================================================== */
-function onCromoClick(id) {
+
+/* Estrella: activa/desactiva modo asignación al cuadrante */
+function onToggleSelect(id) {
   selectedId = (selectedId === id) ? null : id;
   renderRoster();
   renderScheduler();
   updateHint();
+}
+
+/* ======================================================
+   DRAWER: EXPEDIENTE DEL AGENTE
+====================================================== */
+let drawerVid = null;
+let drawerTab = 'detalles';
+
+function openDrawer(id) {
+  drawerVid = id;
+  drawerTab = 'detalles';
+  _syncDrawer();
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-backdrop').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+}
+
+function switchDrawerTab(tab) {
+  drawerTab = tab;
+  document.querySelectorAll('.drawer-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === tab)
+  );
+  const v = getV(drawerVid);
+  document.getElementById('drawer-content').innerHTML =
+    tab === 'nomina' ? _htmlNomina(v) : _htmlDetalles(v);
+}
+
+function _syncDrawer() {
+  const v = getV(drawerVid);
+  if (!v) return;
+  const rgb = hexRgb(v.color);
+  const av  = document.getElementById('drawer-avatar');
+  av.textContent = v.iniciales;
+  av.style.cssText = `background:rgba(${rgb},0.18);border:2px solid rgba(${rgb},0.4);color:${v.color}`;
+  document.getElementById('drawer-nombre').textContent  = v.nombre;
+  document.getElementById('drawer-cargo-lbl').textContent = v.cargo;
+  document.querySelectorAll('.drawer-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === drawerTab)
+  );
+  document.getElementById('drawer-content').innerHTML =
+    drawerTab === 'nomina' ? _htmlNomina(v) : _htmlDetalles(v);
+}
+
+/* Devuelve {armado, nocturno} del vigilante en el cuadrante de hoy */
+function getVigilanteHoy(vid) {
+  const r = { armado: false, nocturno: false };
+  PUESTOS.forEach(p => TURNOS.forEach(t => {
+    if (assignments[p.id] && assignments[p.id][t.id] === vid) {
+      if (p.armado)  r.armado   = true;
+      if (t.esNoche) r.nocturno = true;
+    }
+  }));
+  return r;
+}
+
+function _htmlDetalles(v) {
+  if (!v) return '';
+  const { armado, nocturno } = getVigilanteHoy(v.id);
+  const badgesHTML = v.hab.map(h => {
+    const b = BADGE_DEF[h];
+    return `<span class="badge ${b.cls}">${b.label}</span>`;
+  }).join('');
+  let turnoHoy = armado && nocturno
+    ? `<span style="color:var(--red)">🛡 Armado</span> · <span style="color:var(--purple)">🌙 Nocturno</span>`
+    : armado   ? `<span style="color:var(--red)">🛡 Puesto armado hoy</span>`
+    : nocturno ? `<span style="color:var(--purple)">🌙 Turno nocturno hoy</span>`
+    :            `<span style="color:var(--t3)">Sin asignación hoy</span>`;
+  const esActivo = v.id === selectedId;
+  return `
+    <div class="detail-section">
+      <div class="detail-section-title">Estado en el Cuadrante</div>
+      <div class="detail-row">
+        <span class="detail-lbl">Turno hoy</span>
+        <span class="detail-val">${turnoHoy}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-lbl">Modo asignación ⭐</span>
+        <span class="detail-val" style="color:${esActivo ? 'var(--cyan)' : 'var(--t3)'}">
+          ${esActivo ? 'Activo' : 'Inactivo'}
+        </span>
+      </div>
+      <div class="detail-row" style="align-items:flex-start">
+        <span class="detail-lbl">Habilitaciones</span>
+        <div class="detail-badges-wrap">${badgesHTML}</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Expediente Contractual</div>
+      <div class="detail-row"><span class="detail-lbl">Ref. contrato</span><span class="detail-val">${v.contratoRef||'—'}</span></div>
+      <div class="detail-row"><span class="detail-lbl">Tipo</span><span class="detail-val" style="font-size:9.5px;font-family:var(--sans)">${v.tipoContrato||'—'}</span></div>
+      <div class="detail-row"><span class="detail-lbl">Jornada</span><span class="detail-val">${v.jornada||'—'}</span></div>
+      <div class="detail-row"><span class="detail-lbl">Alta en empresa</span><span class="detail-val">${v.alta||'—'}</span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Perfil Profesional</div>
+      <div class="detail-row"><span class="detail-lbl">Fiabilidad</span><span class="detail-val" style="color:${v.color}">${v.fiabilidad}/10</span></div>
+      <div class="detail-row"><span class="detail-lbl">Experiencia</span><span class="detail-val">${v.experiencia} años</span></div>
+      <div class="detail-row"><span class="detail-lbl">Trienios</span><span class="detail-val">${v.trienios>0?'×'+v.trienios:'Sin trienios'}</span></div>
+      <div class="detail-row"><span class="detail-lbl">Sueldo base</span><span class="detail-val">${fmtEur(v.sueldoBase)}/mes</span></div>
+    </div>
+  `;
+}
+
+/* ======================================================
+   CÁLCULO DE NÓMINA REAL
+====================================================== */
+function calcNomina(v) {
+  const { armado, nocturno } = getVigilanteHoy(v.id);
+  const devBase     = v.sueldoBase;
+  const devTrienios = v.trienios * TRIENIO_MES;
+  const devPelig    = armado   ? PLUS_ARMA        * HORAS_TURNO : 0;
+  const devNoche    = nocturno ? PLUS_NOCTURNIDAD * HORAS_TURNO : 0;
+  const bruto       = devBase + devTrienios + devPelig + devNoche;
+  const ssCC    = bruto * 0.0470;
+  const ssDesem = bruto * 0.0155;
+  const ssFP    = bruto * 0.0010;
+  const ssTotal = ssCC + ssDesem + ssFP;
+  const tipo    = v.tipoContrato || '';
+  const irpfPct = (tipo.includes('Fijo Discontinuo') || tipo.includes('Temporal'))
+    ? 0.020 : (bruto < 1400 ? 0.100 : 0.125);
+  const irpf     = bruto * irpfPct;
+  const totalDed = ssTotal + irpf;
+  const neto     = bruto - totalDed;
+  return { armado, nocturno, devBase, devTrienios, devPelig, devNoche, bruto, ssCC, ssDesem, ssFP, ssTotal, irpf, irpfPct, totalDed, neto };
+}
+
+function _htmlNomina(v) {
+  if (!v) return '';
+  const n = calcNomina(v);
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const now = new Date();
+  const periodo = `${MESES[now.getMonth()]} ${now.getFullYear()}`;
+  const tipo = v.tipoContrato || '';
+  const irpfCtx = (tipo.includes('Fijo Discontinuo') || tipo.includes('Temporal'))
+    ? 'Fijo-discontinuo / temporal'
+    : n.bruto < 1400 ? 'Indefinido · base < 1.400 €' : 'Indefinido · base ≥ 1.400 €';
+  const peligRow = n.armado ? `
+    <div class="nomina-row">
+      <div><div class="nomina-row-lbl">Plus de Peligrosidad</div><div class="nomina-row-sub">Turno armado hoy · 8h × 0,82 €/h</div></div>
+      <span class="nomina-row-val plus">+${fmtEur(n.devPelig)}</span>
+    </div>` : '';
+  const nocheRow = n.nocturno ? `
+    <div class="nomina-row">
+      <div><div class="nomina-row-lbl">Plus de Nocturnidad</div><div class="nomina-row-sub">Turno nocturno hoy · 8h × 1,52 €/h</div></div>
+      <span class="nomina-row-val plus">+${fmtEur(n.devNoche)}</span>
+    </div>` : '';
+  return `
+    <div class="nomina-wrap">
+      <div class="nomina-header-block">
+        <div class="nomina-empresa">Recibo de Salarios · AnalIQstaff v1.2</div>
+        <div class="nomina-empleado">${v.nombre}</div>
+        <div class="nomina-meta">${v.cargo} · ${v.contratoRef||'Sin ref.'}</div>
+        <div class="nomina-periodo">Período: ${periodo}</div>
+      </div>
+      <div class="nomina-section">
+        <div class="nomina-section-title devengos">▲ Devengos</div>
+        <div class="nomina-row">
+          <div><div class="nomina-row-lbl">Sueldo Base</div><div class="nomina-row-sub">${tipo||'—'}</div></div>
+          <span class="nomina-row-val neutral">${fmtEur(n.devBase)}</span>
+        </div>
+        <div class="nomina-row">
+          <div><div class="nomina-row-lbl">Antigüedad · Trienios</div><div class="nomina-row-sub">${v.trienios} trienio${v.trienios!==1?'s':''} × 28,50 €/mes</div></div>
+          <span class="nomina-row-val plus">+${fmtEur(n.devTrienios)}</span>
+        </div>
+        ${peligRow}
+        ${nocheRow}
+        <div class="nomina-subtotal">
+          <span class="nomina-subtotal-lbl">Base de Cotización (Bruto)</span>
+          <span class="nomina-subtotal-val plus">${fmtEur(n.bruto)}</span>
+        </div>
+      </div>
+      <div class="nomina-section">
+        <div class="nomina-section-title deducciones">▼ Deducciones</div>
+        <div class="nomina-row">
+          <div><div class="nomina-row-lbl">SS · Contingencias Comunes</div><div class="nomina-row-sub">4,70% sobre bruto</div></div>
+          <span class="nomina-row-val minus">-${fmtEur(n.ssCC)}</span>
+        </div>
+        <div class="nomina-row">
+          <div><div class="nomina-row-lbl">SS · Desempleo</div><div class="nomina-row-sub">1,55% sobre bruto</div></div>
+          <span class="nomina-row-val minus">-${fmtEur(n.ssDesem)}</span>
+        </div>
+        <div class="nomina-row">
+          <div><div class="nomina-row-lbl">Formación Profesional</div><div class="nomina-row-sub">0,10% sobre bruto</div></div>
+          <span class="nomina-row-val minus">-${fmtEur(n.ssFP)}</span>
+        </div>
+        <div class="nomina-row">
+          <div><div class="nomina-row-lbl">IRPF (${(n.irpfPct*100).toFixed(1)}%)</div><div class="nomina-row-sub">${irpfCtx}</div></div>
+          <span class="nomina-row-val minus">-${fmtEur(n.irpf)}</span>
+        </div>
+        <div class="nomina-subtotal">
+          <span class="nomina-subtotal-lbl">Total Deducciones</span>
+          <span class="nomina-subtotal-val minus">-${fmtEur(n.totalDed)}</span>
+        </div>
+      </div>
+      <div class="nomina-neto-block">
+        <div class="nomina-neto-label">Líquido Total a Percibir</div>
+        <div class="nomina-neto-val">${fmtEur(n.neto)}</div>
+        <div class="nomina-neto-sub">Bruto ${fmtEur(n.bruto)} − Ded. ${fmtEur(n.totalDed)}</div>
+      </div>
+      <div class="nomina-nota">⚠ Simulación orientativa. Pluses proporcionales al turno activo en el cuadrante de hoy.</div>
+    </div>
+  `;
+}
+
+/* ======================================================
+   IMPORTACIÓN DE CV POR IA
+====================================================== */
+const CV_CANDIDATES = [
+  { nombre:'Lucía Gómez',    iniciales:'LG', color:'#f97316', cargo:'Vigilante de Seguridad',  hab:['tip','aeropuertos'],         fiabilidad:8.2, experiencia:4,  trienios:1, sueldoBase:1380.00, tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa' },
+  { nombre:'Roberto Díaz',   iniciales:'RD', color:'#06b6d4', cargo:'Vigilante de Seguridad',  hab:['tip','armas'],               fiabilidad:8.7, experiencia:5,  trienios:1, sueldoBase:1380.00, tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa' },
+  { nombre:'Sofía Martínez', iniciales:'SM', color:'#d946ef', cargo:'Inspector de Servicios',  hab:['tip','armas','aeropuertos'], fiabilidad:9.0, experiencia:7,  trienios:2, sueldoBase:1520.00, tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa' },
+  { nombre:'Marcos León',    iniciales:'ML', color:'#84cc16', cargo:'Vigilante de Seguridad',  hab:['tip'],                       fiabilidad:7.5, experiencia:2,  trienios:0, sueldoBase:1380.00, tipoContrato:'200 - Fijo Discontinuo',   jornada:'Completa' }
+];
+
+function importCV() {
+  document.getElementById('cv-input').click();
+}
+
+function onCVSelected(input) {
+  if (!input.files || !input.files[0]) return;
+  input.value = '';
+  document.getElementById('toast-ia').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('toast-ia').classList.remove('visible');
+    const base = CV_CANDIDATES[Math.floor(Math.random() * CV_CANDIDATES.length)];
+    const year = new Date().getFullYear();
+    const newV = Object.assign({}, base, {
+      id:          Date.now(),
+      contratoRef: `CNT-${year}-CV${String(VIGILANTES.length + 1).padStart(2, '0')}`,
+      alta:        new Date().toLocaleDateString('es-ES')
+    });
+    VIGILANTES.push(newV);
+    renderRoster();
+    document.getElementById('roster-count').textContent = `${VIGILANTES.length} activos`;
+  }, 1500);
 }
 
 function onSlotClick(puestoId, turnoId) {
@@ -2325,6 +2737,7 @@ function onSlotClick(puestoId, turnoId) {
   renderFinancialPanel();
   updateKPI();
   updateHint();
+  if (drawerVid !== null) _syncDrawer();
 }
 
 function onUnassign(puestoId, turnoId) {
@@ -2334,6 +2747,7 @@ function onUnassign(puestoId, turnoId) {
   renderScheduler();
   renderFinancialPanel();
   updateKPI();
+  if (drawerVid !== null) _syncDrawer();
 }
 
 function clearAll() {
@@ -2348,6 +2762,8 @@ function clearAll() {
   const searchInput = document.getElementById('search-vigilante');
   if (searchInput) searchInput.value = '';
   syncFilterPills();
+  closeDrawer();
+  drawerVid = null;
   renderRoster();
   renderScheduler();
   renderFinancialPanel();
