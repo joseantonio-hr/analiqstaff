@@ -1550,6 +1550,141 @@
 
     /* Garantizar que script/style nunca sean visibles como flex-items */
     script, style { display: none !important; visibility: hidden !important; }
+
+    /* ========================================================
+       NAVEGADOR DE FECHA (Dashboard)
+    ======================================================== */
+    .date-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .date-nav-btn {
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--t2);
+      font-size: 15px; cursor: pointer; transition: all 0.2s;
+    }
+    .date-nav-btn:hover { background: var(--glass-hover); color: var(--t1); border-color: var(--border-strong); }
+    .date-today-btn {
+      padding: 3px 9px;
+      background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.18);
+      border-radius: 20px; font-family: var(--mono); font-size: 8.5px;
+      color: var(--cyan); cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .date-today-btn:hover { background: rgba(0,212,255,0.15); }
+
+    /* ========================================================
+       SPA — PESTAÑAS DE NAVEGACIÓN
+    ======================================================== */
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--r-sm);
+      color: var(--t2);
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-tab:hover {
+      background: var(--glass-hover);
+      color: var(--t1);
+      border-color: var(--border);
+    }
+    .nav-tab.active {
+      background: rgba(0,212,255,0.09);
+      border-color: rgba(0,212,255,0.25);
+      color: var(--cyan);
+    }
+
+    /* ========================================================
+       SPA — VISTAS
+    ======================================================== */
+    .app-view {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .hidden { display: none !important; }
+
+    /* ========================================================
+       VISTA CUADRANTES
+    ======================================================== */
+    .cuad-controls {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.12);
+    }
+    .month-nav { display: flex; align-items: center; gap: 4px; }
+    .month-nav-btn {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--t2);
+      font-size: 15px; cursor: pointer; transition: all 0.2s;
+    }
+    .month-nav-btn:hover { background: var(--glass-hover); color: var(--t1); border-color: var(--border-strong); }
+    .month-display {
+      font-family: var(--mono); font-size: 13px; font-weight: 500;
+      color: var(--t1); min-width: 140px; text-align: center;
+    }
+    .cuad-catalog-strip {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 7px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.08);
+      min-height: 40px;
+    }
+    .catalog-label {
+      font-size: 9px; color: var(--t3);
+      text-transform: uppercase; letter-spacing: 0.7px; white-space: nowrap;
+    }
+    .catalog-tag {
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 10px;
+      background: var(--glass); border: 1px solid var(--border); border-radius: 20px;
+      font-size: 10.5px; color: var(--t1); white-space: nowrap;
+    }
+    .catalog-tag .ct-remove {
+      font-size: 9px; color: var(--t3); cursor: pointer;
+      margin-left: 2px; transition: color 0.15s;
+    }
+    .catalog-tag .ct-remove:hover { color: var(--red); }
+    .cuad-body {
+      flex: 1; overflow: auto; padding: 14px;
+      scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
+    }
+    .cuad-body::-webkit-scrollbar { width: 6px; height: 6px; }
+    .cuad-body::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 3px; }
+    .cuad-empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      flex: 1; gap: 8px; color: var(--t3);
+      font-size: 13px; font-family: var(--mono);
+      padding: 40px;
+    }
+    .cuad-empty span { font-size: 32px; }
   </style>
 </head>
 <body>
@@ -1562,7 +1697,15 @@
     <span class="logo-analiq">AnalIQ</span><span class="logo-staff">staff</span>
   </div>
 
-  <div class="version-pill">● v1.2 · OPERACIONES</div>
+  <div class="version-pill">● v1.3</div>
+
+  <div class="hdr-sep"></div>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" data-view="dashboard"   onclick="switchView('dashboard')">📋 Dashboard</button>
+    <button class="nav-tab"        data-view="cuadrantes"  onclick="switchView('cuadrantes')">📅 Cuadrantes</button>
+    <button class="nav-tab"        data-view="nominas"     onclick="switchView('nominas')">💰 Nóminas</button>
+  </nav>
 
   <div class="hdr-sep"></div>
 
@@ -1599,8 +1742,10 @@
 </header>
 
 <!-- ====================================================
-     MAIN: DOS COLUMNAS
+     VIEW 1: DASHBOARD
 ===================================================== -->
+<div id="view-dashboard" class="app-view">
+
 <main class="app-main">
 
   <!-- COLUMNA IZQUIERDA: ROSTER -->
@@ -1657,12 +1802,17 @@
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Nuevo Puesto
       </button>
-      <div class="date-badge">
-        <div class="db-day" id="hdr-day">21</div>
-        <div>
-          <div class="db-month" id="hdr-month">Jun</div>
-          <div class="db-year"  id="hdr-year">2026</div>
+      <div class="date-nav">
+        <button class="date-nav-btn" onclick="prevDay()" title="Día anterior">‹</button>
+        <div class="date-badge">
+          <div class="db-day" id="hdr-day"></div>
+          <div>
+            <div class="db-month" id="hdr-month"></div>
+            <div class="db-year"  id="hdr-year"></div>
+          </div>
         </div>
+        <button class="date-nav-btn" onclick="nextDay()" title="Día siguiente">›</button>
+        <button class="date-today-btn" onclick="goToday()">Hoy</button>
       </div>
     </div>
     <div class="panel-body" id="scheduler-body">
@@ -1676,12 +1826,62 @@
      FOOTER: ANÁLISIS ECONÓMICO DEL CUADRANTE
 ===================================================== -->
 <footer class="payroll-footer" id="payroll-footer">
-  <!-- Franja de título — poblada por JS -->
   <div class="payroll-title-strip" id="payroll-title-strip" style="display:none"></div>
-  <!-- Columnas financieras — pobladas por JS -->
   <div class="payroll-inner" id="payroll-inner"></div>
 </footer>
 
+</div><!-- /view-dashboard -->
+
+<!-- ====================================================
+     VIEW 2: CUADRANTES
+===================================================== -->
+<div id="view-cuadrantes" class="app-view hidden">
+
+  <!-- Barra de controles -->
+  <div class="cuad-controls">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="cuadPrevMonth()">‹</button>
+      <div class="month-display" id="cuad-month-display">—</div>
+      <button class="month-nav-btn" onclick="cuadNextMonth()">›</button>
+    </div>
+
+    <div class="hdr-sep" style="height:24px"></div>
+
+    <button class="btn-hdr primary" onclick="openModal()" style="font-size:11px">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Registrar Servicio
+    </button>
+
+    <button class="btn-hdr" onclick="openPatternModal()" style="font-size:11px">
+      🔄 Aplicar Patrón
+    </button>
+  </div>
+
+  <!-- Catálogo de servicios activos -->
+  <div class="cuad-catalog-strip" id="cuad-catalog-strip">
+    <span class="catalog-label">Catálogo:</span>
+    <!-- Poblado por JS -->
+  </div>
+
+  <!-- Grilla mensual -->
+  <div class="cuad-body" id="cuad-body">
+    <!-- Poblado por renderMonthlyGrid() en D2 -->
+    <div class="cuad-empty">
+      <span>📅</span>
+      Grilla mensual — disponible en el siguiente paso
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     VIEW 3: NÓMINAS (placeholder — se completa en E1)
+===================================================== -->
+<div id="view-nominas" class="app-view hidden">
+  <div style="display:flex;align-items:center;justify-content:center;flex:1;color:var(--t3);font-size:13px;font-family:var(--mono)">
+    💰 Nóminas y Exportación PDF — próximamente (paso E1)
+  </div>
+</div>
 
 <!-- ====================================================
      DRAWER LATERAL: EXPEDIENTE DEL AGENTE
@@ -1854,7 +2054,8 @@ const DIAS_MES         = 30;
 ====================================================== */
 let selectedId  = null;
 let PUESTOS     = [];
-let assignments = {};
+let assignments = {}; // { [fechaISO]: { [puestoId]: { [turnoId]: vigilanteId } } }
+let currentDate = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
 // Filtros del roster
 let filterText   = '';
@@ -1865,7 +2066,7 @@ let filterEstado = 'todos';
    LOCALSTORAGE
 ====================================================== */
 const LS_PUESTOS = 'analiqstaff_puestos_v1';
-const LS_ASSIGN  = 'analiqstaff_assignments_v1';
+const LS_ASSIGN  = 'analiqstaff_assignments_v2'; // nueva estructura multifecha
 
 function saveToStorage() {
   try {
@@ -1887,19 +2088,12 @@ function loadFromStorage() {
 
     if (a) {
       assignments = JSON.parse(a);
-      // Asegura que todos los puestos actuales tienen sus slots en assignments
-      PUESTOS.forEach(p => {
-        if (!assignments[p.id]) {
-          assignments[p.id] = {};
-          TURNOS.forEach(t => { assignments[p.id][t.id] = null; });
-        }
-      });
     } else {
-      initAssignments();
+      assignments = {};
     }
   } catch(e) {
     initPuestos();
-    initAssignments();
+    assignments = {};
   }
 }
 
@@ -1909,10 +2103,20 @@ function initPuestos() {
 
 function initAssignments() {
   assignments = {};
+  // Estructura multifecha — se inicializa bajo demanda via dayAssign()
+}
+
+/** Devuelve las asignaciones del día activo (currentDate),
+ *  inicializando la estructura si aún no existe para esa fecha. */
+function dayAssign() {
+  if (!assignments[currentDate]) assignments[currentDate] = {};
   PUESTOS.forEach(p => {
-    assignments[p.id] = {};
-    TURNOS.forEach(t => { assignments[p.id][t.id] = null; });
+    if (!assignments[currentDate][p.id]) {
+      assignments[currentDate][p.id] = {};
+      TURNOS.forEach(t => { assignments[currentDate][p.id][t.id] = null; });
+    }
   });
+  return assignments[currentDate];
 }
 
 /* ======================================================
@@ -1933,8 +2137,9 @@ function fmtEur(n) {
 
 function countFilled() {
   let n = 0;
+  const da = dayAssign();
   PUESTOS.forEach(p => TURNOS.forEach(t => {
-    if (assignments[p.id] && assignments[p.id][t.id]) n++;
+    if (da[p.id] && da[p.id][t.id]) n++;
   }));
   return n;
 }
@@ -1945,9 +2150,10 @@ function getMissingHabs(v, puesto) {
 
 function getDoubleShifts() {
   const counts = {};
+  const da = dayAssign();
   PUESTOS.forEach(p => {
     TURNOS.forEach(t => {
-      const vid = assignments[p.id] && assignments[p.id][t.id];
+      const vid = da[p.id] && da[p.id][t.id];
       if (vid) counts[vid] = (counts[vid] || 0) + 1;
     });
   });
@@ -1957,10 +2163,11 @@ function getDoubleShifts() {
 /** Cuenta cuántos turnos tiene asignados cada vigilante */
 function getAssignmentCounts() {
   const counts = {};
+  const da = dayAssign();
   VIGILANTES.forEach(v => { counts[v.id] = 0; });
   PUESTOS.forEach(p => {
     TURNOS.forEach(t => {
-      const vid = assignments[p.id] && assignments[p.id][t.id];
+      const vid = da[p.id] && da[p.id][t.id];
       if (vid) counts[vid] = (counts[vid] || 0) + 1;
     });
   });
@@ -1977,9 +2184,10 @@ function calcCuadrante() {
   let nTurnosNoche  = 0;
   let nTurnosArma   = 0;
 
+  const da = dayAssign();
   PUESTOS.forEach(p => {
     TURNOS.forEach(t => {
-      const vid = assignments[p.id] && assignments[p.id][t.id];
+      const vid = da[p.id] && da[p.id][t.id];
       if (!vid) return;
       const v = getV(vid);
       turnosAsignados++;
@@ -2189,7 +2397,8 @@ function renderScheduler() {
 }
 
 function buildSlot(puesto, turno) {
-  const vid = assignments[puesto.id] && assignments[puesto.id][turno.id];
+  const da  = dayAssign();
+  const vid = da[puesto.id] && da[puesto.id][turno.id];
   const hasVigilante = !!vid;
   const slot = document.createElement('div');
   slot.dataset.puesto = puesto.id;
@@ -2461,8 +2670,7 @@ function saveNewPuesto() {
   };
 
   PUESTOS.push(newPuesto);
-  assignments[newPuesto.id] = {};
-  TURNOS.forEach(t => { assignments[newPuesto.id][t.id] = null; });
+  // dayAssign() inicializa slots del nuevo puesto bajo demanda
 
   saveToStorage();
   closeModal();
@@ -2531,8 +2739,9 @@ function _syncDrawer() {
 /* Devuelve {armado, nocturno} del vigilante en el cuadrante de hoy */
 function getVigilanteHoy(vid) {
   const r = { armado: false, nocturno: false };
+  const da = dayAssign();
   PUESTOS.forEach(p => TURNOS.forEach(t => {
-    if (assignments[p.id] && assignments[p.id][t.id] === vid) {
+    if (da[p.id] && da[p.id][t.id] === vid) {
       if (p.armado)  r.armado   = true;
       if (t.esNoche) r.nocturno = true;
     }
@@ -2724,11 +2933,7 @@ function onCVSelected(input) {
 
 function onSlotClick(puestoId, turnoId) {
   if (!selectedId) return;
-  if (!assignments[puestoId]) {
-    assignments[puestoId] = {};
-    TURNOS.forEach(t => { assignments[puestoId][t.id] = null; });
-  }
-  assignments[puestoId][turnoId] = selectedId;
+  dayAssign()[puestoId][turnoId] = selectedId;
   selectedId = null;
 
   saveToStorage();
@@ -2741,7 +2946,7 @@ function onSlotClick(puestoId, turnoId) {
 }
 
 function onUnassign(puestoId, turnoId) {
-  if (assignments[puestoId]) assignments[puestoId][turnoId] = null;
+  dayAssign()[puestoId][turnoId] = null;
   saveToStorage();
   renderRoster();
   renderScheduler();
@@ -2783,21 +2988,117 @@ function updateHint() {
 }
 
 /* ======================================================
-   FECHA DE HOY EN EL HEADER
+   NAVEGACIÓN DE FECHA (Dashboard)
 ====================================================== */
-function setDate() {
-  const now    = new Date();
-  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  document.getElementById('hdr-day').textContent   = now.getDate();
-  document.getElementById('hdr-month').textContent = months[now.getMonth()];
-  document.getElementById('hdr-year').textContent  = now.getFullYear();
+const MONTHS_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MONTHS_LONG  = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                      'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+/* ======================================================
+   NAVEGACIÓN MENSUAL (Cuadrantes)
+====================================================== */
+let cuadYear  = new Date().getFullYear();
+let cuadMonth = new Date().getMonth(); // 0-11
+
+function renderCuadMonthDisplay() {
+  const el = document.getElementById('cuad-month-display');
+  if (el) el.textContent = MONTHS_LONG[cuadMonth] + ' ' + cuadYear;
+}
+
+function renderCuadCatalogStrip() {
+  const strip = document.getElementById('cuad-catalog-strip');
+  if (!strip) return;
+  strip.innerHTML = '<span class="catalog-label">Catálogo:</span>';
+  if (PUESTOS.length === 0) {
+    strip.innerHTML += '<span style="font-size:10px;color:var(--t3)">Sin servicios — usa "Registrar Servicio"</span>';
+    return;
+  }
+  PUESTOS.forEach(p => {
+    const tag = document.createElement('div');
+    tag.className = 'catalog-tag';
+    tag.innerHTML = `<span>${p.emoji} ${p.nombre}</span>`;
+    strip.appendChild(tag);
+  });
+}
+
+function cuadPrevMonth() {
+  cuadMonth--;
+  if (cuadMonth < 0) { cuadMonth = 11; cuadYear--; }
+  renderCuadMonthDisplay();
+  renderMonthlyGrid();
+}
+
+function cuadNextMonth() {
+  cuadMonth++;
+  if (cuadMonth > 11) { cuadMonth = 0; cuadYear++; }
+  renderCuadMonthDisplay();
+  renderMonthlyGrid();
+}
+
+// Stub — se implementa en D2
+function renderMonthlyGrid() { /* D2 */ }
+// Stub — se implementa en D4
+function openPatternModal() { /* D4 */ }
+
+function renderDateNav() {
+  const d = new Date(currentDate + 'T12:00:00');
+  document.getElementById('hdr-day').textContent   = d.getDate();
+  document.getElementById('hdr-month').textContent = MONTHS_SHORT[d.getMonth()];
+  document.getElementById('hdr-year').textContent  = d.getFullYear();
+}
+
+function shiftDate(days) {
+  const d = new Date(currentDate + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  currentDate = d.toISOString().slice(0, 10);
+  renderDateNav();
+  renderRoster();
+  renderScheduler();
+  renderFinancialPanel();
+  updateKPI();
+  updateHint();
+}
+
+function prevDay()  { shiftDate(-1); }
+function nextDay()  { shiftDate(+1); }
+function goToday()  {
+  currentDate = new Date().toISOString().slice(0, 10);
+  renderDateNav();
+  renderRoster();
+  renderScheduler();
+  renderFinancialPanel();
+  updateKPI();
+  updateHint();
+}
+
+/* ======================================================
+   NAVEGACIÓN SPA
+====================================================== */
+let currentView = 'dashboard';
+
+function switchView(view) {
+  if (view === currentView) return;
+  currentView = view;
+
+  document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
+  document.getElementById('view-' + view).classList.remove('hidden');
+
+  document.querySelectorAll('.nav-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.view === view)
+  );
+
+  if (view === 'cuadrantes') {
+    renderCuadMonthDisplay();
+    renderCuadCatalogStrip();
+    renderMonthlyGrid();
+  }
 }
 
 /* ======================================================
    INIT
 ====================================================== */
 function init() {
-  setDate();
+  renderDateNav();
   loadFromStorage();
   renderRoster();
   renderScheduler();
