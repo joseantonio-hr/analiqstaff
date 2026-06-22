@@ -1082,6 +1082,294 @@
     .items-center { align-items: center; }
     .gap-2        { gap: 8px; }
     .ml-auto      { margin-left: auto; }
+
+    /* ========================================================
+       FILTROS DEL ROSTER
+    ======================================================== */
+    .roster-filters {
+      flex-shrink: 0;
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background: rgba(0,0,0,0.12);
+    }
+
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 9px;
+      color: var(--t3);
+      pointer-events: none;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 6px 10px 6px 29px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-family: var(--sans);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input::placeholder { color: var(--t3); }
+    .search-wrap input:focus { border-color: rgba(0,212,255,0.35); }
+
+    .filter-pills-row {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-pills-label {
+      font-size: 8.5px;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      white-space: nowrap;
+      margin-right: 1px;
+    }
+    .filter-pill {
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--t2);
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .filter-pill:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--t1);
+    }
+    .filter-pill.active {
+      background: rgba(0,212,255,0.1);
+      border-color: rgba(0,212,255,0.35);
+      color: var(--cyan);
+    }
+    .filter-pill[data-hab="tip"].active        { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.3); color: var(--green); }
+    .filter-pill[data-hab="armas"].active      { background: rgba(239,68,68,0.11);  border-color: rgba(239,68,68,0.28); color: var(--red); }
+    .filter-pill[data-hab="aeropuertos"].active{ background: rgba(168,85,247,0.11); border-color: rgba(168,85,247,0.28); color: var(--purple); }
+
+    /* ========================================================
+       INDICADORES DE OCUPACIÓN EN CROMOS
+    ======================================================== */
+    .cromo-busy-badge {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      padding: 2px 6px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.28);
+      border-radius: 20px;
+      font-size: 7.5px;
+      font-weight: 600;
+      color: var(--cyan);
+      font-family: var(--mono);
+      letter-spacing: 0.3px;
+    }
+    .cromo-overload-badge {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      padding: 2px 6px;
+      background: rgba(245,158,11,0.14);
+      border: 1px solid rgba(245,158,11,0.38);
+      border-radius: 20px;
+      font-size: 7.5px;
+      font-weight: 600;
+      color: var(--amber);
+      font-family: var(--mono);
+      letter-spacing: 0.3px;
+      animation: warn-flash 2s ease-in-out infinite;
+    }
+    .cromo.cromo-overloaded {
+      opacity: 0.72;
+      filter: saturate(0.65);
+    }
+    .cromo.cromo-overloaded:hover {
+      opacity: 0.92;
+      filter: saturate(1);
+    }
+
+    /* ========================================================
+       MODAL: NUEVO PUESTO
+    ======================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .modal-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-card {
+      background: rgba(8,10,24,0.98);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--r-xl);
+      width: 420px;
+      max-width: 92vw;
+      box-shadow: 0 28px 70px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,212,255,0.07);
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+      overflow: hidden;
+    }
+    .modal-overlay.visible .modal-card {
+      transform: translateY(0) scale(1);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .modal-title {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: var(--t1);
+      flex: 1;
+    }
+    .modal-close {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--t2);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .modal-close:hover {
+      background: rgba(239,68,68,0.15);
+      border-color: rgba(239,68,68,0.35);
+      color: var(--red);
+    }
+    .modal-form {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .modal-field > label:first-child {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--t2);
+      font-weight: 600;
+    }
+    .modal-input {
+      padding: 7px 11px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-family: var(--sans);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-input::placeholder { color: var(--t3); }
+    .modal-input:focus { border-color: rgba(0,212,255,0.4); }
+    .modal-input.error { border-color: var(--red); }
+
+    .modal-checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .modal-check-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 3px 8px 3px 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      transition: all 0.18s;
+      user-select: none;
+    }
+    .modal-check-item:hover { border-color: var(--border-strong); background: rgba(255,255,255,0.06); }
+    .modal-check-item input[type="checkbox"] {
+      width: 12px; height: 12px; cursor: pointer;
+      accent-color: var(--cyan);
+    }
+
+    .modal-field-inline {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Toggle switch */
+    .toggle-switch { position: relative; display: inline-block; cursor: pointer; }
+    .toggle-track {
+      display: block; width: 36px; height: 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 20px; transition: all 0.2s; position: relative;
+    }
+    .toggle-switch input:checked ~ .toggle-track {
+      background: rgba(239,68,68,0.25);
+      border-color: rgba(239,68,68,0.5);
+    }
+    .toggle-thumb {
+      position: absolute; top: 2px; left: 2px;
+      width: 14px; height: 14px;
+      background: var(--t3); border-radius: 50%; transition: all 0.2s;
+    }
+    .toggle-switch input:checked ~ .toggle-track .toggle-thumb {
+      left: 18px; background: var(--red);
+    }
+    .toggle-switch input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Icono de puesto genérico */
+    .puesto-icon.generico {
+      background: rgba(77,142,255,0.1);
+      border: 1px solid rgba(77,142,255,0.2);
+    }
+
+    /* Garantizar que script/style nunca sean visibles como flex-items */
+    script, style { display: none !important; visibility: hidden !important; }
   </style>
 </head>
 <body>
@@ -1113,7 +1401,7 @@
     <div class="kpi-chip">
       <span class="kpi-label">Turnos cubiertos</span>
       <span class="kpi-value" style="font-size:13px">
-        <span id="filled-count">0</span><span style="color:var(--t3);font-size:11px">&thinsp;/ 6</span>
+        <span id="filled-count">0</span><span id="total-slots" style="color:var(--t3);font-size:11px">&thinsp;/ 6</span>
       </span>
     </div>
   </div>
@@ -1144,6 +1432,28 @@
       </div>
       <span class="panel-badge" id="roster-count">5 activos</span>
     </div>
+    <!-- Barra de búsqueda y filtros -->
+    <div class="roster-filters">
+      <div class="search-wrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="search-vigilante" placeholder="Buscar vigilante…" oninput="onSearchInput(event)">
+      </div>
+      <div class="filter-pills-row">
+        <span class="filter-pills-label">Hab:</span>
+        <button class="filter-pill" data-hab="tip"         onclick="onHabFilter('tip')">TIP</button>
+        <button class="filter-pill" data-hab="armas"       onclick="onHabFilter('armas')">Armas</button>
+        <button class="filter-pill" data-hab="aeropuertos" onclick="onHabFilter('aeropuertos')">Aeropuertos</button>
+      </div>
+      <div class="filter-pills-row">
+        <span class="filter-pills-label">Estado:</span>
+        <button class="filter-pill active" data-estado="todos"        onclick="onEstadoFilter('todos')">Todos</button>
+        <button class="filter-pill"        data-estado="disponibles"  onclick="onEstadoFilter('disponibles')">Disponibles</button>
+        <button class="filter-pill"        data-estado="asignados"    onclick="onEstadoFilter('asignados')">Asignados</button>
+      </div>
+    </div>
+
     <div class="panel-body">
       <div class="cromo-grid" id="cromo-grid">
         <!-- Renderizado por JS -->
@@ -1161,6 +1471,10 @@
         <div class="panel-title">Cuadrante del Día</div>
         <div class="panel-sub">Simulador de asignación de turnos</div>
       </div>
+      <button class="btn-hdr primary" onclick="openModal()" style="margin-left:auto;font-size:11px">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuevo Puesto
+      </button>
       <div class="date-badge">
         <div class="db-day" id="hdr-day">21</div>
         <div>
@@ -1188,11 +1502,74 @@
 
 
 <!-- ====================================================
+     MODAL: NUEVO PUESTO
+===================================================== -->
+<div class="modal-overlay" id="modal-overlay" onclick="onOverlayClick(event)">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-title">Nuevo Puesto / Servicio</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <form class="modal-form" id="modal-form" onsubmit="event.preventDefault(); saveNewPuesto()">
+
+      <div class="modal-field">
+        <label>Nombre del puesto</label>
+        <input type="text" id="modal-nombre" class="modal-input" placeholder="Ej: Ronda Exterior" autocomplete="off">
+      </div>
+
+      <div class="modal-field">
+        <label>Lugar / Ubicación</label>
+        <input type="text" id="modal-lugar" class="modal-input" placeholder="Ej: Terminal 1" autocomplete="off">
+      </div>
+
+      <div class="modal-field">
+        <label>Icono (emoji — deja vacío para usar 🔒)</label>
+        <input type="text" id="modal-emoji" class="modal-input" placeholder="🔒" maxlength="2" style="width:70px">
+      </div>
+
+      <div class="modal-field">
+        <label>Habilitaciones requeridas</label>
+        <div class="modal-checkboxes">
+          <label class="modal-check-item">
+            <input type="checkbox" id="modal-hab-tip" value="tip">
+            <span class="badge tip">✓ TIP Activa</span>
+          </label>
+          <label class="modal-check-item">
+            <input type="checkbox" id="modal-hab-armas" value="armas">
+            <span class="badge armas">⚑ Lic. Armas</span>
+          </label>
+          <label class="modal-check-item">
+            <input type="checkbox" id="modal-hab-aeropuertos" value="aeropuertos">
+            <span class="badge aeropuertos">✈ Aeropuertos</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-field modal-field-inline">
+        <label>Puesto Armado <span style="font-size:9px;color:var(--t3);text-transform:none;letter-spacing:0">(genera plus peligrosidad)</span></label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="modal-armado">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-hdr" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn-hdr primary">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Crear Puesto
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====================================================
      JAVASCRIPT
 ===================================================== -->
 <script>
 /* ======================================================
-   DATOS
+   DATOS FIJOS — VIGILANTES
 ====================================================== */
 const VIGILANTES = [
   {
@@ -1257,7 +1634,10 @@ const VIGILANTES = [
   }
 ];
 
-const PUESTOS = [
+/* ======================================================
+   PUESTOS POR DEFECTO
+====================================================== */
+const PUESTOS_DEFAULT = [
   {
     id: 'p1',
     nombre: 'Control de Accesos',
@@ -1290,7 +1670,6 @@ const BADGE_DEF = {
   aeropuertos: { label: '✈ Aeropuertos', cls: 'aeropuertos' }
 };
 
-// Etiquetas para badges de alerta de habilitación faltante
 const HAB_LABELS = {
   tip:         'TIP Activa',
   armas:       'Lic. Armas',
@@ -1298,25 +1677,79 @@ const HAB_LABELS = {
 };
 
 /* Constantes económicas — Convenio Colectivo Vigilancia España 2026 */
-const PLUS_ARMA        = 0.82;   // €/hora — Plus Peligrosidad/Arma
-const PLUS_NOCTURNIDAD = 1.52;   // €/hora — Plus Nocturnidad
-const HORAS_TURNO      = 8;      // horas por turno estándar
-const SS_PATRONAL      = 0.33;   // 33% cotización patronal
-const COSTE_HORA_BASE  = 14.50;  // €/hora — coste laboral base estimado
-const TRIENIO_MES      = 28.50;  // €/mes por trienio devengado
-const DIAS_MES         = 30;     // días para proporcionalizar trienios
+const PLUS_ARMA        = 0.82;
+const PLUS_NOCTURNIDAD = 1.52;
+const HORAS_TURNO      = 8;
+const SS_PATRONAL      = 0.33;
+const COSTE_HORA_BASE  = 14.50;
+const TRIENIO_MES      = 28.50;
+const DIAS_MES         = 30;
 
 /* ======================================================
    ESTADO
 ====================================================== */
-let selectedId = null;  // cromo seleccionado (para asignar)
+let selectedId  = null;
+let PUESTOS     = [];
+let assignments = {};
 
-// Mapa de asignaciones: assignments[puestoId][turnoId] = vigilanteId | null
-const assignments = {};
-PUESTOS.forEach(p => {
-  assignments[p.id] = {};
-  TURNOS.forEach(t => { assignments[p.id][t.id] = null; });
-});
+// Filtros del roster
+let filterText   = '';
+let filterHabs   = new Set();
+let filterEstado = 'todos';
+
+/* ======================================================
+   LOCALSTORAGE
+====================================================== */
+const LS_PUESTOS = 'analiqstaff_puestos_v1';
+const LS_ASSIGN  = 'analiqstaff_assignments_v1';
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(LS_PUESTOS, JSON.stringify(PUESTOS));
+    localStorage.setItem(LS_ASSIGN,  JSON.stringify(assignments));
+  } catch(e) { /* quota exceeded — silencioso */ }
+}
+
+function loadFromStorage() {
+  try {
+    const p = localStorage.getItem(LS_PUESTOS);
+    const a = localStorage.getItem(LS_ASSIGN);
+
+    if (p) {
+      PUESTOS = JSON.parse(p);
+    } else {
+      initPuestos();
+    }
+
+    if (a) {
+      assignments = JSON.parse(a);
+      // Asegura que todos los puestos actuales tienen sus slots en assignments
+      PUESTOS.forEach(p => {
+        if (!assignments[p.id]) {
+          assignments[p.id] = {};
+          TURNOS.forEach(t => { assignments[p.id][t.id] = null; });
+        }
+      });
+    } else {
+      initAssignments();
+    }
+  } catch(e) {
+    initPuestos();
+    initAssignments();
+  }
+}
+
+function initPuestos() {
+  PUESTOS = PUESTOS_DEFAULT.map(p => Object.assign({}, p));
+}
+
+function initAssignments() {
+  assignments = {};
+  PUESTOS.forEach(p => {
+    assignments[p.id] = {};
+    TURNOS.forEach(t => { assignments[p.id][t.id] = null; });
+  });
+}
 
 /* ======================================================
    UTILIDADES
@@ -1324,9 +1757,9 @@ PUESTOS.forEach(p => {
 function getV(id) { return VIGILANTES.find(v => v.id === id); }
 
 function hexRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
   return `${r},${g},${b}`;
 }
 
@@ -1336,41 +1769,43 @@ function fmtEur(n) {
 
 function countFilled() {
   let n = 0;
-  PUESTOS.forEach(p => TURNOS.forEach(t => { if (assignments[p.id][t.id]) n++; }));
+  PUESTOS.forEach(p => TURNOS.forEach(t => {
+    if (assignments[p.id] && assignments[p.id][t.id]) n++;
+  }));
   return n;
 }
 
-/**
- * Devuelve las habilitaciones que le faltan al vigilante para cubrir el puesto.
- */
 function getMissingHabs(v, puesto) {
   return puesto.requiere.filter(h => !v.hab.includes(h));
 }
 
-/**
- * Devuelve un Set de vids que tienen asignados más de 1 turno en el cuadrante.
- * Implica exceso de jornada / incumplimiento del descanso de 12h.
- */
 function getDoubleShifts() {
   const counts = {};
   PUESTOS.forEach(p => {
     TURNOS.forEach(t => {
-      const vid = assignments[p.id][t.id];
-      if (vid !== null) counts[vid] = (counts[vid] || 0) + 1;
+      const vid = assignments[p.id] && assignments[p.id][t.id];
+      if (vid) counts[vid] = (counts[vid] || 0) + 1;
     });
   });
-  return Object.keys(counts)
-    .filter(vid => counts[+vid] > 1)
-    .map(Number);
+  return Object.keys(counts).filter(vid => counts[+vid] > 1).map(Number);
 }
 
-/**
- * Calcula todos los costes del cuadrante actual en tiempo real.
- */
+/** Cuenta cuántos turnos tiene asignados cada vigilante */
+function getAssignmentCounts() {
+  const counts = {};
+  VIGILANTES.forEach(v => { counts[v.id] = 0; });
+  PUESTOS.forEach(p => {
+    TURNOS.forEach(t => {
+      const vid = assignments[p.id] && assignments[p.id][t.id];
+      if (vid) counts[vid] = (counts[vid] || 0) + 1;
+    });
+  });
+  return counts;
+}
+
 function calcCuadrante() {
   let turnosAsignados = 0;
   const vigilantesUnicos = new Set();
-  const trieniosPorVigilante = {}; // vid → coste diario trienio (calculado 1 sola vez)
   let costeBase     = 0;
   let costeTrienios = 0;
   let plusNoche     = 0;
@@ -1380,22 +1815,15 @@ function calcCuadrante() {
 
   PUESTOS.forEach(p => {
     TURNOS.forEach(t => {
-      const vid = assignments[p.id][t.id];
-      if (vid === null) return;
-
+      const vid = assignments[p.id] && assignments[p.id][t.id];
+      if (!vid) return;
       const v = getV(vid);
       turnosAsignados++;
       costeBase += COSTE_HORA_BASE * HORAS_TURNO;
-
-      // Trienio: devengo diario del vigilante (solo 1 vez por vigilante único)
       if (!vigilantesUnicos.has(vid)) {
         vigilantesUnicos.add(vid);
-        const costeDiarioTrienio = v.trienios * (TRIENIO_MES / DIAS_MES);
-        trieniosPorVigilante[vid] = costeDiarioTrienio;
-        costeTrienios += costeDiarioTrienio;
+        costeTrienios += v.trienios * (TRIENIO_MES / DIAS_MES);
       }
-
-      // Pluses por tipo de turno / puesto
       if (t.esNoche) { plusNoche += PLUS_NOCTURNIDAD * HORAS_TURNO; nTurnosNoche++; }
       if (p.armado)  { plusArma  += PLUS_ARMA        * HORAS_TURNO; nTurnosArma++;  }
     });
@@ -1407,82 +1835,149 @@ function calcCuadrante() {
   const costeTotal  = brutoTotal + ssPatronal;
 
   return {
-    turnosAsignados,
-    vigilantesUnicos: vigilantesUnicos.size,
-    costeBase,
-    costeTrienios,
-    plusNoche,
-    plusArma,
-    plusesTotal,
-    nTurnosNoche,
-    nTurnosArma,
-    brutoTotal,
-    ssPatronal,
-    costeTotal
+    turnosAsignados, vigilantesUnicos: vigilantesUnicos.size,
+    costeBase, costeTrienios, plusNoche, plusArma, plusesTotal,
+    nTurnosNoche, nTurnosArma, brutoTotal, ssPatronal, costeTotal
   };
 }
 
 /* ======================================================
-   RENDER: CROMOS
+   FILTROS DEL ROSTER
+====================================================== */
+function getFilteredVigilantes() {
+  const counts = getAssignmentCounts();
+  return VIGILANTES.filter(v => {
+    if (filterText && !v.nombre.toLowerCase().includes(filterText.toLowerCase())) return false;
+    if (filterHabs.size > 0) {
+      if (![...filterHabs].every(h => v.hab.includes(h))) return false;
+    }
+    if (filterEstado === 'disponibles' && counts[v.id] > 0)  return false;
+    if (filterEstado === 'asignados'   && counts[v.id] === 0) return false;
+    return true;
+  });
+}
+
+function onSearchInput(e) {
+  filterText = e.target.value.trim();
+  renderRoster();
+}
+
+function onHabFilter(hab) {
+  if (filterHabs.has(hab)) filterHabs.delete(hab);
+  else filterHabs.add(hab);
+  syncFilterPills();
+  renderRoster();
+}
+
+function onEstadoFilter(estado) {
+  filterEstado = estado;
+  syncFilterPills();
+  renderRoster();
+}
+
+function syncFilterPills() {
+  document.querySelectorAll('.filter-pill[data-hab]').forEach(pill => {
+    pill.classList.toggle('active', filterHabs.has(pill.dataset.hab));
+  });
+  document.querySelectorAll('.filter-pill[data-estado]').forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.estado === filterEstado);
+  });
+}
+
+/* ======================================================
+   RENDER: CROMOS (con filtros + indicadores de ocupación)
 ====================================================== */
 function renderRoster() {
-  const grid = document.getElementById('cromo-grid');
-  grid.innerHTML = '';
+  const grid     = document.getElementById('cromo-grid');
+  const filtered = getFilteredVigilantes();
+  const counts   = getAssignmentCounts();
 
-  VIGILANTES.forEach((v, i) => {
-    const rgb = hexRgb(v.color);
-    const sel = v.id === selectedId;
+  // Transición suave
+  grid.style.transition = 'opacity 0.15s ease';
+  grid.style.opacity    = '0';
 
-    const card = document.createElement('div');
-    card.className = 'cromo' + (sel ? ' selected' : '');
-    card.dataset.id = v.id;
+  setTimeout(() => {
+    grid.innerHTML = '';
 
-    card.style.cssText = `
-      --c-accent: ${v.color};
-      --c-avatar-bg: rgba(${rgb},0.16);
-      --c-avatar-border: rgba(${rgb},0.38);
-      --c-avatar-glow: 0 0 14px rgba(${rgb},0.35);
-    `;
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px 0;color:var(--t3);font-size:12px;line-height:1.8">
+        Sin vigilantes para ese filtro.<br><span style="font-size:10px">Prueba otro criterio de búsqueda</span>
+      </div>`;
+    } else {
+      filtered.forEach((v, i) => {
+        const rgb       = hexRgb(v.color);
+        const sel       = v.id === selectedId;
+        const count     = counts[v.id] || 0;
+        const isOver    = count >= 2;
+        const isBusy    = count === 1;
 
-    const badgesHTML = v.hab.map(h => {
-      const b = BADGE_DEF[h];
-      return `<span class="badge ${b.cls}">${b.label}</span>`;
-    }).join('');
+        // Badge de ocupación
+        let occupancyHTML = '';
+        if (isOver) {
+          occupancyHTML = `<div class="cromo-overload-badge">⚠ Exceso Jornada</div>`;
+        } else if (isBusy) {
+          occupancyHTML = `<div class="cromo-busy-badge">1 Turno</div>`;
+        }
 
-    card.innerHTML = `
-      <div class="cromo-accent-bar"></div>
-      <div class="cromo-num">#${String(i+1).padStart(2,'0')}</div>
-      <div class="cromo-body">
-        <div class="cromo-avatar-wrap">
-          <div class="cromo-avatar">
-            ${v.iniciales}
-            <div class="cromo-sel-dot"></div>
+        const card = document.createElement('div');
+        card.className = 'cromo'
+          + (sel    ? ' selected'         : '')
+          + (isOver ? ' cromo-overloaded' : '');
+        card.dataset.id = v.id;
+        card.style.cssText = `
+          --c-accent: ${v.color};
+          --c-avatar-bg: rgba(${rgb},0.16);
+          --c-avatar-border: rgba(${rgb},0.38);
+          --c-avatar-glow: 0 0 14px rgba(${rgb},0.35);
+        `;
+
+        const badgesHTML = v.hab.map(h => {
+          const b = BADGE_DEF[h];
+          return `<span class="badge ${b.cls}">${b.label}</span>`;
+        }).join('');
+
+        card.innerHTML = `
+          <div class="cromo-accent-bar"></div>
+          <div class="cromo-num">#${String(i + 1).padStart(2, '0')}</div>
+          ${occupancyHTML}
+          <div class="cromo-body">
+            <div class="cromo-avatar-wrap">
+              <div class="cromo-avatar">
+                ${v.iniciales}
+                <div class="cromo-sel-dot"></div>
+              </div>
+            </div>
+            <div class="cromo-name">${v.nombre}</div>
+            <div class="cromo-cargo">${v.cargo}</div>
+            <div class="cromo-badges">${badgesHTML}</div>
+            <div class="cromo-hr"></div>
+            <div class="cromo-stats">
+              <div class="stat">
+                <div class="stat-val accent">${v.fiabilidad}</div>
+                <div class="stat-lbl">Fiabilidad</div>
+              </div>
+              <div class="stat">
+                <div class="stat-val">${v.experiencia}</div>
+                <div class="stat-lbl">Años Exp.</div>
+              </div>
+              <div class="stat">
+                <div class="stat-val">${v.trienios > 0 ? '×' + v.trienios : '–'}</div>
+                <div class="stat-lbl">Trienios</div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="cromo-name">${v.nombre}</div>
-        <div class="cromo-cargo">${v.cargo}</div>
-        <div class="cromo-badges">${badgesHTML}</div>
-        <div class="cromo-hr"></div>
-        <div class="cromo-stats">
-          <div class="stat">
-            <div class="stat-val accent">${v.fiabilidad}</div>
-            <div class="stat-lbl">Fiabilidad</div>
-          </div>
-          <div class="stat">
-            <div class="stat-val">${v.experiencia}</div>
-            <div class="stat-lbl">Años Exp.</div>
-          </div>
-          <div class="stat">
-            <div class="stat-val">${v.trienios > 0 ? '×' + v.trienios : '–'}</div>
-            <div class="stat-lbl">Trienios</div>
-          </div>
-        </div>
-      </div>
-    `;
+        `;
 
-    card.addEventListener('click', () => onCromoClick(v.id));
-    grid.appendChild(card);
-  });
+        card.addEventListener('click', () => onCromoClick(v.id));
+        grid.appendChild(card);
+      });
+    }
+
+    grid.style.opacity = '1';
+    const total = VIGILANTES.length;
+    document.getElementById('roster-count').textContent =
+      filtered.length === total ? `${total} activos` : `${filtered.length} de ${total}`;
+  }, 90);
 }
 
 /* ======================================================
@@ -1522,22 +2017,15 @@ function renderScheduler() {
   });
 }
 
-/**
- * Construye un slot de turno con lógica completa de:
- * - Glow compatible por color del vigilante seleccionado
- * - Badge de advertencia si hay habilitaciones faltantes
- * - Badge de conflicto de convenio si hay doble turno
- */
 function buildSlot(puesto, turno) {
-  const vid = assignments[puesto.id][turno.id];
-  const hasVigilante = vid !== null;
+  const vid = assignments[puesto.id] && assignments[puesto.id][turno.id];
+  const hasVigilante = !!vid;
   const slot = document.createElement('div');
   slot.dataset.puesto = puesto.id;
   slot.dataset.turno  = turno.id;
 
-  // Cabecera común del slot
-  const nocheTag = turno.esNoche ? '<span class="noche-pip">🌙</span>' : '';
-  const slotHdr = `
+  const nocheTag = turno.esNoche ? '<span class="noche-pip">\u{1F319}</span>' : '';
+  const slotHdr  = `
     <div class="turno-hdr-row">
       <span class="turno-label">${turno.label}</span>
       ${nocheTag}
@@ -1546,19 +2034,13 @@ function buildSlot(puesto, turno) {
   `;
 
   if (hasVigilante) {
-    // ── Slot ocupado ──────────────────────────────────────────
     slot.className = 'turno-slot';
-
-    const v = getV(vid);
-    const rgb = hexRgb(v.color);
-
-    // ¿Le faltan habilitaciones para este puesto?
+    const v    = getV(vid);
+    const rgb  = hexRgb(v.color);
     const missing = getMissingHabs(v, puesto);
     const warnHTML = missing.map(h =>
       `<div class="warn-badge">⚠ Falta ${HAB_LABELS[h]}</div>`
     ).join('');
-
-    // ¿Tiene más de 1 turno asignado? → conflicto de convenio
     const doubles = getDoubleShifts();
     const conflictHTML = doubles.includes(vid)
       ? `<div class="conflict-badge">⚠ Conflicto Convenio · Exceso jornada / Descanso 12h</div>`
@@ -1566,10 +2048,8 @@ function buildSlot(puesto, turno) {
 
     slot.innerHTML = `
       ${slotHdr}
-      <div class="mini-cromo"
-           style="background:rgba(${rgb},0.07);border:1px solid rgba(${rgb},0.2)">
-        <div class="mini-avatar"
-             style="background:rgba(${rgb},0.2);border:1px solid rgba(${rgb},0.4);color:${v.color}">
+      <div class="mini-cromo" style="background:rgba(${rgb},0.07);border:1px solid rgba(${rgb},0.2)">
+        <div class="mini-avatar" style="background:rgba(${rgb},0.2);border:1px solid rgba(${rgb},0.4);color:${v.color}">
           ${v.iniciales}
         </div>
         <div class="mini-info">
@@ -1582,29 +2062,23 @@ function buildSlot(puesto, turno) {
       ${conflictHTML}
     `;
 
-    // Botón de borrar asignación
     slot.querySelector('.mini-remove').addEventListener('click', e => {
       e.stopPropagation();
       onUnassign(puesto.id, turno.id);
     });
 
   } else {
-    // ── Slot vacío ─────────────────────────────────────────────
     let classes = 'turno-slot empty';
-
     if (selectedId !== null) {
-      const sv = getV(selectedId);
+      const sv      = getV(selectedId);
       const missing = getMissingHabs(sv, puesto);
       if (missing.length === 0) {
-        // Completamente compatible: glow del color del vigilante
         classes += ' slot-compatible';
         slot.style.setProperty('--hl-rgb', hexRgb(sv.color));
       } else {
-        // Incompatible (pero sigue siendo asignable para demo)
         classes += ' slot-available';
       }
     }
-
     slot.className = classes;
     slot.innerHTML = `
       ${slotHdr}
@@ -1613,10 +2087,8 @@ function buildSlot(puesto, turno) {
         <div class="slot-empty-txt">Vacío</div>
       </div>
     `;
-
     slot.addEventListener('click', () => onSlotClick(puesto.id, turno.id));
   }
-
   return slot;
 }
 
@@ -1624,10 +2096,10 @@ function buildSlot(puesto, turno) {
    RENDER: PANEL FINANCIERO DEL CUADRANTE (footer)
 ====================================================== */
 function renderFinancialPanel() {
-  const footer      = document.getElementById('payroll-footer');
-  const titleStrip  = document.getElementById('payroll-title-strip');
-  const inner       = document.getElementById('payroll-inner');
-  const filled      = countFilled();
+  const footer     = document.getElementById('payroll-footer');
+  const titleStrip = document.getElementById('payroll-title-strip');
+  const inner      = document.getElementById('payroll-inner');
+  const filled     = countFilled();
 
   if (filled === 0) {
     footer.classList.remove('visible');
@@ -1642,11 +2114,8 @@ function renderFinancialPanel() {
   const data    = calcCuadrante();
   const doubles = getDoubleShifts();
 
-  // Franja de título con alerta opcional
   const alertStripHTML = doubles.length > 0
-    ? `<span class="strip-alert">
-         ⚠ Exceso jornada: ${doubles.map(vid => getV(vid).nombre.split(' ')[0]).join(', ')}
-       </span>`
+    ? `<span class="strip-alert">⚠ Exceso jornada: ${doubles.map(vid => getV(vid).nombre.split(' ')[0]).join(', ')}</span>`
     : '';
 
   const now   = new Date();
@@ -1660,120 +2129,91 @@ function renderFinancialPanel() {
     ${alertStripHTML}
   `;
 
-  // Coste medio por turno
   const costeMedioTurno = data.turnosAsignados > 0
-    ? data.costeTotal / data.turnosAsignados
-    : 0;
+    ? data.costeTotal / data.turnosAsignados : 0;
 
   inner.innerHTML = `
-
-    <!-- Columna 1: Resumen del cuadrante -->
     <div class="payroll-col">
       <div class="payroll-col-title">Resumen del Cuadrante</div>
-
       <div class="pay-kpi-row">
         <div class="pay-kpi-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan)"></div>
         <span class="pay-kpi-lbl">Turnos cubiertos</span>
         <span class="pay-kpi-val" style="color:var(--cyan)">${data.turnosAsignados} / ${PUESTOS.length * TURNOS.length}</span>
       </div>
-
       <div class="pay-kpi-row">
         <div class="pay-kpi-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></div>
         <span class="pay-kpi-lbl">Agentes desplegados</span>
         <span class="pay-kpi-val">${data.vigilantesUnicos}</span>
       </div>
-
       <div class="pay-kpi-row">
         <div class="pay-kpi-dot" style="background:var(--purple);box-shadow:0 0 5px var(--purple)"></div>
         <span class="pay-kpi-lbl">Turnos nocturnos</span>
         <span class="pay-kpi-val ${data.nTurnosNoche > 0 ? '' : 'dim'}">${data.nTurnosNoche}</span>
       </div>
-
       <div class="pay-kpi-row">
         <div class="pay-kpi-dot" style="background:var(--red);box-shadow:0 0 5px var(--red)"></div>
         <span class="pay-kpi-lbl">Turnos armados</span>
         <span class="pay-kpi-val ${data.nTurnosArma > 0 ? '' : 'dim'}">${data.nTurnosArma}</span>
       </div>
-
       <div class="pay-total-block">
         <div class="pay-total-lbl">Coste medio / turno</div>
         <div class="pay-total-val" style="color:var(--blue);font-size:17px">${fmtEur(costeMedioTurno)}</div>
         <div class="pay-total-sub">Coste empresa por turno asignado</div>
       </div>
     </div>
-
-    <!-- Columna 2: Coste Base + Trienios -->
     <div class="payroll-col">
       <div class="payroll-col-title">Coste Laboral Base / Día</div>
-
       <div class="pay-row">
         <span class="pay-lbl">${fmtEur(COSTE_HORA_BASE)}/h × 8h × ${data.turnosAsignados} turnos</span>
         <span class="pay-val">${fmtEur(data.costeBase)}</span>
       </div>
-
       <div class="pay-row">
         <span class="pay-lbl">Trienios devengados (${data.vigilantesUnicos} agente${data.vigilantesUnicos !== 1 ? 's' : ''})</span>
         <span class="pay-val green">+${fmtEur(data.costeTrienios)}</span>
       </div>
-
       <div class="pay-hr"></div>
-
       <div class="pay-subtotal-row">
         <span class="pay-subtotal-lbl">Subtotal base</span>
         <span class="pay-subtotal-val">${fmtEur(data.costeBase + data.costeTrienios)}</span>
       </div>
-
       <div class="pay-total-block">
         <div class="pay-total-lbl">Base garantizada / día</div>
         <div class="pay-total-val" style="color:var(--t1);font-size:17px">${fmtEur(data.costeBase + data.costeTrienios)}</div>
         <div class="pay-total-sub">Sin pluses de convenio</div>
       </div>
     </div>
-
-    <!-- Columna 3: Pluses de Convenio 2026 -->
     <div class="payroll-col">
       <div class="payroll-col-title">Pluses Convenio 2026</div>
-
       <div class="pay-row">
-        <span class="pay-lbl">🌙 Nocturnidad (+${PLUS_NOCTURNIDAD}€/h × ${data.nTurnosNoche * HORAS_TURNO}h)</span>
+        <span class="pay-lbl">\u{1F319} Nocturnidad (+${PLUS_NOCTURNIDAD}€/h × ${data.nTurnosNoche * HORAS_TURNO}h)</span>
         <span class="pay-val ${data.plusNoche > 0 ? 'green' : 'dim'}">${data.plusNoche > 0 ? '+' : ''}${fmtEur(data.plusNoche)}</span>
       </div>
-
       <div class="pay-row">
-        <span class="pay-lbl">🛡 Peligrosidad (+${PLUS_ARMA}€/h × ${data.nTurnosArma * HORAS_TURNO}h)</span>
+        <span class="pay-lbl">\u{1F6E1} Peligrosidad (+${PLUS_ARMA}€/h × ${data.nTurnosArma * HORAS_TURNO}h)</span>
         <span class="pay-val ${data.plusArma > 0 ? 'green' : 'dim'}">${data.plusArma > 0 ? '+' : ''}${fmtEur(data.plusArma)}</span>
       </div>
-
       <div class="pay-hr"></div>
-
       <div class="pay-subtotal-row">
         <span class="pay-subtotal-lbl">Total pluses día</span>
         <span class="pay-subtotal-val" style="color:var(--green)">+${fmtEur(data.plusesTotal)}</span>
       </div>
-
       <div class="pay-total-block">
         <div class="pay-total-lbl">Bruto cuadrante / día</div>
         <div class="pay-total-val" style="color:var(--cyan)">${fmtEur(data.brutoTotal)}</div>
         <div class="pay-total-sub">Base + trienios + pluses</div>
       </div>
     </div>
-
-    <!-- Columna 4: Coste Total Empresa -->
     <div class="payroll-col">
       <div class="payroll-col-title">Coste Total Empresa / Día</div>
-
       <div class="pay-row">
         <span class="pay-lbl">Bruto cuadrante</span>
         <span class="pay-val">${fmtEur(data.brutoTotal)}</span>
       </div>
-
       <div class="pay-row">
         <span class="pay-lbl">SS Patronal (33%)</span>
         <span class="pay-val amber">+${fmtEur(data.ssPatronal)}</span>
       </div>
-
       <div class="pay-hr"></div>
-
       <div class="pay-total-block">
         <div class="pay-total-lbl">Coste empresa · día</div>
         <div class="pay-total-val" style="color:var(--pink)">${fmtEur(data.costeTotal)}</div>
@@ -1788,16 +2228,76 @@ function renderFinancialPanel() {
 ====================================================== */
 function updateKPI() {
   const filled = countFilled();
-  const total  = PUESTOS.length * TURNOS.length; // = 6
-  const pct    = Math.round((filled / total) * 100);
+  const total  = PUESTOS.length * TURNOS.length;
+  const pct    = total > 0 ? Math.round((filled / total) * 100) : 0;
 
-  document.getElementById('coverage-pct').textContent   = pct + '%';
-  document.getElementById('coverage-bar').style.width   = pct + '%';
-  document.getElementById('filled-count').textContent   = filled;
+  document.getElementById('coverage-pct').textContent = pct + '%';
+  document.getElementById('coverage-bar').style.width = pct + '%';
+  document.getElementById('filled-count').textContent = filled;
+  document.getElementById('total-slots').textContent  = ' / ' + total;
 
   const dot = document.getElementById('kpi-dot');
   dot.style.background = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--amber)' : 'var(--red)';
   dot.style.boxShadow  = pct === 100 ? '0 0 7px var(--green)' : pct > 50 ? '0 0 7px var(--amber)' : '0 0 7px var(--red)';
+}
+
+/* ======================================================
+   MODAL: NUEVO PUESTO
+====================================================== */
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('visible');
+  setTimeout(() => document.getElementById('modal-nombre').focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+  document.getElementById('modal-form').reset();
+  document.getElementById('modal-nombre').classList.remove('error');
+}
+
+function onOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function saveNewPuesto() {
+  const nombreEl = document.getElementById('modal-nombre');
+  const nombre   = nombreEl.value.trim();
+
+  if (!nombre) {
+    nombreEl.classList.add('error');
+    nombreEl.focus();
+    return;
+  }
+  nombreEl.classList.remove('error');
+
+  const lugar  = document.getElementById('modal-lugar').value.trim() || 'Sin especificar';
+  const emoji  = document.getElementById('modal-emoji').value.trim()  || '\u{1F512}';
+  const armado = document.getElementById('modal-armado').checked;
+
+  const requiere = ['tip', 'armas', 'aeropuertos'].filter(h =>
+    document.getElementById(`modal-hab-${h}`).checked
+  );
+
+  const tipo = armado
+    ? 'armado'
+    : requiere.includes('aeropuertos')
+      ? 'aeropuerto'
+      : 'generico';
+
+  const newPuesto = {
+    id:      'p_' + Date.now(),
+    nombre, lugar, emoji, tipo, requiere, armado
+  };
+
+  PUESTOS.push(newPuesto);
+  assignments[newPuesto.id] = {};
+  TURNOS.forEach(t => { assignments[newPuesto.id][t.id] = null; });
+
+  saveToStorage();
+  closeModal();
+  renderScheduler();
+  updateKPI();
+  renderFinancialPanel();
 }
 
 /* ======================================================
@@ -1812,9 +2312,14 @@ function onCromoClick(id) {
 
 function onSlotClick(puestoId, turnoId) {
   if (!selectedId) return;
+  if (!assignments[puestoId]) {
+    assignments[puestoId] = {};
+    TURNOS.forEach(t => { assignments[puestoId][t.id] = null; });
+  }
   assignments[puestoId][turnoId] = selectedId;
   selectedId = null;
 
+  saveToStorage();
   renderRoster();
   renderScheduler();
   renderFinancialPanel();
@@ -1823,15 +2328,26 @@ function onSlotClick(puestoId, turnoId) {
 }
 
 function onUnassign(puestoId, turnoId) {
-  assignments[puestoId][turnoId] = null;
+  if (assignments[puestoId]) assignments[puestoId][turnoId] = null;
+  saveToStorage();
+  renderRoster();
   renderScheduler();
   renderFinancialPanel();
   updateKPI();
 }
 
 function clearAll() {
-  PUESTOS.forEach(p => TURNOS.forEach(t => { assignments[p.id][t.id] = null; }));
-  selectedId = null;
+  localStorage.removeItem(LS_PUESTOS);
+  localStorage.removeItem(LS_ASSIGN);
+  initPuestos();
+  initAssignments();
+  selectedId   = null;
+  filterText   = '';
+  filterHabs   = new Set();
+  filterEstado = 'todos';
+  const searchInput = document.getElementById('search-vigilante');
+  if (searchInput) searchInput.value = '';
+  syncFilterPills();
   renderRoster();
   renderScheduler();
   renderFinancialPanel();
@@ -1866,9 +2382,11 @@ function setDate() {
 ====================================================== */
 function init() {
   setDate();
+  loadFromStorage();
   renderRoster();
   renderScheduler();
   updateKPI();
+  syncFilterPills();
 }
 
 init();
