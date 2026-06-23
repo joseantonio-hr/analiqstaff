@@ -5887,18 +5887,20 @@ function openPatternModal() {
     const btn = document.createElement('div');
     btn.className = 'pw-dow-btn';
     btn.textContent = lbl;
-    btn.dataset.dow = i;
     btn.onclick = () => {
-      if (pwDowSelected.has(i)) { pwDowSelected.delete(i); btn.classList.remove('on'); }
-      else { pwDowSelected.add(i); btn.classList.add('on'); }
+      if (pwDowSelected.has(i)) { pwDowSelected.delete(i); btn.classList.remove('active'); }
+      else { pwDowSelected.add(i); btn.classList.add('active'); }
       pwUpdatePreview();
     };
     grid.appendChild(btn);
   });
 
+  // Limpiar preview
+  document.getElementById('pw-preview').textContent = '';
   document.getElementById('pw-overwrite').checked = false;
-  pwUpdatePreview();
+
   document.getElementById('modal-pattern').classList.add('visible');
+  pwUpdatePreview();
 }
 
 function closePatternModal() {
@@ -5912,155 +5914,1284 @@ function onPatternOverlayClick(e) {
 function pwSelectPattern(radio) {
   document.querySelectorAll('.pw-radio-row').forEach(r => r.classList.remove('selected'));
   radio.closest('.pw-radio-row').classList.add('selected');
-  document.getElementById('pw-dow-wrap').style.display =
-    radio.value === 'custom' ? 'block' : 'none';
+  const dowWrap = document.getElementById('pw-dow-wrap');
+  dowWrap.style.display = radio.value === 'custom' ? 'block' : 'none';
   pwUpdatePreview();
 }
 
-function pwMatchesPattern(dayNum, dowIndex, pattern) {
-  switch (pattern) {
-    case 'all':      return true;
-    case 'weekdays': return dowIndex <= 4;          // L-V (0-4)
-    case 'weekends': return dowIndex >= 5;          // S-D (5-6)
-    case 'even':     return dayNum % 2 === 0;
-    case 'odd':      return dayNum % 2 !== 0;
-    case 'custom':   return pwDowSelected.has(dowIndex);
-    default:         return false;
-  }
-}
-
-function pwGetMatchingDays() {
-  const pattern  = document.querySelector('input[name="pw-pattern"]:checked')?.value || 'all';
-  const daysInMonth = new Date(cuadYear, cuadMonth + 1, 0).getDate();
-  const matching = [];
-  for (let d = 1; d <= daysInMonth; d++) {
-    const fecha = isoFecha(cuadYear, cuadMonth, d);
-    // getDay(): 0=Dom…6=Sáb → convertir a 0=Lun…6=Dom
-    const jsDay = new Date(fecha + 'T12:00:00').getDay();
-    const dowIndex = jsDay === 0 ? 6 : jsDay - 1;
-    if (pwMatchesPattern(d, dowIndex, pattern)) matching.push(fecha);
-  }
-  return matching;
-}
-
 function pwUpdatePreview() {
-  const days = pwGetMatchingDays();
-  const vId  = parseInt(document.getElementById('pw-vigilante').value) || null;
-  const pId  = document.getElementById('pw-puesto').value || null;
-  const tId  = document.getElementById('pw-turno').value || null;
-  const vNombre = vId ? (VIGILANTES.find(v => v.id === vId)?.nombre || '?') : '—';
-  const pNombre = pId ? (PUESTOS.find(p => p.id === pId)?.nombre   || '?') : 'todos los puestos';
-  const tNombre = tId ? (TURNOS.find(t => t.id === tId)?.label     || '?') : 'todos los turnos';
-  const slots = days.length * (pId ? 1 : PUESTOS.length) * (tId ? 1 : TURNOS.length);
-  document.getElementById('pw-preview').innerHTML =
-    `Se asignará <span>${vNombre}</span> a <span>${pNombre}</span> / <span>${tNombre}</span>
-     en <span>${days.length} días</span> del mes → <span>${slots} slots</span>`;
+  const vid     = parseInt(document.getElementById('pw-vigilante').value);
+  const pattern = document.querySelector('input[name="pw-pattern"]:checked')?.value || 'all';
+  const prev    = document.getElementById('pw-preview');
+
+  if (!vid) { prev.textContent = 'Selecciona un vigilante para ver la previsión.'; return; }
+
+  const v = getV(vid);
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  let count = 0;
+  for (let d = 1; d <= diasEnMes; d++) {
+    const dow = new Date(isoFecha(cuadYear, cuadMonth, d) + 'T12:00:00').getDay();
+    const dowLun = dow === 0 ? 6 : dow - 1; // 0=Lun … 6=Dom
+    if (pattern === 'all')      count++;
+    else if (pattern === 'weekdays' && dow >= 1 && dow <= 5) count++;
+    else if (pattern === 'weekends' && (dow === 0 || dow === 6)) count++;
+    else if (pattern === 'even' && d % 2 === 0) count++;
+    else if (pattern === 'odd'  && d % 2 !== 0) count++;
+    else if (pattern === 'custom' && pwDowSelected.has(dowLun)) count++;
+  }
+  prev.textContent = `${v.nombre} · ${count} días de ${MONTHS_LONG[cuadMonth]}`;
 }
 
 function applyPattern() {
-  const vId  = parseInt(document.getElementById('pw-vigilante').value) || null;
-  if (!vId) { alert('Selecciona un vigilante.'); return; }
-  const pId  = document.getElementById('pw-puesto').value || null;
-  const tId  = document.getElementById('pw-turno').value || null;
+  const vid = parseInt(document.getElementById('pw-vigilante').value);
+  if (!vid) { alert('Selecciona un vigilante.'); return; }
+
+  const puestoId  = document.getElementById('pw-puesto').value;  // '' = todos
+  const turnoId   = document.getElementById('pw-turno').value;   // '' = todos
+  const pattern   = document.querySelector('input[name="pw-pattern"]:checked')?.value || 'all';
   const overwrite = document.getElementById('pw-overwrite').checked;
-  const days = pwGetMatchingDays();
 
-  const targetPuestos = pId ? [PUESTOS.find(p => p.id === pId)].filter(Boolean) : PUESTOS;
-  const targetTurnos  = tId ? [TURNOS.find(t => t.id === tId)].filter(Boolean)  : TURNOS;
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  let count = 0;
 
-  days.forEach(fecha => {
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    const dow   = new Date(fecha + 'T12:00:00').getDay();
+    const dowLun = dow === 0 ? 6 : dow - 1;
+
+    let applies = false;
+    if      (pattern === 'all')      applies = true;
+    else if (pattern === 'weekdays') applies = dow >= 1 && dow <= 5;
+    else if (pattern === 'weekends') applies = dow === 0 || dow === 6;
+    else if (pattern === 'even')     applies = d % 2 === 0;
+    else if (pattern === 'odd')      applies = d % 2 !== 0;
+    else if (pattern === 'custom')   applies = pwDowSelected.has(dowLun);
+
+    if (!applies) continue;
     if (!assignments[fecha]) assignments[fecha] = {};
-    targetPuestos.forEach(puesto => {
-      if (!assignments[fecha][puesto.id]) {
-        assignments[fecha][puesto.id] = {};
-        TURNOS.forEach(t => { assignments[fecha][puesto.id][t.id] = null; });
-      }
-      targetTurnos.forEach(turno => {
-        if (overwrite || assignments[fecha][puesto.id][turno.id] === null) {
-          assignments[fecha][puesto.id][turno.id] = vId;
-        }
+
+    const puestosTarget = puestoId ? PUESTOS.filter(p => p.id === puestoId) : PUESTOS;
+    const turnosTarget  = turnoId  ? TURNOS.filter(t => t.id === turnoId)   : TURNOS;
+
+    puestosTarget.forEach(p => {
+      if (!assignments[fecha][p.id]) assignments[fecha][p.id] = {};
+      turnosTarget.forEach(t => {
+        if (!overwrite && assignments[fecha][p.id][t.id]) return;
+        assignments[fecha][p.id][t.id] = vid;
+        count++;
       });
     });
-  });
+  }
 
   saveToStorage();
   closePatternModal();
   renderMonthlyGrid();
+  renderServiciosGrid();
+  _showAutoToast(`🔄 Patrón aplicado — ${getV(vid).nombre}`, `${count} slot${count !== 1 ? 's' : ''} asignados en ${MONTHS_LONG[cuadMonth]} ${cuadYear}`);
 }
 
-function renderDateNav() {
-  const d = new Date(currentDate + 'T12:00:00');
-  document.getElementById('hdr-day').textContent   = d.getDate();
-  document.getElementById('hdr-month').textContent = MONTHS_SHORT[d.getMonth()];
-  document.getElementById('hdr-year').textContent  = d.getFullYear();
+
+/* ======================================================
+   FASE 4 — CUADRANTE FOCALIZADO (ZOOM MODE)
+   Estado: focusedPuestoId = null (catálogo) | string (foco)
+====================================================== */
+let focusedPuestoId     = null;
+let _focusHabFilter     = [];  // filtros activos en sidebar
+let _focusSearch        = '';  // texto de búsqueda sidebar
+let _focusSelectedSlot  = null; // { fecha, turnoId } slot seleccionado para asignar
+
+/** Entra en modo focalizado para un servicio concreto */
+function enterFocusMode(puestoId) {
+  focusedPuestoId = puestoId;
+  _focusSelectedSlot = null;
+  _focusHabFilter = [];
+  _focusSearch = '';
+
+  const puesto = PUESTOS.find(p => p.id === puestoId);
+  if (!puesto) return;
+
+  // Animar salida del catálogo
+  const section = document.getElementById('servicios-grid-section');
+  const body    = document.getElementById('cuad-body');
+  if (section) { section.style.transition = 'opacity 0.22s,transform 0.22s'; section.style.opacity = '0'; section.style.transform = 'scale(0.97)'; }
+  if (body)    { body.style.transition    = 'opacity 0.22s'; body.style.opacity = '0'; }
+
+  setTimeout(() => {
+    if (section) section.style.display = 'none';
+    if (body)    body.style.display    = 'none';
+
+    // Rellenar cabecera del panel focalizado
+    const acc = accentForPuesto(puesto);
+    document.getElementById('focus-emoji').textContent        = puesto.emoji || '🔒';
+    document.getElementById('focus-service-name').textContent = puesto.nombre;
+    document.getElementById('focus-service-loc').textContent  = '📍 ' + puesto.lugar;
+    document.getElementById('focus-service-accent').style.background = acc.color;
+    document.getElementById('focus-service-accent').style.boxShadow  = `0 0 14px ${acc.glow}`;
+
+    // Mostrar overlay focalizado con animación
+    const overlay = document.getElementById('cuad-focus-overlay');
+    overlay.style.display = 'flex';
+    overlay.offsetHeight; // force reflow
+    overlay.classList.add('visible');
+
+    // Actualizar barra de controles superior
+    document.getElementById('btn-autocompletar-global').style.display = 'none';
+    document.getElementById('btn-limpiar-global').style.display       = 'none';
+
+    renderFocusGrid();
+    renderFocusSidebar();
+  }, 220);
 }
 
-function shiftDate(days) {
-  const d = new Date(currentDate + 'T12:00:00');
-  d.setDate(d.getDate() + days);
-  currentDate = d.toISOString().slice(0, 10);
-  renderDateNav();
-  renderRoster();
-  renderScheduler();
-  renderFinancialPanel();
-  updateKPI();
-  updateHint();
+/** Sale del modo focalizado y vuelve al catálogo */
+function exitFocusMode() {
+  focusedPuestoId    = null;
+  _focusSelectedSlot = null;
+
+  const overlay = document.getElementById('cuad-focus-overlay');
+  overlay.classList.remove('visible');
+
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    const section = document.getElementById('servicios-grid-section');
+    const body    = document.getElementById('cuad-body');
+    if (section) {
+      section.style.display   = '';
+      section.style.opacity   = '0';
+      section.style.transform = 'scale(0.97)';
+      section.offsetHeight;
+      section.style.transition = 'opacity 0.25s,transform 0.25s';
+      section.style.opacity    = '1';
+      section.style.transform  = 'scale(1)';
+    }
+    if (body) {
+      body.style.display  = '';
+      body.style.opacity  = '0';
+      body.offsetHeight;
+      body.style.transition = 'opacity 0.25s';
+      body.style.opacity    = '1';
+    }
+    document.getElementById('btn-autocompletar-global').style.display = '';
+    document.getElementById('btn-limpiar-global').style.display       = '';
+
+    renderServiciosGrid();
+    renderMonthlyGrid();
+  }, 300);
 }
 
-function prevDay()  { shiftDate(-1); }
-function nextDay()  { shiftDate(+1); }
-function goToday()  {
-  currentDate = new Date().toISOString().slice(0, 10);
-  renderDateNav();
-  renderRoster();
-  renderScheduler();
-  renderFinancialPanel();
-  updateKPI();
-  updateHint();
+/** Renderiza la grilla mensual SOLO del puesto focalizado */
+function renderFocusGrid() {
+  const area = document.getElementById('focus-grid-area');
+  if (!area || !focusedPuestoId) return;
+
+  const puesto    = PUESTOS.find(p => p.id === focusedPuestoId);
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  const today     = new Date().toISOString().slice(0, 10);
+  const DOW       = ['D','L','M','X','J','V','S'];
+
+  // KPI de cobertura
+  let ocupados = 0, total = diasEnMes * TURNOS.length;
+  for (let d = 1; d <= diasEnMes; d++) {
+    const f = isoFecha(cuadYear, cuadMonth, d);
+    TURNOS.forEach(t => { if (assignments[f]?.[puesto.id]?.[t.id]) ocupados++; });
+  }
+  const pct = total > 0 ? Math.round(ocupados / total * 100) : 0;
+  const acc = accentForPuesto(puesto);
+
+  let html = `
+  <div class="focus-kpi-bar">
+    <div class="fk-item">
+      <span class="fk-label">Cobertura</span>
+      <span class="fk-val" style="color:${pct >= 80 ? 'var(--green)' : 'var(--amber)'}">${pct}%</span>
+    </div>
+    <div class="fk-item">
+      <span class="fk-label">Turnos cubiertos</span>
+      <span class="fk-val">${ocupados} / ${total}</span>
+    </div>
+    <div class="fk-item">
+      <span class="fk-label">Mes</span>
+      <span class="fk-val">${MONTHS_LONG[cuadMonth]} ${cuadYear}</span>
+    </div>
+    <div class="fk-bar-wrap">
+      <div class="fk-bar-fill" style="width:${pct}%;background:${acc.color};box-shadow:0 0 8px ${acc.glow}"></div>
+    </div>
+  </div>
+  <div class="focus-mgrid-scroll">
+  <table class="focus-mgrid-table">
+    <thead><tr>
+      <th class="focus-th-turno">Turno</th>`;
+
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    const dow   = new Date(fecha + 'T12:00:00').getDay();
+    const isT   = fecha === today;
+    const isW   = dow === 0 || dow === 6;
+    html += `<th class="focus-th-day ${isT ? 'fth-today' : isW ? 'fth-weekend' : ''}">
+      <span class="fth-num">${d}</span>
+      <span class="fth-dow">${DOW[dow]}</span>
+    </th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  TURNOS.forEach(turno => {
+    html += `<tr><td class="focus-td-turno">
+      <span class="fturno-icon">${turno.id === 'manana' ? '☀️' : turno.id === 'tarde' ? '🌇' : '🌙'}</span>
+      ${turno.label}
+    </td>`;
+    for (let d = 1; d <= diasEnMes; d++) {
+      const fecha  = isoFecha(cuadYear, cuadMonth, d);
+      const dow    = new Date(fecha + 'T12:00:00').getDay();
+      const isT    = fecha === today;
+      const isW    = dow === 0 || dow === 6;
+      const vid    = assignments[fecha]?.[puesto.id]?.[turno.id] ?? null;
+      const isSelSlot = _focusSelectedSlot && _focusSelectedSlot.fecha === fecha && _focusSelectedSlot.turnoId === turno.id;
+
+      if (vid) {
+        const v   = getV(vid);
+        const rgb = hexRgb(v.color);
+        html += `<td class="focus-td-day ${isT ? 'ftd-today' : isW ? 'ftd-weekend' : ''}">
+          <div class="focus-chip chip-assigned"
+               style="background:rgba(${rgb},0.2);border-color:rgba(${rgb},0.45);color:${v.color}"
+               onclick="focusSlotClick(event,'${fecha}','${turno.id}')"
+               title="${v.nombre} · clic para cambiar">
+            <span class="fchip-iniciales">${v.iniciales}</span>
+            <span class="fchip-nombre">${v.nombre.split(' ')[0]}</span>
+          </div>
+        </td>`;
+      } else {
+        html += `<td class="focus-td-day ${isT ? 'ftd-today' : isW ? 'ftd-weekend' : ''}">
+          <div class="focus-chip chip-vacant ${isSelSlot ? 'chip-selected' : ''}"
+               onclick="focusSlotClick(event,'${fecha}','${turno.id}')"
+               title="Vacío · clic para seleccionar">
+            <span class="fchip-vacant-icon">+</span>
+          </div>
+        </td>`;
+      }
+    }
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  area.innerHTML = html;
+
+  // Mostrar/ocultar hint de selección
+  const hint = document.getElementById('focus-assign-hint');
+  if (hint) hint.style.display = _focusSelectedSlot ? 'flex' : 'none';
+}
+
+/** Click en un slot del cuadrante focalizado */
+function focusSlotClick(event, fecha, turnoId) {
+  event.stopPropagation();
+  if (_focusSelectedSlot && _focusSelectedSlot.fecha === fecha && _focusSelectedSlot.turnoId === turnoId) {
+    // Deseleccionar si es el mismo
+    _focusSelectedSlot = null;
+  } else {
+    _focusSelectedSlot = { fecha, turnoId };
+  }
+  renderFocusGrid();
+  // Highlight hint
+  const hint = document.getElementById('focus-assign-hint');
+  if (hint) {
+    hint.style.display = _focusSelectedSlot ? 'flex' : 'none';
+    if (_focusSelectedSlot) {
+      const turno = TURNOS.find(t => t.id === turnoId);
+      const d = new Date(fecha + 'T12:00:00');
+      hint.innerHTML = `<span>🎯 Slot seleccionado: <strong>${turno?.label}</strong> del <strong>${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}</strong> — Ahora haz clic en un vigilante del panel para asignar</span>
+        <button onclick="_focusSelectedSlot=null;renderFocusGrid()" style="margin-left:auto;background:none;border:none;color:var(--t2);cursor:pointer;font-size:13px">✕</button>`;
+    }
+  }
+}
+
+/** Renderiza el panel lateral de asignación rápida */
+function renderFocusSidebar() {
+  const list = document.getElementById('fv-vig-list');
+  if (!list) return;
+
+  const puesto = PUESTOS.find(p => p.id === focusedPuestoId);
+  const req    = puesto?.requiere || [];
+
+  // Filtrar vigilantes
+  let candidatos = VIGILANTES.filter(v => {
+    if (_focusSearch && !v.nombre.toLowerCase().includes(_focusSearch.toLowerCase()) &&
+        !v.iniciales.toLowerCase().includes(_focusSearch.toLowerCase())) return false;
+    if (_focusHabFilter.length > 0 && !_focusHabFilter.every(h => v.hab.includes(h))) return false;
+    return true;
+  });
+
+  if (candidatos.length === 0) {
+    list.innerHTML = `<div class="fv-empty">Sin vigilantes que coincidan con los filtros.</div>`;
+    return;
+  }
+
+  list.innerHTML = candidatos.map(v => {
+    const rgb      = hexRgb(v.color);
+    const reqOk    = req.length === 0 || req.every(h => v.hab.includes(h));
+    const habBadges = v.hab.map(h => {
+      if (h === 'tip')         return `<span class="fv-badge fv-tip">TIP</span>`;
+      if (h === 'armas')       return `<span class="fv-badge fv-arma">⚑</span>`;
+      if (h === 'aeropuertos') return `<span class="fv-badge fv-aero">✈</span>`;
+      return '';
+    }).join('');
+
+    // Calcular turnos que tiene este vigilante en este mes/puesto
+    const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+    let turnosAsig = 0;
+    for (let d = 1; d <= diasEnMes; d++) {
+      const f = isoFecha(cuadYear, cuadMonth, d);
+      TURNOS.forEach(t => { if (assignments[f]?.[focusedPuestoId]?.[t.id] === v.id) turnosAsig++; });
+    }
+
+    return `<div class="fv-vig-item ${!reqOk ? 'fv-vig-nohab' : ''}" onclick="focusAssignVigilante(${v.id})"
+        style="--fv-color:${v.color};--fv-rgb:${rgb}" title="${v.nombre}${!reqOk ? ' · ⚠ Sin habilitación requerida' : ''}">
+      <div class="fv-avatar" style="background:rgba(${rgb},0.22);border-color:rgba(${rgb},0.4);color:${v.color}">${v.iniciales}</div>
+      <div class="fv-info">
+        <div class="fv-nombre">${v.nombre}</div>
+        <div class="fv-badges-row">${habBadges}${!reqOk ? '<span class="fv-warn-hab">⚠ Hab. insuf.</span>' : ''}</div>
+      </div>
+      <div class="fv-turnos-count" title="Turnos asignados en este puesto">${turnosAsig > 0 ? turnosAsig+'T' : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+/** Asigna el vigilante seleccionado al slot activo del cuadrante focalizado */
+function focusAssignVigilante(vid) {
+  if (!_focusSelectedSlot) {
+    _showAutoToast('ℹ️ Selecciona primero un slot', 'Haz clic en una celda del cuadrante para seleccionarla.');
+    return;
+  }
+  const { fecha, turnoId } = _focusSelectedSlot;
+  if (!assignments[fecha]) assignments[fecha] = {};
+  if (!assignments[fecha][focusedPuestoId]) assignments[fecha][focusedPuestoId] = {};
+  assignments[fecha][focusedPuestoId][turnoId] = vid;
+  _focusSelectedSlot = null;
+  saveToStorage();
+  renderFocusGrid();
+  renderFocusSidebar();
+}
+
+/** Auto-completar MES actuando SOLO sobre el puesto focalizado */
+function autoCompletarServicio() {
+  if (!focusedPuestoId) return;
+  const puesto = PUESTOS.find(p => p.id === focusedPuestoId);
+  if (!puesto || VIGILANTES.length === 0) {
+    alert('No hay vigilantes registrados.');
+    return;
+  }
+  const mesNombre = MONTHS_LONG[cuadMonth] + ' ' + cuadYear;
+  if (!confirm(`⚡ Auto-completar turnos vacíos de\n"${puesto.nombre}"\n\n• Solo se rellenan los slots vacíos de este servicio.\n• Se respetan los descansos del Convenio.\n\n¿Continuar?`)) return;
+
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  const req = puesto.requiere || [];
+
+  // Fin de semana libre rotativo
+  const weekends = [];
+  for (let d = 1; d <= diasEnMes; d++) {
+    const f = isoFecha(cuadYear, cuadMonth, d);
+    if (new Date(f + 'T12:00:00').getDay() === 6) {
+      const dSun = d + 1;
+      weekends.push({ sat: f, sun: dSun <= diasEnMes ? isoFecha(cuadYear, cuadMonth, dSun) : null });
+    }
+  }
+  const weekendLibre = {};
+  const candidatosBase = VIGILANTES.filter(v => req.length === 0 || req.every(h => v.hab.includes(h)));
+  if (candidatosBase.length === 0) {
+    alert('Ningún vigilante tiene las habilitaciones requeridas para este puesto.');
+    return;
+  }
+  candidatosBase.forEach((v, i) => {
+    weekendLibre[v.id] = weekends.length > 0 ? weekends[i % weekends.length] : null;
+  });
+
+  const horasMes = {}, consec = {};
+  candidatosBase.forEach(v => { horasMes[v.id] = 0; consec[v.id] = 0; });
+
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    const dow   = new Date(fecha + 'T12:00:00').getDay();
+    if (!assignments[fecha]) assignments[fecha] = {};
+    if (!assignments[fecha][puesto.id]) assignments[fecha][puesto.id] = {};
+
+    const trabajaHoy = new Set();
+    // Registrar pre-existentes del DÍA completo (todos los puestos) para respetar descansos
+    PUESTOS.forEach(p2 => {
+      const pd = assignments[fecha][p2.id];
+      if (!pd) return;
+      TURNOS.forEach(t => { if (pd[t.id]) trabajaHoy.add(pd[t.id]); });
+    });
+
+    TURNOS.forEach(turno => {
+      if (assignments[fecha][puesto.id][turno.id]) return; // ya tiene asignación
+      const validos = candidatosBase.filter(v => {
+        const we = weekendLibre[v.id];
+        if (we) {
+          if (dow === 6 && we.sat === fecha) return false;
+          if (dow === 0 && we.sun === fecha) return false;
+        }
+        if (turno.id === 'manana' && d > 1) {
+          const ayer = isoFecha(cuadYear, cuadMonth, d - 1);
+          if (assignments[ayer]) {
+            for (const p2 of PUESTOS) {
+              if (assignments[ayer][p2.id]?.['noche'] === v.id) return false;
+            }
+          }
+        }
+        if (consec[v.id] >= 6 && !trabajaHoy.has(v.id)) return false;
+        if (horasMes[v.id] >= 203) return false;
+        return true;
+      });
+      if (!validos.length) return;
+      validos.sort((a, b) => horasMes[a.id] - horasMes[b.id]);
+      const elegido = validos[0];
+      assignments[fecha][puesto.id][turno.id] = elegido.id;
+      horasMes[elegido.id] += 8;
+      trabajaHoy.add(elegido.id);
+    });
+
+    candidatosBase.forEach(v => { consec[v.id] = trabajaHoy.has(v.id) ? consec[v.id] + 1 : 0; });
+  }
+
+  saveToStorage();
+  renderFocusGrid();
+  renderFocusSidebar();
+  renderNominasTab();
+  _showAutoToast(`✅ Cuadrante completado — ${puesto.nombre}`, `Mes de ${mesNombre}`);
+}
+
+/** Abre el modal de impresión profesional del cuadrante focalizado */
+function printCuadranteFocused() {
+  if (!focusedPuestoId) return;
+  const puesto    = PUESTOS.find(p => p.id === focusedPuestoId);
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  const DOW_ESP   = ['D','L','M','X','J','V','S'];
+  const today     = new Date().toISOString().slice(0, 10);
+  const mesLabel  = MONTHS_LONG[cuadMonth] + ' ' + cuadYear;
+  const now       = new Date();
+  const emitDate  = `${now.getDate()} de ${MONTHS_LONG[now.getMonth()]} de ${now.getFullYear()}`;
+
+  // Construir filas de la tabla
+  let rowsHtml = '';
+  TURNOS.forEach(turno => {
+    let cells = `<td class="pt-td-turno">${turno.id === 'manana' ? 'Mañana' : turno.id === 'tarde' ? 'Tarde' : 'Noche'}</td>`;
+    for (let d = 1; d <= diasEnMes; d++) {
+      const fecha = isoFecha(cuadYear, cuadMonth, d);
+      const dow   = new Date(fecha + 'T12:00:00').getDay();
+      const isW   = dow === 0 || dow === 6;
+      const vid   = assignments[fecha]?.[puesto.id]?.[turno.id] ?? null;
+      const v     = vid ? getV(vid) : null;
+      cells += `<td class="pt-td-day${isW ? ' pt-weekend' : ''}${fecha === today ? ' pt-today' : ''}">${v ? `<span class="pt-iniciales">${v.iniciales}</span>` : ''}</td>`;
+    }
+    rowsHtml += `<tr>${cells}</tr>`;
+  });
+
+  // Cabecera de días
+  let dayCols = '<th class="pt-th-turno">Turno</th>';
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    const dow   = new Date(fecha + 'T12:00:00').getDay();
+    dayCols += `<th class="pt-th-day${dow===0||dow===6?' pt-weekend':''}">${d}<br><small>${DOW_ESP[dow]}</small></th>`;
+  }
+
+  // Leyenda vigilantes
+  const viguUsados = new Set();
+  for (let d = 1; d <= diasEnMes; d++) {
+    const f = isoFecha(cuadYear, cuadMonth, d);
+    TURNOS.forEach(t => { const vid = assignments[f]?.[puesto.id]?.[t.id]; if (vid) viguUsados.add(vid); });
+  }
+  const leyenda = [...viguUsados].map(vid => {
+    const v = getV(vid);
+    return `<div class="pt-leyenda-item"><span class="pt-ini-box">${v.iniciales}</span> ${v.nombre} — ${v.cargo}</div>`;
+  }).join('');
+
+  const printHtml = `
+  <div class="pt-page" id="pt-page">
+    <div class="pt-header">
+      <div class="pt-header-left">
+        <div class="pt-company-name">EMPRESA DE SEGURIDAD PRIVADA</div>
+        <div class="pt-company-sub">Cuadrante Mensual de Servicios</div>
+      </div>
+      <div class="pt-header-right">
+        <div class="pt-doc-label">DOCUMENTO OFICIAL</div>
+        <div class="pt-doc-ref">Ref. AnalIQstaff · ${mesLabel}</div>
+      </div>
+    </div>
+    <div class="pt-meta">
+      <div class="pt-meta-row"><span class="pt-meta-label">Servicio / Cliente:</span><span class="pt-meta-val">${puesto.emoji} ${puesto.nombre}</span></div>
+      <div class="pt-meta-row"><span class="pt-meta-label">Ubicación:</span><span class="pt-meta-val">${puesto.lugar}</span></div>
+      <div class="pt-meta-row"><span class="pt-meta-label">Período:</span><span class="pt-meta-val">${mesLabel}</span></div>
+      <div class="pt-meta-row"><span class="pt-meta-label">Fecha de emisión:</span><span class="pt-meta-val">${emitDate}</span></div>
+    </div>
+    <table class="pt-table">
+      <thead><tr>${dayCols}</tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="pt-leyenda"><strong>Leyenda de efectivos:</strong><div class="pt-leyenda-grid">${leyenda || '<em>Sin asignaciones en el mes.</em>'}</div></div>
+    <div class="pt-signatures">
+      <div class="pt-sig-box">
+        <div class="pt-sig-title">Inspector de Servicios</div>
+        <div class="pt-sig-line"></div>
+        <div class="pt-sig-name">Nombre y Firma</div>
+        <div class="pt-sig-date">Fecha: _______________</div>
+      </div>
+      <div class="pt-sig-box pt-sig-center">
+        <div class="pt-sig-title">Sello Oficial de la Empresa</div>
+        <div class="pt-sig-stamp-area"></div>
+      </div>
+      <div class="pt-sig-box">
+        <div class="pt-sig-title">Conformidad del Cliente</div>
+        <div class="pt-sig-line"></div>
+        <div class="pt-sig-name">Nombre y Firma</div>
+        <div class="pt-sig-date">Fecha: _______________</div>
+      </div>
+    </div>
+    <div class="pt-footer">
+      Documento generado por AnalIQstaff · Sistema de Gestión de Cuadrantes · ${emitDate}
+    </div>
+  </div>`;
+
+  const pmo = document.getElementById('print-modal-overlay');
+  document.getElementById('print-modal-body').innerHTML = printHtml;
+  pmo.classList.add('visible');
+}
+
+function closePrintModal() {
+  document.getElementById('print-modal-overlay').classList.remove('visible');
+}
+
+function doPrint() {
+  document.getElementById('print-modal-overlay').classList.add('printing');
+  window.print();
+  setTimeout(() => document.getElementById('print-modal-overlay').classList.remove('printing'), 1000);
+}
+
+/* ── Delegación de eventos: click en servicio-card → enterFocusMode ─ */
+document.addEventListener('click', function(e) {
+  const card = e.target.closest('.servicio-card[data-puesto-id]');
+  if (card) enterFocusMode(card.dataset.puestoId);
+});
+
+/* ── Parchear renderServiciosGrid para añadir data-puesto-id y cursor ─ */
+const _origRenderServiciosGrid = renderServiciosGrid;
+renderServiciosGrid = function() {
+  _origRenderServiciosGrid();
+  document.querySelectorAll('.servicio-card').forEach((card, i) => {
+    if (PUESTOS[i]) {
+      card.dataset.puestoId = PUESTOS[i].id;
+      card.style.cursor = 'pointer';
+    }
+  });
+};
+
+/* ── Helpers de búsqueda y filtros del sidebar focalizado ─────────── */
+function focusSidebarSearch(val) {
+  _focusSearch = val;
+  renderFocusSidebar();
+}
+
+function toggleFocusHabFilter(hab, btn) {
+  const idx = _focusHabFilter.indexOf(hab);
+  if (idx === -1) { _focusHabFilter.push(hab); btn.classList.add('active'); }
+  else            { _focusHabFilter.splice(idx, 1); btn.classList.remove('active'); }
+  renderFocusSidebar();
+}
+
+function focusQuitarAsignacion() {
+  if (!_focusSelectedSlot) return;
+  const { fecha, turnoId } = _focusSelectedSlot;
+  if (assignments[fecha]?.[focusedPuestoId]) {
+    assignments[fecha][focusedPuestoId][turnoId] = null;
+    _focusSelectedSlot = null;
+    saveToStorage();
+    renderFocusGrid();
+    renderFocusSidebar();
+  }
 }
 
 /* ======================================================
-   NAVEGACIÓN SPA
+   ARRANQUE DE LA APLICACIÓN
+   Bloque ejecutado al cargar la página (restaurado Fase 4)
 ====================================================== */
-let currentView = 'dashboard';
+(function initApp() {
+  // 1. Cargar datos persistidos
+  loadFromStorage();
 
-function switchView(view) {
-  if (view === currentView) return;
-  currentView = view;
+  // 2. Renderizar vista Dashboard (activa por defecto)
+  renderRoster();
+  renderScheduler();
+  renderGlobalStats();
+  renderFinancialPanel();
+  updateKPI();
+  updateHint();
+  syncFilterPills();
 
-  document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
-  document.getElementById('view-' + view).classList.remove('hidden');
+  // 3. Inicializar displays de mes en Cuadrantes y Nóminas
+  renderCuadMonthDisplay();
+  renderNomMonthDisplay();
+  renderServiciosGrid();
 
-  document.querySelectorAll('.nav-tab').forEach(t =>
-    t.classList.toggle('active', t.dataset.view === view)
-  );
+  // 4. Pre-renderizar grilla mensual (para cuando el usuario cambie a esa vista)
+  renderMonthlyGrid();
+})();
 
-  if (view === 'cuadrantes') {
+</script>
+
+<!-- ====================================================
+     FASE 4 — CSS: VISTA FOCALIZADA + ESTILOS IMPRESIÓN
+===================================================== -->
+<style>
+
+/* ── Overlay focalizado ──────────────────────────────── */
+#cuad-focus-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  flex-direction: column;
+  background: var(--bg-void);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.28s cubic-bezier(0.4,0,0.2,1), transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+#cuad-focus-overlay.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Barra superior del foco ─────────────────────────── */
+.focus-top-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(6,7,16,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  flex-wrap: wrap;
+}
+
+.focus-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  background: var(--glass);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  color: var(--t2);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+.focus-back-btn:hover { background: var(--glass-hover); color: var(--t1); }
+
+.focus-service-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px 5px 5px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  min-width: 0;
+}
+.focus-service-accent-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+#focus-emoji { font-size: 22px; line-height: 1; }
+.focus-service-name {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--t1);
+  white-space: nowrap;
+}
+.focus-service-loc {
+  font-size: 10px;
+  color: var(--t3);
+  white-space: nowrap;
+}
+
+.focus-top-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.btn-focus-auto {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 14px;
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.28);
+  border-radius: var(--r-sm);
+  color: var(--cyan);
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+}
+.btn-focus-auto:hover { background: rgba(0,212,255,0.16); }
+
+.btn-focus-print {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 14px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.28);
+  border-radius: var(--r-sm);
+  color: var(--green);
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+}
+.btn-focus-print:hover { background: rgba(16,185,129,0.16); }
+
+/* ── Hint de selección ───────────────────────────────── */
+.focus-assign-hint {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(0,212,255,0.07);
+  border-bottom: 1px solid rgba(0,212,255,0.2);
+  font-size: 11.5px;
+  color: var(--cyan);
+  animation: fade-in 0.15s ease;
+}
+
+/* ── Layout: sidebar + grid ──────────────────────────── */
+.focus-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Sidebar de asignación rápida ────────────────────── */
+.focus-sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.fv-sidebar-hdr {
+  flex-shrink: 0;
+  padding: 11px 14px 9px;
+  border-bottom: 1px solid var(--border);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--t3);
+  font-family: var(--mono);
+}
+
+.fv-search-wrap {
+  flex-shrink: 0;
+  padding: 9px 10px 6px;
+  position: relative;
+}
+.fv-search-wrap svg {
+  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+  color: var(--t3); pointer-events: none;
+}
+.fv-search-wrap input {
+  width: 100%; padding: 6px 10px 6px 30px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--t1); font-family: var(--sans); font-size: 12px; outline: none;
+  transition: border-color 0.18s;
+}
+.fv-search-wrap input::placeholder { color: var(--t3); }
+.fv-search-wrap input:focus { border-color: rgba(0,212,255,0.35); }
+
+.fv-filter-row {
+  flex-shrink: 0;
+  padding: 4px 10px 8px;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.fv-filter-pill {
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 10px; font-weight: 600;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--t2);
+  cursor: pointer; transition: all 0.18s;
+}
+.fv-filter-pill:hover { background: rgba(255,255,255,0.07); color: var(--t1); }
+.fv-filter-pill.active { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.35); color: var(--cyan); }
+.fv-filter-pill[data-hab="tip"].active        { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.3);  color: var(--green); }
+.fv-filter-pill[data-hab="armas"].active      { background: rgba(239,68,68,0.11);  border-color: rgba(239,68,68,0.28);  color: var(--red);   }
+.fv-filter-pill[data-hab="aeropuertos"].active{ background: rgba(168,85,247,0.11); border-color: rgba(168,85,247,0.28); color: var(--purple);}
+
+.fv-vig-list {
+  flex: 1; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
+  padding: 6px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.fv-vig-list::-webkit-scrollbar { width: 4px; }
+.fv-vig-list::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+
+.fv-vig-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.fv-vig-item:hover {
+  background: rgba(var(--fv-rgb, 255,255,255), 0.08);
+  border-color: var(--fv-color, var(--border-strong));
+  transform: translateX(2px);
+}
+.fv-vig-item.fv-vig-nohab { opacity: 0.55; }
+.fv-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  border: 1px solid; flex-shrink: 0;
+}
+.fv-info { flex: 1; min-width: 0; }
+.fv-nombre { font-size: 12px; font-weight: 600; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fv-badges-row { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 2px; }
+.fv-badge { font-size: 8px; padding: 1px 5px; border-radius: 8px; }
+.fv-tip  { background: rgba(16,185,129,0.12);  border: 1px solid rgba(16,185,129,0.3);  color: var(--green); }
+.fv-arma { background: rgba(239,68,68,0.11);   border: 1px solid rgba(239,68,68,0.28);  color: var(--red);   }
+.fv-aero { background: rgba(168,85,247,0.11);  border: 1px solid rgba(168,85,247,0.28); color: var(--purple);}
+.fv-warn-hab { font-size: 8px; color: var(--amber); }
+.fv-turnos-count {
+  font-family: var(--mono); font-size: 10px; color: var(--cyan);
+  flex-shrink: 0; min-width: 20px; text-align: right;
+}
+.fv-empty { padding: 20px; color: var(--t3); font-size: 11px; text-align: center; font-family: var(--mono); }
+
+/* ── Área de la grilla focalizada ────────────────────── */
+.focus-grid-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 14px;
+}
+
+/* KPI bar */
+.focus-kpi-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  position: relative;
+  overflow: hidden;
+}
+.fk-item { display: flex; flex-direction: column; gap: 1px; }
+.fk-label { font-size: 8.5px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.7px; font-family: var(--mono); }
+.fk-val   { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--t1); }
+.fk-bar-wrap {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: rgba(255,255,255,0.06);
+}
+.fk-bar-fill { height: 100%; border-radius: 0; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+/* Scroll wrapper de la tabla focalizada */
+.focus-mgrid-scroll {
+  flex: 1;
+  overflow: auto;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
+}
+.focus-mgrid-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.focus-mgrid-scroll::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 3px; }
+
+.focus-mgrid-table {
+  border-collapse: collapse;
+  min-width: max-content;
+  width: 100%;
+}
+
+.focus-th-turno {
+  position: sticky; left: 0; z-index: 6;
+  padding: 8px 14px;
+  text-align: left; font-size: 9px; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--t3); font-family: var(--mono);
+  background: rgba(6,7,16,0.98);
+  border-bottom: 2px solid var(--border-strong);
+  border-right: 1px solid var(--border-strong);
+  min-width: 100px;
+}
+.focus-th-day {
+  padding: 5px 3px;
+  text-align: center; font-family: var(--mono);
+  background: rgba(6,7,16,0.95);
+  border-bottom: 2px solid var(--border-strong);
+  border-right: 1px solid rgba(255,255,255,0.04);
+  min-width: 44px;
+}
+.fth-num  { display: block; font-size: 11px; color: var(--t2); font-weight: 500; }
+.fth-dow  { display: block; font-size: 8px; color: var(--t3); margin-top: 1px; }
+.fth-today .fth-num  { color: var(--cyan); }
+.fth-today .fth-dow  { color: rgba(0,212,255,0.6); }
+.fth-weekend .fth-num { color: rgba(255,107,138,0.6); }
+.fth-today  { background: rgba(0,212,255,0.07) !important; }
+.fth-weekend { background: rgba(0,0,0,0.15) !important; }
+
+.focus-td-turno {
+  position: sticky; left: 0; z-index: 4;
+  padding: 8px 14px;
+  background: rgba(6,7,16,0.95);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border-strong);
+  font-size: 12px; font-weight: 600; color: var(--t1);
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 7px;
+}
+.fturno-icon { font-size: 15px; }
+
+.focus-td-day {
+  padding: 3px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+  text-align: center;
+}
+.ftd-today   { background: rgba(0,212,255,0.03); }
+.ftd-weekend { background: rgba(0,0,0,0.18); }
+
+.focus-chip {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 52px; border-radius: 6px; cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s; user-select: none;
+  padding: 3px;
+}
+.chip-assigned {
+  border-width: 1px;
+}
+.chip-assigned:hover { filter: brightness(1.25); transform: scale(1.05); }
+.chip-vacant {
+  background: rgba(255,255,255,0.025);
+  border-color: rgba(255,255,255,0.06);
+  color: var(--t3);
+}
+.chip-vacant:hover {
+  background: rgba(0,212,255,0.08);
+  border-color: rgba(0,212,255,0.3);
+  color: var(--cyan);
+}
+.chip-selected {
+  background: rgba(0,212,255,0.12) !important;
+  border-color: var(--cyan) !important;
+  color: var(--cyan) !important;
+  box-shadow: 0 0 12px rgba(0,212,255,0.25), inset 0 0 8px rgba(0,212,255,0.08);
+  animation: pulse-glow 1.2s ease-in-out infinite;
+}
+.fchip-iniciales { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+.fchip-nombre    { font-size: 8px; color: currentColor; opacity: 0.75; white-space: nowrap; overflow: hidden; max-width: 38px; text-overflow: ellipsis; }
+.fchip-vacant-icon { font-size: 18px; opacity: 0.3; font-weight: 300; }
+.chip-vacant:hover .fchip-vacant-icon { opacity: 0.9; font-weight: 600; }
+
+/* ── Modal de impresión ──────────────────────────────── */
+.print-modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s;
+  overflow-y: auto;
+}
+.print-modal-overlay.visible { opacity: 1; pointer-events: all; }
+
+.print-modal-card {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%; max-width: 900px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+
+.print-modal-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+.print-modal-toolbar-title {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; color: #e2e8f0;
+}
+.print-modal-toolbar-sub {
+  font-size: 10.5px; color: #64748b; margin-left: 4px;
+}
+.print-toolbar-actions { margin-left: auto; display: flex; gap: 8px; }
+.btn-pt-action {
+  padding: 7px 16px; border-radius: 7px;
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; border: 1px solid;
+}
+.btn-pt-print  { background: #0f766e; border-color: #0d9488; color: #fff; }
+.btn-pt-print:hover { background: #0d9488; }
+.btn-pt-close  { background: transparent; border-color: #475569; color: #94a3b8; }
+.btn-pt-close:hover { border-color: #64748b; color: #cbd5e1; }
+
+/* ── Contenido de impresión (dentro del modal) ───────── */
+#print-modal-body { padding: 20px; background: #fff; }
+
+.pt-page {
+  font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;
+  font-size: 10px; color: #111; background: #fff;
+}
+.pt-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding-bottom: 14px; margin-bottom: 14px;
+  border-bottom: 3px solid #0f172a;
+}
+.pt-company-name { font-size: 18px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
+.pt-company-sub  { font-size: 11px; color: #475569; margin-top: 2px; }
+.pt-header-right { text-align: right; }
+.pt-doc-label    { font-size: 9px; font-weight: 700; color: #fff; background: #0f172a; padding: 2px 9px; border-radius: 4px; letter-spacing: 1px; display: inline-block; }
+.pt-doc-ref      { font-size: 10px; color: #64748b; margin-top: 5px; }
+.pt-meta {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5px 20px; margin-bottom: 14px;
+  padding: 10px 14px; background: #f8fafc;
+  border: 1px solid #e2e8f0; border-radius: 8px;
+}
+.pt-meta-row   { display: flex; gap: 8px; align-items: baseline; }
+.pt-meta-label { font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; min-width: 100px; }
+.pt-meta-val   { font-size: 11px; font-weight: 600; color: #0f172a; }
+
+.pt-table {
+  width: 100%; border-collapse: collapse;
+  margin-bottom: 14px; font-size: 8.5px;
+}
+.pt-th-turno {
+  padding: 5px 9px; background: #0f172a; color: #fff;
+  text-align: left; font-size: 8px; text-transform: uppercase; letter-spacing: 0.8px;
+  border: 1px solid #334155; white-space: nowrap; min-width: 70px;
+}
+.pt-th-day {
+  padding: 4px 2px; background: #0f172a; color: #cbd5e1;
+  text-align: center; font-size: 8px; border: 1px solid #334155;
+  min-width: 26px; line-height: 1.3;
+}
+.pt-th-day small { display: block; font-size: 7px; color: #64748b; }
+.pt-th-day.pt-weekend { background: #334155; color: #94a3b8; }
+.pt-td-turno {
+  padding: 6px 9px; background: #f1f5f9;
+  font-weight: 700; font-size: 9px; color: #1e293b;
+  border: 1px solid #cbd5e1; white-space: nowrap;
+}
+.pt-td-day {
+  padding: 4px 2px; text-align: center;
+  border: 1px solid #e2e8f0; vertical-align: middle;
+  background: #fff;
+}
+.pt-td-day.pt-weekend { background: #f8fafc; }
+.pt-td-day.pt-today   { background: #eff6ff; }
+.pt-iniciales {
+  display: inline-block; padding: 2px 4px;
+  background: #1e293b; color: #fff; border-radius: 3px;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.3px;
+}
+.pt-leyenda {
+  margin-bottom: 16px; padding: 10px 14px;
+  border: 1px solid #e2e8f0; border-radius: 8px;
+  font-size: 9px; color: #334155;
+}
+.pt-leyenda strong { display: block; margin-bottom: 7px; font-size: 9.5px; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px; }
+.pt-leyenda-grid { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.pt-leyenda-item { display: flex; align-items: center; gap: 6px; }
+.pt-ini-box { display: inline-block; padding: 2px 6px; background: #1e293b; color: #fff; border-radius: 4px; font-size: 8.5px; font-weight: 700; }
+
+/* Cajas de firma */
+.pt-signatures {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px; margin-bottom: 14px;
+}
+.pt-sig-box {
+  border: 2px solid #334155; border-radius: 8px;
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.pt-sig-title {
+  font-size: 9px; font-weight: 700; color: #0f172a;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  text-align: center; padding-bottom: 6px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.pt-sig-line {
+  height: 1px; background: #334155; margin-top: 40px;
+}
+.pt-sig-name  { font-size: 8px; color: #64748b; text-align: center; }
+.pt-sig-date  { font-size: 8px; color: #64748b; }
+.pt-sig-center { border-color: #0f172a; background: #f8fafc; }
+.pt-sig-stamp-area {
+  flex: 1; border: 2px dashed #cbd5e1; border-radius: 6px;
+  min-height: 70px; display: flex; align-items: center; justify-content: center;
+  color: #cbd5e1; font-size: 10px;
+  background: repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,0.02) 4px,rgba(0,0,0,0.02) 8px);
+}
+.pt-sig-stamp-area::before { content: 'SELLO'; font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: 3px; }
+
+.pt-footer {
+  font-size: 7.5px; color: #94a3b8; text-align: center;
+  padding-top: 10px; border-top: 1px solid #e2e8f0;
+}
+
+/* ── @media print ────────────────────────────────────── */
+@media print {
+  body > *:not(#cuad-print-wrapper) { display: none !important; }
+  #cuad-print-wrapper { display: block !important; }
+  .print-modal-overlay { position: static !important; padding: 0 !important; background: none !important; opacity: 1 !important; }
+  .print-modal-card { box-shadow: none !important; max-width: none !important; border-radius: 0 !important; }
+  .print-modal-toolbar { display: none !important; }
+  #print-modal-body { padding: 0 !important; }
+  .pt-page { font-size: 9px !important; }
+}
+
+/* ── Ajuste de view-cuadrantes para el overlay ───────── */
+#view-cuadrantes {
+  position: relative;
+}
+
+</style>
+
+<!-- ====================================================
+     FASE 4 — HTML: OVERLAY CUADRANTE FOCALIZADO
+===================================================== -->
+
+<!-- Contenedor de impresión (invisible salvo al imprimir) -->
+<div id="cuad-print-wrapper" style="display:none">
+  <div class="print-modal-overlay visible" id="print-modal-overlay-print"></div>
+</div>
+
+<!-- Modal de vista previa de impresión -->
+<div class="print-modal-overlay" id="print-modal-overlay">
+  <div class="print-modal-card">
+    <div class="print-modal-toolbar">
+      <span class="print-modal-toolbar-title">🖨 Vista Previa de Impresión</span>
+      <span class="print-modal-toolbar-sub">Cuadrante mensual — versión oficial</span>
+      <div class="print-toolbar-actions">
+        <button class="btn-pt-action btn-pt-print" onclick="doPrint()">🖨 Imprimir / Guardar PDF</button>
+        <button class="btn-pt-action btn-pt-close" onclick="closePrintModal()">✕ Cerrar</button>
+      </div>
+    </div>
+    <div id="print-modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ── switchView — navegación entre vistas principales ───────────────
+   Restaurado en Fase 4 (estaba en el bloque truncado del archivo)  */
+function switchView(name) {
+  document.querySelectorAll('.app-view').forEach(v => v.classList.add('hidden'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const el  = document.getElementById('view-' + name);
+  const tab = document.querySelector('.nav-tab[data-view="' + name + '"]');
+  if (el)  el.classList.remove('hidden');
+  if (tab) tab.classList.add('active');
+  if (name !== 'cuadrantes' && focusedPuestoId) exitFocusMode();
+  if (name === 'cuadrantes') {
     renderCuadMonthDisplay();
-    renderCuadCatalogStrip();
+    renderServiciosGrid();
     renderMonthlyGrid();
   }
-  if (view === 'nominas') {
-    renderNomMonthDisplay();
-    renderNominasTab();
-  }
+  if (name === 'nominas') renderNominasTab();
 }
 
-/* ======================================================
-   INIT
-====================================================== */
-function init() {
-  renderDateNav();
-  loadFromStorage();
-  renderRoster();
-  renderGlobalStats();  // Panel derecho: estadísticas globales por defecto
-  updateKPI();
-  syncFilterPills();
-  renderCuadMonthDisplay();
-  renderCuadCatalogStrip();
-}
+/* ── Inyectar el overlay focalizado dentro de #view-cuadrantes ──────
+   Se hace via JS para no alterar el HTML estático de fases previas  */
+(function injectFocusOverlay() {
+  const view = document.getElementById('view-cuadrantes');
+  if (!view) return;
 
-init();
+  /* -- Overlay principal -- */
+  const overlay = document.createElement('div');
+  overlay.id = 'cuad-focus-overlay';
+
+  const topBar = document.createElement('div');
+  topBar.className = 'focus-top-bar';
+  topBar.innerHTML =
+    '<button class="focus-back-btn" onclick="exitFocusMode()">&#8592; Cat&#225;logo</button>' +
+    '<div class="focus-service-pill">' +
+      '<div id="focus-service-accent" class="focus-service-accent-dot"></div>' +
+      '<span id="focus-emoji" style="font-size:22px">&#128274;</span>' +
+      '<div>' +
+        '<div class="focus-service-name" id="focus-service-name">&#8212;</div>' +
+        '<div class="focus-service-loc"  id="focus-service-loc">&#8212;</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="focus-top-actions">' +
+      '<button class="btn-focus-auto" onclick="autoCompletarServicio()" title="Rellena turnos vacios solo de este servicio">' +
+        '&#9889; Auto-completar Mes' +
+      '</button>' +
+      '<button class="btn-focus-print" onclick="printCuadranteFocused()" title="Genera version profesional para imprimir o PDF">' +
+        '&#128424; Imprimir / Exportar Cuadrante' +
+      '</button>' +
+    '</div>';
+  overlay.appendChild(topBar);
+
+  const hint = document.createElement('div');
+  hint.className = 'focus-assign-hint';
+  hint.id = 'focus-assign-hint';
+  hint.textContent = 'Selecciona un slot del cuadrante y luego haz clic en un vigilante para asignar';
+  overlay.appendChild(hint);
+
+  const layout = document.createElement('div');
+  layout.className = 'focus-layout';
+
+  /* -- Sidebar -- */
+  const sidebar = document.createElement('div');
+  sidebar.className = 'focus-sidebar';
+  sidebar.innerHTML =
+    '<div class="fv-sidebar-hdr">Asignación Rápida</div>' +
+    '<div class="fv-search-wrap">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' +
+        '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>' +
+      '</svg>' +
+      '<input type="text" placeholder="Buscar vigilante…" oninput="focusSidebarSearch(this.value)">' +
+    '</div>' +
+    '<div class="fv-filter-row">' +
+      '<button class="fv-filter-pill" data-hab="tip"         onclick="toggleFocusHabFilter(\'tip\',this)">TIP</button>' +
+      '<button class="fv-filter-pill" data-hab="armas"       onclick="toggleFocusHabFilter(\'armas\',this)">&#9873; Armas</button>' +
+      '<button class="fv-filter-pill" data-hab="aeropuertos" onclick="toggleFocusHabFilter(\'aeropuertos\',this)">&#9992; Aero</button>' +
+    '</div>' +
+    '<div class="fv-vig-list" id="fv-vig-list"></div>';
+
+  layout.appendChild(sidebar);
+
+  /* -- Grilla focalizada -- */
+  const gridArea = document.createElement('div');
+  gridArea.className = 'focus-grid-area';
+  gridArea.id = 'focus-grid-area';
+  layout.appendChild(gridArea);
+
+  overlay.appendChild(layout);
+  view.appendChild(overlay);
+
+  /* -- IDs a los botones globales de auto-completar y limpiar -- */
+  document.querySelectorAll('#view-cuadrantes .cuad-controls .btn-hdr').forEach(function(btn) {
+    var t = btn.textContent;
+    if (t.indexOf('Auto-completar') !== -1) btn.id = 'btn-autocompletar-global';
+    if (t.indexOf('Limpiar')         !== -1) btn.id = 'btn-limpiar-global';
+  });
+
+  /* -- Repintar catálogo con data-puesto-id -- */
+  renderServiciosGrid();
+})();
 </script>
+
 </body>
 </html>
