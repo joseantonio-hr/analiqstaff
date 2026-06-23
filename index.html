@@ -2094,6 +2094,313 @@
     script, style { display: none !important; visibility: hidden !important; }
 
     /* ========================================================
+       FASE 3 — VISTA SERVICIOS: Centro de Mando de Clientes
+    ======================================================== */
+    .servicios-view-inner {
+      display: flex; flex-direction: column; height: 100%; overflow: hidden;
+    }
+
+    /* ─ Catálogo ──────────────────────────────────────────── */
+    .svc-catalog {
+      flex: 1; overflow-y: auto; padding: 24px 28px;
+      scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
+    }
+    .svc-catalog::-webkit-scrollbar { width: 4px; }
+    .svc-catalog::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+
+    .svc-catalog-hdr {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 22px;
+    }
+    .svc-catalog-title {
+      font-family: var(--serif); font-size: 22px; color: var(--t1); line-height: 1.1;
+    }
+    .svc-catalog-sub {
+      font-size: 10px; color: var(--t2); margin-top: 4px;
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+    .svc-catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    /* Service card — glassmorphism + neon glow on hover */
+    .svc-card {
+      position: relative;
+      padding: 20px 18px 16px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      cursor: pointer;
+      transition: border-color 0.3s, box-shadow 0.35s, background 0.3s, transform 0.22s;
+      overflow: hidden;
+      animation: fade-in 0.32s ease both;
+    }
+    .svc-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, var(--sc-neon, rgba(0,212,255,0.09)), transparent 65%);
+      pointer-events: none; transition: opacity 0.3s; opacity: 0.85;
+    }
+    .svc-card:hover {
+      border-color: var(--sc-accent, var(--cyan));
+      background: rgba(255,255,255,0.055);
+      box-shadow:
+        0 0 0 1px var(--sc-accent, var(--cyan)),
+        0 0 30px -4px var(--sc-neon, rgba(0,212,255,0.45)),
+        0 10px 35px rgba(0,0,0,0.35);
+      transform: translateY(-5px);
+    }
+    .svc-card:hover::before { opacity: 1.8; }
+
+    .svc-card-emoji {
+      font-size: 40px; line-height: 1; display: block; margin-bottom: 12px;
+      filter: drop-shadow(0 0 7px var(--sc-neon, rgba(0,212,255,0.5)));
+      transition: filter 0.3s, transform 0.22s;
+    }
+    .svc-card:hover .svc-card-emoji {
+      filter: drop-shadow(0 0 18px var(--sc-neon, rgba(0,212,255,0.85)));
+      transform: scale(1.1);
+    }
+    .svc-card-nombre {
+      font-size: 14px; font-weight: 700; color: var(--t1); margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .svc-card-lugar {
+      font-size: 10px; color: var(--t2); margin-bottom: 12px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .svc-card-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+    .svc-card-cov {
+      position: absolute; top: 12px; right: 12px;
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 3px 9px; border-radius: 20px;
+      font-family: var(--mono); font-size: 9px; font-weight: 600;
+    }
+    .svc-card-cov.ok    { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: var(--green); }
+    .svc-card-cov.warn  { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: var(--amber); }
+    .svc-card-cov.empty { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--t3); }
+    .svc-card-open-hint {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 9px; color: var(--t3); text-transform: uppercase;
+      letter-spacing: 0.7px; transition: color 0.2s;
+    }
+    .svc-card:hover .svc-card-open-hint { color: var(--sc-accent, var(--cyan)); }
+
+    /* ─ Ficha Operativa Panel ───────────────────────────── */
+    .ficha-panel {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .ficha-hdr {
+      flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.015);
+    }
+    .ficha-emoji-big {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+      background: var(--glass); border: 1px solid var(--border-strong);
+    }
+    .ficha-hdr-info { flex: 1; min-width: 0; }
+    .ficha-hdr-nombre {
+      font-family: var(--serif); font-size: 19px; color: var(--t1);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ficha-hdr-lugar { font-size: 10.5px; color: var(--t2); margin-top: 2px; }
+    .btn-ficha-back {
+      display: flex; align-items: center; gap: 5px; padding: 6px 12px;
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--t2);
+      font-family: var(--sans); font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-ficha-back:hover { background: var(--glass-hover); color: var(--t1); border-color: var(--border-strong); }
+    .btn-ficha-plan {
+      display: flex; align-items: center; gap: 5px; padding: 7px 14px;
+      background: rgba(0,212,255,0.09); border: 1px solid rgba(0,212,255,0.25);
+      border-radius: var(--r-sm); color: var(--cyan);
+      font-family: var(--sans); font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-ficha-plan:hover { background: rgba(0,212,255,0.18); border-color: rgba(0,212,255,0.45); }
+
+    .ficha-body {
+      flex: 1; overflow-y: auto; padding: 20px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-content: start;
+      scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
+    }
+    .ficha-body::-webkit-scrollbar { width: 4px; }
+    .ficha-body::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+    .ficha-col { display: flex; flex-direction: column; gap: 14px; }
+
+    .ficha-section {
+      background: var(--glass); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden;
+    }
+    .ficha-section-hdr {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .ficha-section-icon {
+      width: 22px; height: 22px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 11px;
+    }
+    .ficha-section-title {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--t3); font-family: var(--mono); font-weight: 700;
+    }
+    .ficha-section-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .ficha-field { display: flex; flex-direction: column; gap: 5px; }
+    .ficha-field > label:first-child {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--t2); font-weight: 600;
+    }
+    .ficha-input {
+      padding: 7px 10px; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: var(--r-sm);
+      color: var(--t1); font-family: var(--sans); font-size: 12px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .ficha-input::placeholder { color: var(--t3); }
+    .ficha-input:focus { border-color: rgba(0,212,255,0.4); }
+    .ficha-check-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ficha-check-item {
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 9px 3px 7px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 20px; cursor: pointer; user-select: none;
+      transition: all 0.18s; font-size: 10px; color: var(--t2);
+    }
+    .ficha-check-item:hover { background: rgba(255,255,255,0.07); border-color: var(--border-strong); }
+    .ficha-check-item input[type=checkbox] { width: 12px; height: 12px; accent-color: var(--cyan); cursor: pointer; }
+    .ficha-inline { flex-direction: row; align-items: center; justify-content: space-between; }
+    .ficha-save-row { padding: 0 14px 14px; display: flex; justify-content: flex-end; }
+    .btn-ficha-save {
+      padding: 6px 15px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+      border-radius: var(--r-sm); color: var(--green);
+      font-family: var(--sans); font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ficha-save:hover { background: rgba(16,185,129,0.22); border-color: rgba(16,185,129,0.5); }
+    .btn-ficha-save.saved { animation: save-flash 0.4s ease; }
+    @keyframes save-flash {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.06); box-shadow: 0 0 10px rgba(16,185,129,0.4); }
+    }
+    .btn-ficha-save.pending { color: var(--amber); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.08); }
+
+    /* ─ Libro de Consigna IA ────────────────────────────── */
+    .libro-consigna-section {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(77,142,255,0.05), rgba(168,85,247,0.04));
+      border: 1px solid rgba(77,142,255,0.2) !important;
+    }
+    .libro-hdr {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-bottom: 1px solid rgba(77,142,255,0.15);
+      background: rgba(77,142,255,0.04);
+    }
+    .libro-hdr-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(77,142,255,0.14); border: 1px solid rgba(77,142,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .libro-hdr-info { flex: 1; }
+    .libro-hdr-label {
+      font-size: 8px; text-transform: uppercase; letter-spacing: 1.1px;
+      color: var(--blue); font-family: var(--mono);
+    }
+    .libro-hdr-title { font-size: 13px; font-weight: 600; color: var(--t1); margin-top: 1px; }
+    .libro-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    .libro-upload-area {
+      border: 2px dashed rgba(77,142,255,0.25); border-radius: var(--r-md);
+      padding: 22px; text-align: center; cursor: pointer;
+      transition: border-color 0.22s, background 0.22s;
+    }
+    .libro-upload-area:hover {
+      border-color: rgba(77,142,255,0.55); background: rgba(77,142,255,0.04);
+    }
+    .libro-upload-icon { font-size: 30px; margin-bottom: 7px; }
+    .libro-upload-txt { font-size: 11.5px; color: var(--t2); font-weight: 500; }
+    .libro-upload-sub { font-size: 9px; color: var(--t3); margin-top: 3px; font-family: var(--mono); }
+
+    .libro-file-status {
+      display: none; align-items: center; gap: 10px; padding: 9px 12px;
+      background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--r-sm);
+    }
+    .libro-file-status.visible { display: flex; }
+    .libro-file-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; }
+    .libro-file-name { font-family: var(--mono); font-size: 10.5px; color: var(--t1); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .libro-file-tag { font-family: var(--mono); font-size: 8.5px; color: var(--t3); flex-shrink: 0; padding: 2px 7px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; }
+
+    /* ─ Consigna Viewer ─────────────────────────────────── */
+    .consigna-viewer {
+      display: none; flex-direction: column; gap: 0;
+      border: 1px solid rgba(77,142,255,0.2); border-radius: var(--r-md);
+      overflow: hidden; background: rgba(6,7,16,0.7);
+    }
+    .consigna-viewer.visible { display: flex; animation: fade-in 0.3s ease; }
+    .consigna-viewer-hdr {
+      padding: 9px 14px; border-bottom: 1px solid rgba(77,142,255,0.15);
+      background: rgba(77,142,255,0.06);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .consigna-viewer-hdr-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue); box-shadow: 0 0 6px var(--blue); flex-shrink: 0;
+    }
+    .consigna-viewer-hdr-label {
+      font-size: 8px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--blue); font-family: var(--mono);
+    }
+    .consigna-viewer-hdr-stamp {
+      margin-left: auto; font-family: var(--mono); font-size: 8.5px; color: var(--t3);
+    }
+    .consigna-section {
+      padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .consigna-section:last-child { border-bottom: none; }
+    .consigna-section-label {
+      font-size: 8px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--t3); font-family: var(--mono); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .consigna-section-label::before {
+      content: ''; display: inline-block; width: 14px; height: 1px; background: var(--t3);
+    }
+    .consigna-text {
+      font-family: var(--mono); font-size: 11px; color: var(--t1); line-height: 1.75;
+    }
+    .consigna-list { display: flex; flex-direction: column; gap: 5px; }
+    .consigna-item {
+      display: flex; align-items: baseline; gap: 8px;
+      font-family: var(--mono); font-size: 11px; color: var(--t1); line-height: 1.5;
+    }
+    .consigna-item::before {
+      content: '▸'; color: var(--blue); font-size: 9px; flex-shrink: 0;
+    }
+    .consigna-tel {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 5px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
+      font-family: var(--mono); font-size: 10.5px; color: var(--green); font-weight: 500;
+      margin: 2px 0;
+    }
+    .consigna-contacts-row {
+      display: flex; align-items: center; gap: 10px; margin: 3px 0;
+    }
+    .consigna-contacts-rol {
+      font-family: var(--mono); font-size: 9.5px; color: var(--t2); min-width: 165px;
+    }
+
+    /* ========================================================
        NAVEGADOR DE FECHA (Dashboard)
     ======================================================== */
     .date-nav {
@@ -2759,6 +3066,7 @@
 
   <nav class="nav-tabs">
     <button class="nav-tab active" data-view="dashboard"   onclick="switchView('dashboard')">📋 Dashboard</button>
+    <button class="nav-tab"        data-view="servicios"   onclick="switchView('servicios')">🏢 Servicios</button>
     <button class="nav-tab"        data-view="cuadrantes"  onclick="switchView('cuadrantes')">📅 Cuadrantes</button>
     <button class="nav-tab"        data-view="nominas"     onclick="switchView('nominas')">💰 Nóminas</button>
   </nav>
@@ -3034,6 +3342,163 @@
 
   </div>
 </div>
+
+<!-- ====================================================
+     VIEW 4: SERVICIOS — Centro de Mando de Clientes (FASE 3)
+===================================================== -->
+<div id="view-servicios" class="app-view hidden">
+  <div class="servicios-view-inner">
+
+    <!-- CATÁLOGO (visible por defecto) -->
+    <div id="svc-catalog-section" class="svc-catalog">
+      <div class="svc-catalog-hdr">
+        <div>
+          <div class="svc-catalog-title">Centro de Mando de Clientes</div>
+          <div class="svc-catalog-sub">Servicios activos · Haz clic en una tarjeta para abrir la ficha operativa</div>
+        </div>
+        <button class="btn-hdr primary" onclick="openModal()" style="font-size:11px;padding:7px 14px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo Servicio
+        </button>
+      </div>
+      <div class="svc-catalog-grid" id="svc-catalog-grid">
+        <!-- Renderizado por renderCatalogServicios() -->
+      </div>
+    </div>
+
+    <!-- FICHA OPERATIVA (oculta por defecto, se activa al clicar tarjeta) -->
+    <div id="svc-ficha-panel" class="ficha-panel" style="display:none">
+
+      <!-- Cabecera de la ficha -->
+      <div class="ficha-hdr">
+        <button class="btn-ficha-back" onclick="closeFichaServicio()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver al catálogo de clientes
+        </button>
+        <div class="ficha-emoji-big" id="ficha-emoji-big">🔒</div>
+        <div class="ficha-hdr-info">
+          <div class="ficha-hdr-nombre" id="ficha-hdr-nombre">—</div>
+          <div class="ficha-hdr-lugar"  id="ficha-hdr-lugar">—</div>
+        </div>
+        <button class="btn-ficha-plan" onclick="fichaGoToPlan()">
+          📅 Ir a planificación mensual
+        </button>
+      </div>
+
+      <!-- Cuerpo: 2 columnas -->
+      <div class="ficha-body">
+
+        <!-- Columna izquierda: datos editables -->
+        <div class="ficha-col">
+
+          <!-- Datos básicos -->
+          <div class="ficha-section">
+            <div class="ficha-section-hdr">
+              <div class="ficha-section-icon" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2)">📋</div>
+              <span class="ficha-section-title">Datos del Servicio</span>
+            </div>
+            <div class="ficha-section-body">
+              <div class="ficha-field">
+                <label>Nombre del servicio</label>
+                <input type="text" class="ficha-input" id="ficha-nombre" placeholder="Nombre del puesto" oninput="autoSaveFicha()">
+              </div>
+              <div class="ficha-field">
+                <label>Ubicación / Cliente</label>
+                <input type="text" class="ficha-input" id="ficha-lugar" placeholder="Dirección o nombre del cliente" oninput="autoSaveFicha()">
+              </div>
+              <div class="ficha-field">
+                <label>Emoji identificador</label>
+                <input type="text" class="ficha-input" id="ficha-emoji-input" placeholder="🔒" maxlength="2" style="width:70px" oninput="autoSaveFicha()">
+              </div>
+            </div>
+            <div class="ficha-save-row">
+              <button class="btn-ficha-save" id="btn-ficha-save" onclick="saveFichaEdits()">✓ Guardado</button>
+            </div>
+          </div>
+
+          <!-- Requerimientos operativos -->
+          <div class="ficha-section">
+            <div class="ficha-section-hdr">
+              <div class="ficha-section-icon" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2)">🛡</div>
+              <span class="ficha-section-title">Requerimientos Operativos</span>
+            </div>
+            <div class="ficha-section-body">
+              <div class="ficha-field">
+                <label>Habilitaciones requeridas</label>
+                <div class="ficha-check-group">
+                  <label class="ficha-check-item">
+                    <input type="checkbox" id="ficha-hab-tip" onchange="autoSaveFicha()">
+                    <span class="badge tip">✓ TIP Activa</span>
+                  </label>
+                  <label class="ficha-check-item">
+                    <input type="checkbox" id="ficha-hab-armas" onchange="autoSaveFicha()">
+                    <span class="badge armas">⚑ Lic. Armas</span>
+                  </label>
+                  <label class="ficha-check-item">
+                    <input type="checkbox" id="ficha-hab-aeropuertos" onchange="autoSaveFicha()">
+                    <span class="badge aeropuertos">✈ Aeropuertos</span>
+                  </label>
+                </div>
+              </div>
+              <div class="ficha-field ficha-inline">
+                <label>Puesto Armado <span style="font-size:8px;color:var(--t3);text-transform:none;letter-spacing:0">(genera plus de peligrosidad)</span></label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="ficha-armado" onchange="autoSaveFicha()">
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /ficha-col izquierda -->
+
+        <!-- Columna derecha: Libro de Consigna IA -->
+        <div class="ficha-col">
+          <div class="ficha-section libro-consigna-section">
+            <div class="libro-hdr">
+              <div class="libro-hdr-icon">📚</div>
+              <div class="libro-hdr-info">
+                <div class="libro-hdr-label">AnalIQ · Módulo IA</div>
+                <div class="libro-hdr-title">Libro de Consigna</div>
+              </div>
+            </div>
+            <div class="libro-body">
+
+              <!-- Zona de subida -->
+              <div class="libro-upload-area" onclick="document.getElementById('normativa-input').click()" title="Adjuntar normativa del servicio">
+                <div class="libro-upload-icon">📎</div>
+                <div class="libro-upload-txt">Adjuntar normativa del servicio</div>
+                <div class="libro-upload-sub">PDF · DOCX · TXT — La IA extraerá los protocolos de seguridad</div>
+              </div>
+              <input type="file" id="normativa-input" accept=".pdf,.txt,.doc,.docx"
+                     style="display:none" onchange="onNormativaFile(this)">
+
+              <!-- Estado del archivo adjunto -->
+              <div class="libro-file-status" id="libro-file-status">
+                <div class="libro-file-dot"></div>
+                <div class="libro-file-name" id="libro-file-name">—</div>
+                <span class="libro-file-tag" id="libro-file-tag">Extraído por IA</span>
+              </div>
+
+              <!-- Visor de consigna extraída -->
+              <div class="consigna-viewer" id="consigna-viewer">
+                <div class="consigna-viewer-hdr">
+                  <div class="consigna-viewer-hdr-dot"></div>
+                  <span class="consigna-viewer-hdr-label">Libro de Consigna — Extraído por IA</span>
+                  <span class="consigna-viewer-hdr-stamp" id="consigna-stamp">—</span>
+                </div>
+                <div id="consigna-sections-content"></div>
+              </div>
+
+            </div>
+          </div>
+        </div><!-- /ficha-col derecha -->
+
+      </div><!-- /ficha-body -->
+    </div><!-- /svc-ficha-panel -->
+
+  </div><!-- /servicios-view-inner -->
+</div><!-- /view-servicios -->
 
 <!-- ====================================================
      DRAWER LATERAL: EXPEDIENTE DEL AGENTE
@@ -7102,13 +7567,14 @@ function switchView(name) {
   const tab = document.querySelector('.nav-tab[data-view="' + name + '"]');
   if (el)  el.classList.remove('hidden');
   if (tab) tab.classList.add('active');
-  if (name !== 'cuadrantes' && focusedPuestoId) exitFocusMode();
+  if (name !== 'cuadrantes' && typeof focusedPuestoId !== 'undefined' && focusedPuestoId) exitFocusMode();
   if (name === 'cuadrantes') {
     renderCuadMonthDisplay();
     renderServiciosGrid();
     renderMonthlyGrid();
   }
-  if (name === 'nominas') renderNominasTab();
+  if (name === 'nominas')   renderNominasTab();
+  if (name === 'servicios') renderCatalogServicios();
 }
 
 /* ── Inyectar el overlay focalizado dentro de #view-cuadrantes ──────
@@ -7190,6 +7656,361 @@ function switchView(name) {
 
   /* -- Repintar catálogo con data-puesto-id -- */
   renderServiciosGrid();
+})();
+</script>
+
+<script>
+/* ======================================================
+   FASE 3 — SERVICIOS: Centro de Mando de Clientes
+   · Catálogo glassmorphism con neon hover
+   · Ficha Operativa (edición directa → localStorage)
+   · Libro de Consigna IA (upload → extracción simulada)
+====================================================== */
+
+let fichaCurrentPuestoId = null;
+let fichaAutoSaveTimer   = null;
+
+/* ── Renderiza el catálogo de tarjetas en la vista Servicios ── */
+function renderCatalogServicios() {
+  const grid = document.getElementById('svc-catalog-grid');
+  if (!grid) return;
+
+  if (!PUESTOS || PUESTOS.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;
+                  gap:12px;padding:60px 20px;color:var(--t3);text-align:center">
+        <span style="font-size:44px">🏢</span>
+        <div style="font-size:14px;color:var(--t2)">Sin servicios registrados</div>
+        <div style="font-size:10.5px">Pulsa <strong style="color:var(--cyan)">"Nuevo Servicio"</strong> para añadir el primer cliente</div>
+      </div>`;
+    return;
+  }
+
+  const accentMap = {
+    armado:     { color: 'var(--amber)', glow: 'rgba(245,158,11,0.42)',  neon: 'rgba(245,158,11,0.09)' },
+    aeropuerto: { color: 'var(--cyan)',  glow: 'rgba(0,212,255,0.42)',   neon: 'rgba(0,212,255,0.09)'  },
+    generico:   { color: 'var(--blue)',  glow: 'rgba(77,142,255,0.42)',  neon: 'rgba(77,142,255,0.09)' }
+  };
+
+  grid.innerHTML = PUESTOS.map((p, i) => {
+    const acc = accentMap[p.tipo] || accentMap.generico;
+    const pct = typeof calcCoberturaPuesto === 'function' ? calcCoberturaPuesto(p.id) : 0;
+    let covCls, covTxt;
+    if (pct >= 80)     { covCls = 'ok';   covTxt = pct + '% Cubierto'; }
+    else if (pct > 0)  { covCls = 'warn'; covTxt = pct + '% ⚠ Revisar'; }
+    else               { covCls = 'empty';covTxt = 'Sin cubrir'; }
+
+    const badges = [
+      p.requiere && p.requiere.includes('tip')         ? '<span class="sc-badge-tip">TIP</span>'        : '',
+      p.requiere && p.requiere.includes('armas')       ? '<span class="sc-badge-arma">⚑ Armas</span>'  : '',
+      p.requiere && p.requiere.includes('aeropuertos') ? '<span class="sc-badge-aero">✈ Aero</span>'   : '',
+      p.armado                                          ? '<span class="sc-badge-arma">🔫 Armado</span>' : '',
+    ].filter(Boolean).join('');
+
+    const consignaIcon = p.consigna ? '<span style="font-size:10px">📚</span>' : '';
+
+    return `
+    <div class="svc-card"
+         style="--sc-accent:${acc.color};--sc-neon:${acc.glow};animation-delay:${i * 0.06}s"
+         onclick="openFichaServicio('${p.id}')">
+      <span class="svc-card-cov ${covCls}">${covTxt}</span>
+      <span class="svc-card-emoji">${p.emoji || '🔒'}</span>
+      <div class="svc-card-nombre">${p.nombre}</div>
+      <div class="svc-card-lugar">📍 ${p.lugar}</div>
+      ${badges ? `<div class="svc-card-badges">${badges}</div>` : ''}
+      <div class="svc-card-open-hint">${consignaIcon} Ver ficha operativa →</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Abre el panel de ficha de un servicio ────────────── */
+function openFichaServicio(pId) {
+  const p = PUESTOS.find(x => x.id === pId);
+  if (!p) return;
+  fichaCurrentPuestoId = pId;
+
+  // Transición: ocultar catálogo → mostrar ficha
+  const cat   = document.getElementById('svc-catalog-section');
+  const panel = document.getElementById('svc-ficha-panel');
+  if (cat)   cat.style.display   = 'none';
+  if (panel) panel.style.display = 'flex';
+
+  // Cabecera
+  const emojiBig = document.getElementById('ficha-emoji-big');
+  const hdrNom   = document.getElementById('ficha-hdr-nombre');
+  const hdrLoc   = document.getElementById('ficha-hdr-lugar');
+  if (emojiBig) emojiBig.textContent = p.emoji || '🔒';
+  if (hdrNom)   hdrNom.textContent   = p.nombre;
+  if (hdrLoc)   hdrLoc.textContent   = '📍 ' + p.lugar;
+
+  // Formulario
+  const fNombre = document.getElementById('ficha-nombre');
+  const fLugar  = document.getElementById('ficha-lugar');
+  const fEmoji  = document.getElementById('ficha-emoji-input');
+  const fTip    = document.getElementById('ficha-hab-tip');
+  const fArmas  = document.getElementById('ficha-hab-armas');
+  const fAero   = document.getElementById('ficha-hab-aeropuertos');
+  const fArmado = document.getElementById('ficha-armado');
+
+  if (fNombre) fNombre.value = p.nombre;
+  if (fLugar)  fLugar.value  = p.lugar;
+  if (fEmoji)  fEmoji.value  = p.emoji || '';
+  if (fTip)    fTip.checked    = p.requiere ? p.requiere.includes('tip')         : false;
+  if (fArmas)  fArmas.checked  = p.requiere ? p.requiere.includes('armas')       : false;
+  if (fAero)   fAero.checked   = p.requiere ? p.requiere.includes('aeropuertos') : false;
+  if (fArmado) fArmado.checked = p.armado || false;
+
+  // Botón guardar — estado limpio
+  const btn = document.getElementById('btn-ficha-save');
+  if (btn) { btn.textContent = '✓ Guardado'; btn.classList.remove('saved','pending'); }
+
+  // Libro de consigna: cargar si existe
+  _loadConsignaViewer(p);
+}
+
+/* ── Cierra la ficha y vuelve al catálogo ─────────────── */
+function closeFichaServicio() {
+  fichaCurrentPuestoId = null;
+  if (fichaAutoSaveTimer) { clearTimeout(fichaAutoSaveTimer); fichaAutoSaveTimer = null; }
+
+  const cat   = document.getElementById('svc-catalog-section');
+  const panel = document.getElementById('svc-ficha-panel');
+  if (cat)   cat.style.display   = '';
+  if (panel) panel.style.display = 'none';
+
+  // Ocultar visor de consigna para la próxima apertura
+  const viewer   = document.getElementById('consigna-viewer');
+  const statusEl = document.getElementById('libro-file-status');
+  if (viewer)   viewer.classList.remove('visible');
+  if (statusEl) statusEl.classList.remove('visible');
+
+  renderCatalogServicios();
+}
+
+/* ── Ir a planificación mensual ───────────────────────── */
+function fichaGoToPlan() {
+  const pId = fichaCurrentPuestoId;
+  switchView('cuadrantes');
+  if (pId && typeof enterFocusMode === 'function') {
+    setTimeout(function() { enterFocusMode(pId); }, 200);
+  }
+}
+
+/* ── Autoguardado con debounce ────────────────────────── */
+function autoSaveFicha() {
+  const btn = document.getElementById('btn-ficha-save');
+  if (btn) { btn.textContent = '● Guardando…'; btn.classList.add('pending'); btn.classList.remove('saved'); }
+  if (fichaAutoSaveTimer) clearTimeout(fichaAutoSaveTimer);
+  fichaAutoSaveTimer = setTimeout(saveFichaEdits, 700);
+}
+
+/* ── Guarda cambios del formulario al store ───────────── */
+function saveFichaEdits() {
+  if (!fichaCurrentPuestoId) return;
+  const p = PUESTOS.find(x => x.id === fichaCurrentPuestoId);
+  if (!p) return;
+
+  const fNombre = document.getElementById('ficha-nombre');
+  const fLugar  = document.getElementById('ficha-lugar');
+  const fEmoji  = document.getElementById('ficha-emoji-input');
+  const fTip    = document.getElementById('ficha-hab-tip');
+  const fArmas  = document.getElementById('ficha-hab-armas');
+  const fAero   = document.getElementById('ficha-hab-aeropuertos');
+  const fArmado = document.getElementById('ficha-armado');
+
+  const nuevoNombre = (fNombre && fNombre.value.trim()) || p.nombre;
+  const nuevoLugar  = (fLugar  && fLugar.value.trim())  || p.lugar;
+  const nuevoEmoji  = (fEmoji  && fEmoji.value.trim())  || p.emoji;
+
+  const habs = [];
+  if (fTip   && fTip.checked)   habs.push('tip');
+  if (fArmas && fArmas.checked) habs.push('armas');
+  if (fAero  && fAero.checked)  habs.push('aeropuertos');
+  const armado = fArmado ? fArmado.checked : p.armado;
+
+  // Tipo derivado de habilitaciones
+  let tipo = 'generico';
+  if (armado || habs.includes('armas'))  tipo = 'armado';
+  if (habs.includes('aeropuertos'))      tipo = 'aeropuerto';
+
+  Object.assign(p, { nombre: nuevoNombre, lugar: nuevoLugar, emoji: nuevoEmoji,
+                     requiere: habs, armado: armado, tipo: tipo });
+
+  // Actualizar cabecera en tiempo real
+  const emojiBig = document.getElementById('ficha-emoji-big');
+  const hdrNom   = document.getElementById('ficha-hdr-nombre');
+  const hdrLoc   = document.getElementById('ficha-hdr-lugar');
+  if (emojiBig) emojiBig.textContent = nuevoEmoji || '🔒';
+  if (hdrNom)   hdrNom.textContent   = nuevoNombre;
+  if (hdrLoc)   hdrLoc.textContent   = '📍 ' + nuevoLugar;
+
+  saveToStorage();
+
+  const btn = document.getElementById('btn-ficha-save');
+  if (btn) {
+    btn.textContent = '✓ Cambios guardados';
+    btn.classList.remove('pending');
+    btn.classList.add('saved');
+  }
+}
+
+/* ── Maneja archivo de normativa seleccionado ─────────── */
+function onNormativaFile(input) {
+  if (!input.files || !input.files[0] || !fichaCurrentPuestoId) return;
+  const file = input.files[0];
+  const p    = PUESTOS.find(x => x.id === fichaCurrentPuestoId);
+  if (!p) return;
+
+  // Mostrar estado del archivo
+  const statusEl = document.getElementById('libro-file-status');
+  const nameEl   = document.getElementById('libro-file-name');
+  if (statusEl) statusEl.classList.add('visible');
+  if (nameEl)   nameEl.textContent = file.name;
+
+  // Ocultar viewer mientras procesa
+  const viewer = document.getElementById('consigna-viewer');
+  if (viewer) viewer.classList.remove('visible');
+
+  // Toast de progreso IA
+  _showToastFase3('AnalIQ-IA: Extrayendo protocolos de seguridad y teléfonos de emergencia…',
+                  'Procesando normativa · Identificando consignas críticas');
+
+  setTimeout(function() {
+    _hideToastFase3();
+
+    const now   = new Date();
+    const stamp = now.toLocaleDateString('es-ES') + ' · ' +
+                  now.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+
+    // Consigna estructurada simulada (extraída de la normativa)
+    p.consigna = {
+      protocolo:
+        'El vigilante efectuará un registro visual de todos los accesos al inicio de cada turno. ' +
+        'Ante cualquier anomalía activar el protocolo de alerta interna y notificar inmediatamente al mando operativo. ' +
+        'Queda prohibido el acceso de personas no acreditadas a zonas restringidas. ' +
+        'Se realizará ronda de comprobación cada 90 minutos con registro en el libro de novedades. ' +
+        'Cualquier incidencia relevante debe comunicarse a la central antes de finalizar el turno.',
+      puntosRonda: [
+        'Verificación de accesos principales y secundarios (check visual + registro)',
+        'Revisión de cámaras y sistemas CCTV en sala de control',
+        'Comprobación de sala de racks y servidores (zona crítica — acceso restringido)',
+        'Inspección de almacenes y zonas de carga y descarga',
+        'Revisión de perímetro exterior — valla y puntos ciegos',
+        'Control de aforo en zonas públicas (si aplica)',
+      ],
+      equipamiento: [
+        'Chaleco de protección nivel IIIA / antibalas (si puesto armado)',
+        'Linterna de alta potencia — mínimo 1.000 lúmenes',
+        'Walkie-talkie red Tetra / ETSI P25',
+        'Terminal de control de rondas (NFC / RFID)',
+        'Kit de primeros auxilios básico',
+      ],
+      contactos: [
+        { rol: 'Jefe de Servicio',         tel: '600 123 456' },
+        { rol: 'Central de Alarmas 24 h',  tel: '900 100 200' },
+        { rol: 'Responsable del Cliente',   tel: '654 789 012' },
+        { rol: 'Emergencias Generales',     tel: '112'         },
+        { rol: 'Policía Nacional',           tel: '091'         },
+      ],
+      archivo: file.name,
+      stamp:   stamp
+    };
+
+    saveToStorage();
+    _loadConsignaViewer(p);
+  }, 1800);
+
+  // Reset el input para permitir adjuntar el mismo archivo de nuevo
+  input.value = '';
+}
+
+/* ── Carga y muestra el visor de consigna ─────────────── */
+function _loadConsignaViewer(p) {
+  const viewer   = document.getElementById('consigna-viewer');
+  const stampEl  = document.getElementById('consigna-stamp');
+  const content  = document.getElementById('consigna-sections-content');
+  const statusEl = document.getElementById('libro-file-status');
+  const nameEl   = document.getElementById('libro-file-name');
+  const tagEl    = document.getElementById('libro-file-tag');
+
+  if (!p.consigna) {
+    if (viewer)   viewer.classList.remove('visible');
+    if (statusEl) statusEl.classList.remove('visible');
+    return;
+  }
+
+  const c = p.consigna;
+  if (stampEl) stampEl.textContent = c.stamp || '—';
+  if (statusEl) statusEl.classList.add('visible');
+  if (nameEl)   nameEl.textContent = c.archivo || '—';
+  if (tagEl)    tagEl.textContent  = 'Extraído por IA';
+
+  const puntosHtml = (c.puntosRonda || []).map(function(item) {
+    return '<div class="consigna-item">' + item + '</div>';
+  }).join('');
+
+  const equipHtml = (c.equipamiento || []).map(function(item) {
+    return '<div class="consigna-item">' + item + '</div>';
+  }).join('');
+
+  const contactsHtml = (c.contactos || []).map(function(ct) {
+    return '<div class="consigna-contacts-row">' +
+           '<span class="consigna-contacts-rol">' + ct.rol + '</span>' +
+           '<span class="consigna-tel">📞 ' + ct.tel + '</span>' +
+           '</div>';
+  }).join('');
+
+  if (content) {
+    content.innerHTML =
+      '<div class="consigna-section">' +
+        '<div class="consigna-section-label">Protocolo Operativo de Seguridad</div>' +
+        '<div class="consigna-text">' + c.protocolo + '</div>' +
+      '</div>' +
+      '<div class="consigna-section">' +
+        '<div class="consigna-section-label">Puntos Críticos de Ronda</div>' +
+        '<div class="consigna-list">' + puntosHtml + '</div>' +
+      '</div>' +
+      '<div class="consigna-section">' +
+        '<div class="consigna-section-label">Equipamiento Requerido</div>' +
+        '<div class="consigna-list">' + equipHtml + '</div>' +
+      '</div>' +
+      '<div class="consigna-section">' +
+        '<div class="consigna-section-label">Contactos de Emergencia</div>' +
+        '<div style="padding:2px 0">' + contactsHtml + '</div>' +
+      '</div>';
+  }
+
+  if (viewer) viewer.classList.add('visible');
+}
+
+/* ── Helpers para el toast IA (reutilizando el existente) ─ */
+function _showToastFase3(text, sub) {
+  const t  = document.getElementById('toast-ia');
+  const tt = document.getElementById('toast-ia-text');
+  const ts = document.getElementById('toast-ia-sub');
+  if (tt) tt.textContent = text || '';
+  if (ts) ts.textContent = sub  || '';
+  if (t)  t.classList.add('visible');
+}
+function _hideToastFase3() {
+  const t = document.getElementById('toast-ia');
+  if (t) t.classList.remove('visible');
+}
+
+/* ── Hook para openModal desde la vista Servicios ─────── */
+/* Cuando se crea un nuevo servicio desde la vista Servicios,
+   al guardar hay que re-renderizar el catálogo.            */
+(function patchSaveNewPuesto() {
+  if (typeof saveNewPuesto !== 'function') return;
+  var _orig = saveNewPuesto;
+  window.saveNewPuesto = function() {
+    _orig.apply(this, arguments);
+    // Si la vista activa es servicios, refrescar catálogo
+    var svcView = document.getElementById('view-servicios');
+    if (svcView && !svcView.classList.contains('hidden')) {
+      renderCatalogServicios();
+    }
+  };
 })();
 </script>
 
