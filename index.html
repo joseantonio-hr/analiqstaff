@@ -1843,7 +1843,202 @@
       min-height: 14px;
     }
     .pw-preview span { color: var(--accent); font-weight: 600; }
+
+    /* ── Nóminas Tab (E1) ──────────────────────────────── */
+    .nom-layout {
+      display: flex; flex-direction: column; gap: 16px;
+      padding: 20px; max-width: 1100px; margin: 0 auto; width: 100%;
+    }
+    .nom-controls {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .nom-month-nav {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 9px; padding: 5px 10px;
+    }
+    .nom-month-btn {
+      background: none; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 14px; padding: 0 4px; line-height: 1;
+      transition: color 0.15s;
+    }
+    .nom-month-btn:hover { color: var(--text-primary); }
+    .nom-month-display {
+      font-size: 13px; font-weight: 700; color: var(--text-primary);
+      min-width: 120px; text-align: center; letter-spacing: 0.3px;
+    }
+    .nom-summary-bar {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .nom-kpi {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; flex: 1; min-width: 120px;
+    }
+    .nom-kpi-label {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); margin-bottom: 4px;
+    }
+    .nom-kpi-value {
+      font-size: 18px; font-weight: 800; color: var(--text-primary);
+      font-family: var(--mono);
+    }
+    .nom-kpi-sub {
+      font-size: 9.5px; color: var(--text-muted); margin-top: 2px;
+    }
+    /* Tabla de nóminas */
+    .nom-table-wrap {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .nom-table {
+      width: 100%; border-collapse: collapse; font-size: 12px;
+    }
+    .nom-table thead th {
+      background: rgba(255,255,255,0.04); padding: 10px 14px;
+      text-align: left; font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .nom-table thead th.right { text-align: right; }
+    .nom-table tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.12s;
+    }
+    .nom-table tbody tr:last-child { border-bottom: none; }
+    .nom-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+    .nom-td { padding: 11px 14px; color: var(--text-primary); }
+    .nom-td.right { text-align: right; font-family: var(--mono); }
+    .nom-td.muted { color: var(--text-muted); font-size: 11px; }
+    .nom-agente-cell {
+      display: flex; align-items: center; gap: 9px;
+    }
+    .nom-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9.5px; font-weight: 800; flex-shrink: 0;
+      font-family: var(--mono);
+    }
+    .nom-badge {
+      display: inline-block; padding: 2px 7px; border-radius: 4px;
+      font-size: 9px; font-weight: 700; font-family: var(--mono);
+      background: rgba(99,102,241,0.15); color: var(--accent);
+    }
+    .nom-badge.warn { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .nom-td-total {
+      font-weight: 800; color: var(--accent); font-family: var(--mono);
+    }
+    /* Botón imprimir nómina */
+    .btn-nom-print {
+      background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3);
+      color: var(--accent); border-radius: 6px; padding: 4px 9px;
+      font-size: 10px; cursor: pointer; transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-nom-print:hover { background: rgba(99,102,241,0.25); }
+    /* Nota pie */
+    .nom-footer-note {
+      font-size: 10px; color: var(--text-muted); text-align: center;
+      padding: 8px 0;
+    }
+
+    /* ── Nómina Preview Modal (E4) ─────────────────────── */
+    #modal-nomina-preview {
+      position: fixed; inset: 0; z-index: 9000;
+      background: rgba(0,0,0,0.72);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    #modal-nomina-preview.visible { opacity: 1; pointer-events: all; }
+    .nom-preview-shell {
+      background: #fff; border-radius: 10px;
+      width: min(760px, 96vw); max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      display: flex; flex-direction: column;
+    }
+    /* Toolbar (solo en pantalla, oculto al imprimir) */
+    .nom-preview-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0; border-radius: 10px 10px 0 0;
+      flex-shrink: 0;
+    }
+    .nom-preview-toolbar-title {
+      font-size: 12px; font-weight: 700; color: #334155;
+    }
+    .nom-preview-toolbar-actions { display: flex; gap: 8px; }
+    .btn-nom-action {
+      padding: 5px 14px; border-radius: 6px; font-size: 11px;
+      font-weight: 700; cursor: pointer; border: none;
+    }
+    .btn-nom-action.print  { background: #6366f1; color: #fff; }
+    .btn-nom-action.close  { background: #e2e8f0; color: #475569; }
+    .btn-nom-action:hover  { filter: brightness(0.92); }
+    /* Documento nómina (blanco, para impresión) */
+    #nom-doc {
+      padding: 36px 40px; color: #1e293b; font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12px; line-height: 1.5; flex: 1;
+    }
+    .ndoc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .ndoc-company-name { font-size: 18px; font-weight: 900; color: #1e293b; letter-spacing: -0.5px; }
+    .ndoc-company-sub  { font-size: 10px; color: #64748b; margin-top: 2px; }
+    .ndoc-periodo {
+      text-align: right; font-size: 11px; color: #475569;
+    }
+    .ndoc-periodo strong { font-size: 14px; color: #1e293b; display: block; }
+    .ndoc-divider { border: none; border-top: 2px solid #6366f1; margin: 0 0 18px; }
+    .ndoc-worker {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px;
+      background: #f8fafc; border-radius: 8px; padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    .ndoc-field { display: flex; flex-direction: column; }
+    .ndoc-field-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; }
+    .ndoc-field-val { font-size: 12px; font-weight: 600; color: #1e293b; }
+    .ndoc-section-title {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+      color: #6366f1; font-weight: 700; margin: 18px 0 6px;
+    }
+    .ndoc-table { width: 100%; border-collapse: collapse; }
+    .ndoc-table th {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px;
+      color: #64748b; padding: 5px 8px; border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+    .ndoc-table th.right, .ndoc-table td.right { text-align: right; }
+    .ndoc-table td { padding: 6px 8px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    .ndoc-table tr:last-child td { border-bottom: none; }
+    .ndoc-table .highlight td { background: #f0f0ff; font-weight: 700; }
+    .ndoc-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #6366f1; color: #fff; border-radius: 8px;
+      padding: 12px 16px; margin-top: 16px;
+    }
+    .ndoc-total-label { font-size: 12px; font-weight: 700; }
+    .ndoc-total-value { font-size: 20px; font-weight: 900; font-family: monospace; }
+    .ndoc-foot {
+      margin-top: 24px; padding-top: 12px; border-top: 1px solid #e2e8f0;
+      font-size: 9.5px; color: #94a3b8; text-align: center;
+    }
+    /* Print: ocultar toolbar y fondo, mostrar solo el doc */
+    @media print {
+      body > *:not(#modal-nomina-preview) { display: none !important; }
+      #modal-nomina-preview {
+        position: static !important; background: none !important;
+        opacity: 1 !important; pointer-events: all !important;
+      }
+      .nom-preview-shell {
+        box-shadow: none !important; border-radius: 0 !important;
+        max-height: none !important; width: 100% !important;
+      }
+      .nom-preview-toolbar { display: none !important; }
+      #nom-doc { padding: 20px 24px !important; }
+    }
   </style>
+  <!-- html2pdf.js — exportación PDF del lado cliente (E5) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+          integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -2036,8 +2231,71 @@
      VIEW 3: NÓMINAS (placeholder — se completa en E1)
 ===================================================== -->
 <div id="view-nominas" class="app-view hidden">
-  <div style="display:flex;align-items:center;justify-content:center;flex:1;color:var(--t3);font-size:13px;font-family:var(--mono)">
-    💰 Nóminas y Exportación PDF — próximamente (paso E1)
+  <div class="nom-layout">
+
+    <!-- Controles: navegación de mes + botón exportar todo -->
+    <div class="nom-controls">
+      <div class="nom-month-nav">
+        <button class="nom-month-btn" onclick="nomPrevMonth()">‹</button>
+        <div class="nom-month-display" id="nom-month-display">— — —</div>
+        <button class="nom-month-btn" onclick="nomNextMonth()">›</button>
+      </div>
+      <button class="btn-hdr" onclick="nomExportAll()" style="font-size:11px">
+        📄 Exportar todas las nóminas
+      </button>
+    </div>
+
+    <!-- KPIs del mes -->
+    <div class="nom-summary-bar" id="nom-summary-bar">
+      <div class="nom-kpi">
+        <div class="nom-kpi-label">Masa salarial</div>
+        <div class="nom-kpi-value" id="nom-kpi-masa">—</div>
+        <div class="nom-kpi-sub">total bruto mes</div>
+      </div>
+      <div class="nom-kpi">
+        <div class="nom-kpi-label">Días trabajados</div>
+        <div class="nom-kpi-value" id="nom-kpi-dias">—</div>
+        <div class="nom-kpi-sub">suma todos los agentes</div>
+      </div>
+      <div class="nom-kpi">
+        <div class="nom-kpi-label">Turnos cubiertos</div>
+        <div class="nom-kpi-value" id="nom-kpi-turnos">—</div>
+        <div class="nom-kpi-sub">slots asignados en el mes</div>
+      </div>
+      <div class="nom-kpi">
+        <div class="nom-kpi-label">Agentes activos</div>
+        <div class="nom-kpi-value" id="nom-kpi-agentes">—</div>
+        <div class="nom-kpi-sub">con al menos 1 turno</div>
+      </div>
+    </div>
+
+    <!-- Tabla principal de nóminas -->
+    <div class="nom-table-wrap">
+      <table class="nom-table">
+        <thead>
+          <tr>
+            <th>Agente</th>
+            <th class="right">Días</th>
+            <th class="right">Turnos M</th>
+            <th class="right">Turnos T</th>
+            <th class="right">Turnos N</th>
+            <th class="right">Sueldo base</th>
+            <th class="right">Nocturnidad</th>
+            <th class="right">Plus doble</th>
+            <th class="right">Total bruto</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="nom-tbody">
+          <!-- renderizado por renderNominasTab() en E3 -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="nom-footer-note">
+      Los importes son orientativos. Convenio de Seguridad Privada (valores configurables).
+    </div>
+
   </div>
 </div>
 
@@ -2136,6 +2394,23 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ====================================================
+     MODAL: NÓMINA PREVIEW / IMPRESIÓN (E4)
+===================================================== -->
+<div id="modal-nomina-preview" onclick="onNominaPreviewOverlayClick(event)">
+  <div class="nom-preview-shell">
+    <div class="nom-preview-toolbar">
+      <span class="nom-preview-toolbar-title" id="nom-preview-title">Nómina</span>
+      <div class="nom-preview-toolbar-actions">
+        <button class="btn-nom-action print" onclick="window.print()">🖨 Imprimir</button>
+        <button class="btn-nom-action print" onclick="downloadNominaPDF()" style="background:#10b981">⬇ Descargar PDF</button>
+        <button class="btn-nom-action close" onclick="closeNominaPreview()">✕ Cerrar</button>
+      </div>
+    </div>
+    <div id="nom-doc"><!-- generado por openNominaPreview() --></div>
   </div>
 </div>
 
@@ -3285,6 +3560,416 @@ function cuadNextMonth() {
   renderMonthlyGrid();
 }
 
+/* ======================================================
+   NAVEGACIÓN MENSUAL (Nóminas) — E1
+====================================================== */
+let nomYear  = new Date().getFullYear();
+let nomMonth = new Date().getMonth(); // 0-11
+
+const MONTHS_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                     'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function renderNomMonthDisplay() {
+  const el = document.getElementById('nom-month-display');
+  if (el) el.textContent = `${MONTHS_FULL[nomMonth]} ${nomYear}`;
+}
+
+function nomPrevMonth() {
+  nomMonth--;
+  if (nomMonth < 0) { nomMonth = 11; nomYear--; }
+  renderNomMonthDisplay();
+  renderNominasTab();
+}
+
+function nomNextMonth() {
+  nomMonth++;
+  if (nomMonth > 11) { nomMonth = 0; nomYear++; }
+  renderNomMonthDisplay();
+  renderNominasTab();
+}
+
+/* ======================================================
+   RENDER NÓMINAS TAB — E3
+====================================================== */
+function renderNominasTab() {
+  const tbody = document.getElementById('nom-tbody');
+  if (!tbody) return;
+
+  // Calcular nómina de cada vigilante
+  const rows = VIGILANTES.map(v => ({
+    v,
+    nom: calcNominaMensual(v, nomMonth, nomYear),
+  }));
+
+  // ── KPIs ──────────────────────────────────────────────
+  const masaSalarial   = rows.reduce((s, r) => s + r.nom.totalBruto, 0);
+  const totalDias      = rows.reduce((s, r) => s + r.nom.diasTrabajados, 0);
+  const totalTurnos    = rows.reduce((s, r) => s + r.nom.turnosM + r.nom.turnosT + r.nom.turnosN, 0);
+  const agentesActivos = rows.filter(r => r.nom.diasTrabajados > 0).length;
+
+  const kpiMasa    = document.getElementById('nom-kpi-masa');
+  const kpiDias    = document.getElementById('nom-kpi-dias');
+  const kpiTurnos  = document.getElementById('nom-kpi-turnos');
+  const kpiAgentes = document.getElementById('nom-kpi-agentes');
+
+  if (kpiMasa)    kpiMasa.textContent    = fmt€(masaSalarial);
+  if (kpiDias)    kpiDias.textContent    = totalDias;
+  if (kpiTurnos)  kpiTurnos.textContent  = totalTurnos;
+  if (kpiAgentes) kpiAgentes.textContent = agentesActivos;
+
+  // ── Filas de la tabla ─────────────────────────────────
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" class="nom-td" style="text-align:center;color:var(--text-muted);padding:30px">
+      No hay vigilantes registrados.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(({ v, nom }) => {
+    const rgb = hexToRgb(v.color);
+    const bgAvatar = `rgba(${rgb},0.18)`;
+    const sinTurnos = nom.diasTrabajados === 0;
+
+    // Badges extra (dobles, peligrosidad)
+    let badges = '';
+    if (nom.diasArmado > 0)
+      badges += `<span class="nom-badge warn" title="Días en puesto armado">⚑ ${nom.diasArmado}d</span> `;
+    if (nom.diasDoble > 0)
+      badges += `<span class="nom-badge" title="Días con turno doble">×2 ${nom.diasDoble}d</span>`;
+
+    return `
+    <tr>
+      <td class="nom-td">
+        <div class="nom-agente-cell">
+          <div class="nom-avatar" style="background:${bgAvatar};color:${v.color}">${v.iniciales}</div>
+          <div>
+            <div style="font-weight:600">${v.nombre}</div>
+            <div style="font-size:10px;color:var(--text-muted)">${v.cargo}</div>
+            <div style="margin-top:2px">${badges}</div>
+          </div>
+        </div>
+      </td>
+      <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.diasTrabajados}<span style="color:var(--text-muted);font-size:9px"> /${nom.diasEnMes}</span></td>
+      <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosM || '–'}</td>
+      <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosT || '–'}</td>
+      <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosN || '–'}</td>
+      <td class="nom-td right">${fmt€(nom.sueldoProporcional)}</td>
+      <td class="nom-td right ${nom.nocturnidad > 0 ? '' : 'muted'}">${nom.nocturnidad > 0 ? fmt€(nom.nocturnidad) : '–'}</td>
+      <td class="nom-td right ${nom.plusDoble > 0 ? '' : 'muted'}">${nom.plusDoble > 0 ? fmt€(nom.plusDoble) : '–'}</td>
+      <td class="nom-td right nom-td-total">${sinTurnos ? '<span style="color:var(--text-muted)">–</span>' : fmt€(nom.totalBruto)}</td>
+      <td class="nom-td">
+        <button class="btn-nom-print" onclick="openNominaPreview(${v.id})"
+          ${sinTurnos ? 'disabled style="opacity:0.35;cursor:default"' : ''}>
+          🖨 Nómina
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/** Formatea número como euros: 1.234,56 € */
+function fmt€(n) {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+/* ── Nómina Preview / Impresión (E4) ───────────────── */
+function openNominaPreview(vid) {
+  const v = VIGILANTES.find(x => x.id === vid);
+  if (!v) return;
+  const nom = calcNominaMensual(v, nomMonth, nomYear);
+  const mesLabel = `${MONTHS_FULL[nomMonth]} ${nomYear}`;
+
+  // Tabla de conceptos devengados
+  const conceptos = [
+    { desc: 'Salario base proporcional',
+      detalle: `${nom.diasTrabajados} días / ${nom.diasEnMes} días en el mes`,
+      importe: nom.sueldoProporcional },
+    { desc: `Trienios (${v.trienios} × ${(NOM_CONFIG.trienio_pct*100).toFixed(0)}%)`,
+      detalle: 'Sobre salario proporcional',
+      importe: nom.trienios },
+    { desc: 'Plus nocturnidad',
+      detalle: `${nom.turnosN} turno(s) nocturno(s) × ${fmt€(NOM_CONFIG.nocturnidad_turno)}`,
+      importe: nom.nocturnidad },
+    { desc: 'Plus peligrosidad / toxicidad',
+      detalle: `${nom.diasArmado} día(s) en puesto armado × ${fmt€(NOM_CONFIG.peligrosidad_dia)}`,
+      importe: nom.peligrosidad },
+    { desc: 'Plus turno doble',
+      detalle: `${nom.diasDoble} día(s) con 2+ turnos × ${fmt€(NOM_CONFIG.plus_doble_dia)}`,
+      importe: nom.plusDoble },
+  ].filter(c => c.importe > 0);
+
+  const filasTurnos = [
+    ['Turno mañana (06:00–14:00)', nom.turnosM],
+    ['Turno tarde (14:00–22:00)',  nom.turnosT],
+    ['Turno noche (22:00–06:00)',  nom.turnosN],
+  ].filter(([,n]) => n > 0);
+
+  const hoy = new Date().toLocaleDateString('es-ES');
+
+  document.getElementById('nom-doc').innerHTML = `
+    <div class="ndoc-header">
+      <div>
+        <div class="ndoc-company-name">AnalIQ<span style="color:#6366f1">staff</span></div>
+        <div class="ndoc-company-sub">Gestión de Seguridad Privada</div>
+      </div>
+      <div class="ndoc-periodo">
+        <strong>${mesLabel}</strong>
+        Documento generado: ${hoy}
+      </div>
+    </div>
+    <hr class="ndoc-divider">
+
+    <div class="ndoc-worker">
+      <div class="ndoc-field">
+        <span class="ndoc-field-lbl">Nombre</span>
+        <span class="ndoc-field-val">${v.nombre}</span>
+      </div>
+      <div class="ndoc-field">
+        <span class="ndoc-field-lbl">Categoría</span>
+        <span class="ndoc-field-val">${v.cargo}</span>
+      </div>
+      <div class="ndoc-field">
+        <span class="ndoc-field-lbl">Tipo de contrato</span>
+        <span class="ndoc-field-val">${v.tipoContrato}</span>
+      </div>
+      <div class="ndoc-field">
+        <span class="ndoc-field-lbl">Referencia contrato</span>
+        <span class="ndoc-field-val">${v.contratoRef}</span>
+      </div>
+      <div class="ndoc-field">
+        <span class="ndoc-field-lbl">Alta empresa</span>
+        <span class="ndoc-field-val">${v.alta}</span>
+      </div>
+      <div class="ndoc-field">
+        <span class="ndoc-field-lbl">Jornada</span>
+        <span class="ndoc-field-val">${v.jornada}</span>
+      </div>
+    </div>
+
+    <div class="ndoc-section-title">Actividad del mes</div>
+    <table class="ndoc-table">
+      <thead><tr>
+        <th>Concepto</th><th class="right">Cantidad</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Días trabajados</td><td class="right">${nom.diasTrabajados} de ${nom.diasEnMes}</td></tr>
+        ${filasTurnos.map(([lbl,n]) => `<tr><td>${lbl}</td><td class="right">${n}</td></tr>`).join('')}
+        ${nom.diasArmado > 0 ? `<tr><td>Días en puesto armado</td><td class="right">${nom.diasArmado}</td></tr>` : ''}
+        ${nom.diasDoble  > 0 ? `<tr><td>Días con turno doble</td><td class="right">${nom.diasDoble}</td></tr>`  : ''}
+      </tbody>
+    </table>
+
+    <div class="ndoc-section-title">Devengos</div>
+    <table class="ndoc-table">
+      <thead><tr>
+        <th>Concepto</th><th>Detalle</th><th class="right">Importe</th>
+      </tr></thead>
+      <tbody>
+        ${conceptos.map(c => `
+          <tr>
+            <td>${c.desc}</td>
+            <td style="color:#64748b;font-size:10.5px">${c.detalle}</td>
+            <td class="right">${fmt€(c.importe)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+
+    <div class="ndoc-total-row">
+      <span class="ndoc-total-label">TOTAL BRUTO A PERCIBIR</span>
+      <span class="ndoc-total-value">${fmt€(nom.totalBruto)}</span>
+    </div>
+
+    <div class="ndoc-foot">
+      Documento generado automáticamente por AnalIQstaff. Importes orientativos según
+      Convenio Colectivo de Empresas de Seguridad Privada. No tiene valor legal sin firma autorizada.
+    </div>`;
+
+  document.getElementById('nom-preview-title').textContent =
+    `Nómina · ${v.nombre} · ${mesLabel}`;
+  document.getElementById('modal-nomina-preview').classList.add('visible');
+}
+
+function closeNominaPreview() {
+  document.getElementById('modal-nomina-preview').classList.remove('visible');
+}
+
+function onNominaPreviewOverlayClick(e) {
+  if (e.target === document.getElementById('modal-nomina-preview')) closeNominaPreview();
+}
+/* ── PDF Export (E5) ────────────────────────────────── */
+
+/** Opciones base html2pdf compartidas */
+function _pdfOpts(filename) {
+  return {
+    margin:       [10, 12, 10, 12],  // mm: top right bottom left
+    filename,
+    image:        { type: 'jpeg', quality: 0.97 },
+    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: ['avoid-all', 'css'] },
+  };
+}
+
+/**
+ * Descarga PDF de la nómina actualmente visible en #nom-doc.
+ * Llamado desde el botón "⬇ Descargar PDF" del toolbar del preview.
+ */
+function downloadNominaPDF() {
+  if (typeof html2pdf === 'undefined') {
+    alert('La librería html2pdf no está disponible. Comprueba tu conexión e inténtalo de nuevo.');
+    return;
+  }
+  const titleEl = document.getElementById('nom-preview-title');
+  // "Nómina · Ana Soto · Junio 2026" → "Nomina_Ana-Soto_Junio-2026.pdf"
+  const slug = (titleEl?.textContent || 'nomina')
+    .replace(/·/g, '').replace(/\s+/g, '-').replace(/[^a-zA-Z0-9\-_]/g, '') + '.pdf';
+  const el = document.getElementById('nom-doc');
+  html2pdf().set(_pdfOpts(slug)).from(el).save();
+}
+
+/**
+ * Genera un PDF por página para cada vigilante con actividad en el mes
+ * y los descarga como un único archivo "Nominas_MesAño.pdf".
+ */
+function nomExportAll() {
+  if (typeof html2pdf === 'undefined') {
+    alert('La librería html2pdf no está disponible. Comprueba tu conexión e inténtalo de nuevo.');
+    return;
+  }
+  const mesLabel = `${MONTHS_FULL[nomMonth]}_${nomYear}`;
+
+  // Construir un contenedor oculto con una página por vigilante
+  const container = document.createElement('div');
+  container.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;background:#fff';
+  document.body.appendChild(container);
+
+  let hasPaginas = false;
+  VIGILANTES.forEach((v, idx) => {
+    const nom = calcNominaMensual(v, nomMonth, nomYear);
+    if (nom.diasTrabajados === 0) return; // omitir sin actividad
+
+    // Reutilizar el generador de HTML de openNominaPreview
+    // clonando el documento en un div temporal
+    const tmp = document.createElement('div');
+    tmp.id = 'nom-doc'; // necesario para que los estilos .ndoc-* apliquen
+    tmp.style.cssText = 'padding:32px 36px;font-family:Segoe UI,Arial,sans-serif;color:#1e293b;font-size:12px';
+    document.body.appendChild(tmp);
+    openNominaPreview(v.id);           // rellena #nom-doc real
+    tmp.innerHTML = document.getElementById('nom-doc').innerHTML;
+    document.body.removeChild(tmp);
+    closeNominaPreview();              // cierra sin animar (ya oculto)
+
+    // Página: cada vigilante en su propio div con salto de página CSS
+    const page = document.createElement('div');
+    page.style.cssText = idx === 0
+      ? 'padding:32px 36px'
+      : 'padding:32px 36px;page-break-before:always';
+    page.innerHTML = tmp.innerHTML;
+    container.appendChild(page);
+    hasPaginas = true;
+  });
+
+  if (!hasPaginas) {
+    document.body.removeChild(container);
+    alert('No hay vigilantes con actividad en este mes.');
+    return;
+  }
+
+  const filename = `Nominas_${mesLabel}.pdf`;
+  html2pdf().set(_pdfOpts(filename)).from(container).save()
+    .then(() => document.body.removeChild(container))
+    .catch(() => document.body.removeChild(container));
+}
+
+/* ======================================================
+   CÁLCULO NÓMINA MENSUAL — E2
+   Convenio Colectivo de Empresas de Seguridad Privada
+   (valores orientativos, editables en NOM_CONFIG)
+====================================================== */
+const NOM_CONFIG = {
+  trienio_pct:        0.04,   // 4 % del proporcional por trienio
+  nocturnidad_turno:  9.50,   // € por turno nocturno (22:00–06:00)
+  peligrosidad_dia:   3.20,   // € por día en puesto armado
+  plus_doble_dia:    16.00,   // € por día con 2+ turnos cubiertos
+};
+
+/**
+ * calcNominaMensual(v, mes, ano)
+ *
+ * Devuelve un objeto con todos los conceptos del mes:
+ * {
+ *   diasTrabajados,   // días con ≥1 slot asignado
+ *   diasEnMes,
+ *   turnosM, turnosT, turnosN,   // conteo por tipo
+ *   diasArmado,       // días con algún slot en puesto armado
+ *   diasDoble,        // días con ≥2 slots
+ *   sueldoProporcional,
+ *   trienios,
+ *   nocturnidad,
+ *   peligrosidad,
+ *   plusDoble,
+ *   totalBruto,
+ * }
+ */
+function calcNominaMensual(v, mes, ano) {
+  const diasEnMes = new Date(ano, mes + 1, 0).getDate();
+
+  let diasTrabajados = 0;
+  let turnosM = 0, turnosT = 0, turnosN = 0;
+  let diasArmado = 0;
+  let diasDoble  = 0;
+
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(ano, mes, d);
+    const diaData = assignments[fecha];
+    if (!diaData) continue;
+
+    let slotsDia   = 0;
+    let armadoHoy  = false;
+
+    PUESTOS.forEach(p => {
+      const pData = diaData[p.id];
+      if (!pData) return;
+      TURNOS.forEach(t => {
+        if (pData[t.id] !== v.id) return;
+        slotsDia++;
+        if (t.id === 'manana') turnosM++;
+        else if (t.id === 'tarde') turnosT++;
+        else if (t.id === 'noche') turnosN++;
+        if (p.armado) armadoHoy = true;
+      });
+    });
+
+    if (slotsDia > 0) {
+      diasTrabajados++;
+      if (armadoHoy)  diasArmado++;
+      if (slotsDia >= 2) diasDoble++;
+    }
+  }
+
+  // Conceptos económicos
+  const sueldoProporcional = parseFloat(
+    (v.sueldoBase * (diasTrabajados / diasEnMes)).toFixed(2)
+  );
+  const trienios = parseFloat(
+    (sueldoProporcional * (v.trienios || 0) * NOM_CONFIG.trienio_pct).toFixed(2)
+  );
+  const nocturnidad  = parseFloat((turnosN    * NOM_CONFIG.nocturnidad_turno).toFixed(2));
+  const peligrosidad = parseFloat((diasArmado * NOM_CONFIG.peligrosidad_dia).toFixed(2));
+  const plusDoble    = parseFloat((diasDoble  * NOM_CONFIG.plus_doble_dia).toFixed(2));
+  const totalBruto   = parseFloat(
+    (sueldoProporcional + trienios + nocturnidad + peligrosidad + plusDoble).toFixed(2)
+  );
+
+  return {
+    diasTrabajados, diasEnMes,
+    turnosM, turnosT, turnosN,
+    diasArmado, diasDoble,
+    sueldoProporcional, trienios,
+    nocturnidad, peligrosidad, plusDoble,
+    totalBruto,
+  };
+}
+
 function renderMonthlyGrid() {
   const body = document.getElementById('cuad-body');
   if (!body) return;
@@ -3356,6 +4041,76 @@ function renderMonthlyGrid() {
 function isoFecha(year, month, day) {
   return `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 }
+
+/* ── Popup asignación grilla mensual (D3) ───────────── */
+let _apFecha = null, _apPuestoId = null, _apTurnoId = null;
+
+function openAssignPopup(event, fecha, puestoId, turnoId) {
+  event.stopPropagation();
+  _apFecha = fecha; _apPuestoId = puestoId; _apTurnoId = turnoId;
+
+  const puesto  = PUESTOS.find(p => p.id === puestoId);
+  const turno   = TURNOS.find(t => t.id === turnoId);
+  const current = assignments[fecha]?.[puestoId]?.[turnoId] ?? null;
+
+  const d = new Date(fecha + 'T12:00:00');
+  const dayStr = `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
+  document.getElementById('ap-header').innerHTML =
+    `<strong>${puesto ? puesto.nombre : puestoId}</strong><br>
+     ${turno ? turno.label : turnoId} · ${dayStr}`;
+
+  let html = '';
+  VIGILANTES.forEach(v => {
+    const isCurrent = current === v.id;
+    html += `<div class="ap-row${isCurrent ? ' ap-row-selected' : ''}"
+               onclick="assignFromPopup(${v.id})">
+               <span class="ap-dot" style="background:${v.color}"></span>
+               ${v.nombre}${isCurrent ? ' ✓' : ''}
+             </div>`;
+  });
+  if (current !== null) {
+    html += `<div class="ap-row ap-unassign" onclick="assignFromPopup(null)">
+               ✕ Quitar asignación
+             </div>`;
+  }
+  document.getElementById('ap-list').innerHTML = html;
+
+  const popup = document.getElementById('assign-popup');
+  popup.style.left = '0'; popup.style.top = '0';
+  popup.classList.add('visible');
+  const pw = popup.offsetWidth, ph = popup.offsetHeight;
+  const vw = window.innerWidth,  vh = window.innerHeight;
+  let x = event.clientX + 6, y = event.clientY + 6;
+  if (x + pw > vw - 8) x = event.clientX - pw - 6;
+  if (y + ph > vh - 8) y = event.clientY - ph - 6;
+  popup.style.left = x + 'px';
+  popup.style.top  = y + 'px';
+}
+
+function assignFromPopup(vid) {
+  if (!assignments[_apFecha]) assignments[_apFecha] = {};
+  if (!assignments[_apFecha][_apPuestoId]) {
+    assignments[_apFecha][_apPuestoId] = {};
+    TURNOS.forEach(t => { assignments[_apFecha][_apPuestoId][t.id] = null; });
+  }
+  assignments[_apFecha][_apPuestoId][_apTurnoId] = vid;
+  saveData();
+  closeAssignPopup();
+  renderMonthlyGrid();
+}
+
+function closeAssignPopup() {
+  document.getElementById('assign-popup').classList.remove('visible');
+  _apFecha = null; _apPuestoId = null; _apTurnoId = null;
+}
+
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('assign-popup');
+  if (popup && popup.classList.contains('visible') && !popup.contains(e.target)) {
+    closeAssignPopup();
+  }
+});
+
 /* ── Pattern Wizard (D4) ────────────────────────────── */
 const DOW_LABELS = ['L','M','X','J','V','S','D'];
 let pwDowSelected = new Set(); // días de semana seleccionados (0=Lun…6=Dom)
@@ -3495,79 +4250,6 @@ function applyPattern() {
   renderMonthlyGrid();
 }
 
-/* ── Popup asignación grilla mensual (D3) ───────────── */
-let _apFecha = null, _apPuestoId = null, _apTurnoId = null;
-
-function openAssignPopup(event, fecha, puestoId, turnoId) {
-  event.stopPropagation();
-  _apFecha = fecha; _apPuestoId = puestoId; _apTurnoId = turnoId;
-
-  const puesto  = PUESTOS.find(p => p.id === puestoId);
-  const turno   = TURNOS.find(t => t.id === turnoId);
-  const current = assignments[fecha]?.[puestoId]?.[turnoId] ?? null;
-
-  // Header
-  const d = new Date(fecha + 'T12:00:00');
-  const dayStr = `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
-  document.getElementById('ap-header').innerHTML =
-    `<strong>${puesto ? puesto.nombre : puestoId}</strong><br>
-     ${turno ? turno.label : turnoId} · ${dayStr}`;
-
-  // Lista de vigilantes
-  let html = '';
-  VIGILANTES.forEach(v => {
-    const isCurrent = current === v.id;
-    html += `<div class="ap-row${isCurrent ? ' ap-row-selected' : ''}"
-               onclick="assignFromPopup(${v.id})">
-               <span class="ap-dot" style="background:${v.color}"></span>
-               ${v.nombre}${isCurrent ? ' ✓' : ''}
-             </div>`;
-  });
-  if (current !== null) {
-    html += `<div class="ap-row ap-unassign" onclick="assignFromPopup(null)">
-               ✕ Quitar asignación
-             </div>`;
-  }
-  document.getElementById('ap-list').innerHTML = html;
-
-  // Posicionamiento: evitar desbordamiento de pantalla
-  const popup = document.getElementById('assign-popup');
-  popup.style.left = '0'; popup.style.top = '0';
-  popup.classList.add('visible');
-  const pw = popup.offsetWidth, ph = popup.offsetHeight;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  let x = event.clientX + 6, y = event.clientY + 6;
-  if (x + pw > vw - 8) x = event.clientX - pw - 6;
-  if (y + ph > vh - 8) y = event.clientY - ph - 6;
-  popup.style.left = x + 'px';
-  popup.style.top  = y + 'px';
-}
-
-function assignFromPopup(vid) {
-  if (!assignments[_apFecha]) assignments[_apFecha] = {};
-  if (!assignments[_apFecha][_apPuestoId]) {
-    assignments[_apFecha][_apPuestoId] = {};
-    TURNOS.forEach(t => { assignments[_apFecha][_apPuestoId][t.id] = null; });
-  }
-  assignments[_apFecha][_apPuestoId][_apTurnoId] = vid;
-  saveData();
-  closeAssignPopup();
-  renderMonthlyGrid();
-}
-
-function closeAssignPopup() {
-  document.getElementById('assign-popup').classList.remove('visible');
-  _apFecha = null; _apPuestoId = null; _apTurnoId = null;
-}
-
-// Cierre al hacer click fuera del popup
-document.addEventListener('click', function(e) {
-  const popup = document.getElementById('assign-popup');
-  if (popup && popup.classList.contains('visible') && !popup.contains(e.target)) {
-    closeAssignPopup();
-  }
-});
-
 function renderDateNav() {
   const d = new Date(currentDate + 'T12:00:00');
   document.getElementById('hdr-day').textContent   = d.getDate();
@@ -3619,6 +4301,10 @@ function switchView(view) {
     renderCuadMonthDisplay();
     renderCuadCatalogStrip();
     renderMonthlyGrid();
+  }
+  if (view === 'nominas') {
+    renderNomMonthDisplay();
+    renderNominasTab();
   }
 }
 
