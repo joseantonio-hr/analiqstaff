@@ -1685,6 +1685,164 @@
       padding: 40px;
     }
     .cuad-empty span { font-size: 32px; }
+
+    /* ========================================================
+       GRILLA MENSUAL
+    ======================================================== */
+    .mgrid-wrap { min-width: max-content; }
+    .mgrid-table { border-collapse: collapse; }
+
+    .mgrid-th-service {
+      position: sticky; left: 0; z-index: 6;
+      width: 175px; min-width: 175px; padding: 6px 10px;
+      text-align: left; font-size: 9px; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--t3); font-family: var(--mono);
+      background: rgba(6,7,16,0.98);
+      border-bottom: 1px solid var(--border-strong);
+      border-right: 1px solid var(--border-strong);
+    }
+    .mgrid-th-day {
+      width: 40px; min-width: 40px; padding: 4px 2px;
+      text-align: center; font-family: var(--mono); font-size: 9px; color: var(--t3);
+      border-bottom: 1px solid var(--border-strong);
+      border-right: 1px solid var(--border);
+      background: rgba(6,7,16,0.95);
+    }
+    .mgrid-th-day.is-today  { color: var(--cyan); background: rgba(0,212,255,0.07); }
+    .mgrid-th-day.is-weekend { color: rgba(255,107,138,0.55); }
+    .th-dow { display: block; font-size: 7px; color: var(--t3); margin-top: 1px; }
+    .mgrid-th-day.is-today  .th-dow  { color: rgba(0,212,255,0.6); }
+    .mgrid-th-day.is-weekend .th-dow { color: rgba(255,107,138,0.4); }
+
+    .mgrid-td-service {
+      position: sticky; left: 0; z-index: 4;
+      padding: 5px 10px; vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border-strong);
+      background: rgba(6,7,16,0.95);
+    }
+    .mgrid-service-name { font-size: 11px; font-weight: 600; color: var(--t1); white-space: nowrap; }
+    .mgrid-service-loc  { font-size: 8.5px; color: var(--t3); white-space: nowrap; }
+
+    .mgrid-td-day {
+      padding: 2px; vertical-align: top;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid rgba(255,255,255,0.04);
+      background: rgba(6,7,16,0.35);
+    }
+    .mgrid-td-day.is-today-col   { background: rgba(0,212,255,0.03); border-right-color: rgba(0,212,255,0.12); }
+    .mgrid-td-day.is-weekend-col { background: rgba(0,0,0,0.2); }
+
+    .mgrid-turns { display: flex; flex-direction: column; gap: 1px; }
+    .mgrid-chip {
+      display: flex; align-items: center; justify-content: center;
+      height: 15px; border-radius: 3px; cursor: pointer;
+      font-size: 7.5px; font-family: var(--mono); font-weight: 700;
+      border: 1px solid transparent; transition: filter 0.15s, opacity 0.15s;
+      letter-spacing: 0.2px; user-select: none;
+    }
+    .mgrid-chip.chip-empty {
+      background: rgba(255,255,255,0.025);
+      border-color: rgba(255,255,255,0.05);
+      color: var(--t3);
+    }
+    .mgrid-chip.chip-empty:hover {
+      background: rgba(0,212,255,0.08);
+      border-color: rgba(0,212,255,0.22);
+      color: var(--cyan);
+    }
+    .mgrid-chip.chip-filled:hover { filter: brightness(1.25); }
+
+    /* ── Assign Popup (grilla mensual) ─────────────────── */
+    #assign-popup {
+      position: fixed; z-index: 9999;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 6px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      min-width: 170px; max-width: 220px;
+      display: none; flex-direction: column; gap: 2px;
+    }
+    #assign-popup.visible { display: flex; }
+    .ap-header {
+      font-size: 9.5px; color: var(--text-muted);
+      padding: 0 6px 4px; border-bottom: 1px solid var(--border);
+      margin-bottom: 2px; line-height: 1.4;
+    }
+    .ap-header strong { color: var(--text-primary); font-size: 11px; }
+    .ap-row {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 8px; border-radius: 6px; cursor: pointer;
+      font-size: 11px; color: var(--text-primary);
+      transition: background 0.12s;
+    }
+    .ap-row:hover { background: rgba(255,255,255,0.06); }
+    .ap-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ap-unassign {
+      color: var(--danger); font-size: 10.5px;
+      border-top: 1px solid var(--border); margin-top: 3px; padding-top: 5px;
+    }
+    .ap-unassign:hover { background: rgba(239,68,68,0.1); }
+
+    /* ── Pattern Wizard Modal ──────────────────────────── */
+    #modal-pattern { z-index: 8000; }
+    .pw-card { max-width: 440px; width: 95vw; }
+    .pw-section {
+      background: rgba(255,255,255,0.03); border-radius: 8px;
+      padding: 12px 14px; margin-bottom: 10px; border: 1px solid var(--border);
+    }
+    .pw-section-lbl {
+      font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .pw-select {
+      width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+      color: var(--text-primary); border-radius: 7px; padding: 7px 10px;
+      font-size: 12px; cursor: pointer;
+    }
+    .pw-select:focus { outline: none; border-color: var(--accent); }
+    .pw-radio-group {
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .pw-radio-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 8px; border-radius: 6px; cursor: pointer;
+      font-size: 11.5px; color: var(--text-secondary);
+      border: 1px solid transparent; transition: background 0.12s, border-color 0.12s;
+    }
+    .pw-radio-row:hover { background: rgba(255,255,255,0.05); }
+    .pw-radio-row.selected {
+      background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.4);
+      color: var(--text-primary);
+    }
+    .pw-radio-row input[type=radio] { accent-color: var(--accent); }
+    .pw-dow-grid {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+      margin-top: 6px;
+    }
+    .pw-dow-btn {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 5px; color: var(--text-muted); font-size: 9.5px;
+      font-weight: 700; padding: 4px 0; cursor: pointer; text-align: center;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      user-select: none;
+    }
+    .pw-dow-btn.on {
+      background: rgba(99,102,241,0.18); border-color: rgba(99,102,241,0.5);
+      color: var(--accent);
+    }
+    .pw-overwrite {
+      display: flex; align-items: center; gap: 8px; font-size: 11px;
+      color: var(--text-secondary); margin-top: 6px; cursor: pointer;
+    }
+    .pw-overwrite input { accent-color: var(--accent); cursor: pointer; }
+    .pw-preview {
+      font-size: 10px; color: var(--text-muted); margin-top: 6px;
+      min-height: 14px;
+    }
+    .pw-preview span { color: var(--accent); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -1911,6 +2069,14 @@
 </div>
 
 <!-- ====================================================
+     POPUP: ASIGNACIÓN GRILLA MENSUAL
+===================================================== -->
+<div id="assign-popup" role="menu">
+  <div class="ap-header" id="ap-header"></div>
+  <div id="ap-list"></div>
+</div>
+
+<!-- ====================================================
      MODAL: NUEVO PUESTO
 ===================================================== -->
 <div class="modal-overlay" id="modal-overlay" onclick="onOverlayClick(event)">
@@ -1970,6 +2136,90 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ====================================================
+     MODAL: PATTERN WIZARD
+===================================================== -->
+<div class="modal-overlay" id="modal-pattern" onclick="onPatternOverlayClick(event)">
+  <div class="modal-card pw-card">
+    <div class="modal-header">
+      <span class="modal-title">🔄 Aplicar Patrón de Turno</span>
+      <button class="modal-close" onclick="closePatternModal()">✕</button>
+    </div>
+
+    <!-- Vigilante -->
+    <div class="pw-section">
+      <div class="pw-section-lbl">Vigilante</div>
+      <select class="pw-select" id="pw-vigilante" onchange="pwUpdatePreview()">
+        <option value="">— Selecciona vigilante —</option>
+      </select>
+    </div>
+
+    <!-- Puesto + Turno -->
+    <div class="pw-section" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="pw-section-lbl">Puesto / Servicio</div>
+        <select class="pw-select" id="pw-puesto" onchange="pwUpdatePreview()">
+          <option value="">— Todos los puestos —</option>
+        </select>
+      </div>
+      <div>
+        <div class="pw-section-lbl">Turno</div>
+        <select class="pw-select" id="pw-turno" onchange="pwUpdatePreview()">
+          <option value="">— Todos los turnos —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Patrón -->
+    <div class="pw-section">
+      <div class="pw-section-lbl">Patrón de días</div>
+      <div class="pw-radio-group" id="pw-radio-group">
+        <label class="pw-radio-row selected">
+          <input type="radio" name="pw-pattern" value="all" checked onchange="pwSelectPattern(this)"> Todos los días del mes
+        </label>
+        <label class="pw-radio-row">
+          <input type="radio" name="pw-pattern" value="weekdays" onchange="pwSelectPattern(this)"> Lunes a Viernes
+        </label>
+        <label class="pw-radio-row">
+          <input type="radio" name="pw-pattern" value="weekends" onchange="pwSelectPattern(this)"> Sábados y Domingos
+        </label>
+        <label class="pw-radio-row">
+          <input type="radio" name="pw-pattern" value="even" onchange="pwSelectPattern(this)"> Días pares
+        </label>
+        <label class="pw-radio-row">
+          <input type="radio" name="pw-pattern" value="odd" onchange="pwSelectPattern(this)"> Días impares
+        </label>
+        <label class="pw-radio-row">
+          <input type="radio" name="pw-pattern" value="custom" onchange="pwSelectPattern(this)"> Días de semana personalizados
+        </label>
+      </div>
+      <!-- Selector días custom (oculto por defecto) -->
+      <div id="pw-dow-wrap" style="display:none">
+        <div class="pw-dow-grid" id="pw-dow-grid">
+          <!-- L M X J V S D -->
+        </div>
+      </div>
+      <div class="pw-preview" id="pw-preview"></div>
+    </div>
+
+    <!-- Opciones -->
+    <div class="pw-section">
+      <div class="pw-section-lbl">Opciones</div>
+      <label class="pw-overwrite">
+        <input type="checkbox" id="pw-overwrite">
+        Sobreescribir asignaciones existentes
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-hdr" onclick="closePatternModal()">Cancelar</button>
+      <button class="btn-hdr primary" onclick="applyPattern()">
+        ✓ Aplicar patrón
+      </button>
+    </div>
   </div>
 </div>
 
@@ -3035,10 +3285,288 @@ function cuadNextMonth() {
   renderMonthlyGrid();
 }
 
-// Stub — se implementa en D2
-function renderMonthlyGrid() { /* D2 */ }
-// Stub — se implementa en D4
-function openPatternModal() { /* D4 */ }
+function renderMonthlyGrid() {
+  const body = document.getElementById('cuad-body');
+  if (!body) return;
+
+  if (PUESTOS.length === 0) {
+    body.innerHTML = '<div class="cuad-empty"><span>📅</span>Sin servicios en el catálogo.<br>Usa "Registrar Servicio" para añadir uno.</div>';
+    return;
+  }
+
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  const today     = new Date().toISOString().slice(0, 10);
+  const DOW       = ['D','L','M','X','J','V','S'];
+
+  /* ── Cabecera ── */
+  let html = '<div class="mgrid-wrap"><table class="mgrid-table"><thead><tr>';
+  html += '<th class="mgrid-th-service">Servicio</th>';
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    const dow   = new Date(fecha + 'T12:00:00').getDay();
+    const isT   = fecha === today;
+    const isW   = dow === 0 || dow === 6;
+    const cls   = isT ? 'is-today' : isW ? 'is-weekend' : '';
+    html += `<th class="mgrid-th-day ${cls}">${d}<span class="th-dow">${DOW[dow]}</span></th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  /* ── Filas por servicio ── */
+  PUESTOS.forEach(puesto => {
+    html += '<tr>';
+    html += `<td class="mgrid-td-service">
+      <div class="mgrid-service-name">${puesto.emoji} ${puesto.nombre}</div>
+      <div class="mgrid-service-loc">${puesto.lugar}</div>
+    </td>`;
+
+    for (let d = 1; d <= diasEnMes; d++) {
+      const fecha  = isoFecha(cuadYear, cuadMonth, d);
+      const dow    = new Date(fecha + 'T12:00:00').getDay();
+      const isT    = fecha === today;
+      const isW    = dow === 0 || dow === 6;
+      const colCls = isT ? 'is-today-col' : isW ? 'is-weekend-col' : '';
+      const da     = (assignments[fecha] && assignments[fecha][puesto.id]) || {};
+
+      html += `<td class="mgrid-td-day ${colCls}"><div class="mgrid-turns">`;
+      TURNOS.forEach(turno => {
+        const vid = da[turno.id] || null;
+        if (vid) {
+          const v   = getV(vid);
+          const rgb = hexRgb(v.color);
+          html += `<div class="mgrid-chip chip-filled"
+            style="background:rgba(${rgb},0.22);border-color:rgba(${rgb},0.4);color:${v.color}"
+            onclick="openAssignPopup(event,'${fecha}','${puesto.id}','${turno.id}')"
+            title="${v.nombre} · ${turno.label}">${v.iniciales}</div>`;
+        } else {
+          html += `<div class="mgrid-chip chip-empty"
+            onclick="openAssignPopup(event,'${fecha}','${puesto.id}','${turno.id}')"
+            title="${turno.label} · vacío">${turno.label.charAt(0)}</div>`;
+        }
+      });
+      html += '</div></td>';
+    }
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  body.innerHTML = html;
+}
+
+/** Helper: devuelve "YYYY-MM-DD" */
+function isoFecha(year, month, day) {
+  return `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+}
+/* ── Pattern Wizard (D4) ────────────────────────────── */
+const DOW_LABELS = ['L','M','X','J','V','S','D'];
+let pwDowSelected = new Set(); // días de semana seleccionados (0=Lun…6=Dom)
+
+function openPatternModal() {
+  // Poblar selects
+  const selV = document.getElementById('pw-vigilante');
+  selV.innerHTML = '<option value="">— Selecciona vigilante —</option>';
+  VIGILANTES.forEach(v => {
+    selV.innerHTML += `<option value="${v.id}">${v.nombre}</option>`;
+  });
+
+  const selP = document.getElementById('pw-puesto');
+  selP.innerHTML = '<option value="">— Todos los puestos —</option>';
+  PUESTOS.forEach(p => {
+    selP.innerHTML += `<option value="${p.id}">${p.nombre}</option>`;
+  });
+
+  const selT = document.getElementById('pw-turno');
+  selT.innerHTML = '<option value="">— Todos los turnos —</option>';
+  TURNOS.forEach(t => {
+    selT.innerHTML += `<option value="${t.id}">${t.label}</option>`;
+  });
+
+  // Reset radio
+  document.querySelector('input[name="pw-pattern"][value="all"]').checked = true;
+  document.querySelectorAll('.pw-radio-row').forEach(r => r.classList.remove('selected'));
+  document.querySelector('input[name="pw-pattern"][value="all"]').closest('.pw-radio-row').classList.add('selected');
+  document.getElementById('pw-dow-wrap').style.display = 'none';
+
+  // Construir grid días personalizados
+  pwDowSelected = new Set();
+  const grid = document.getElementById('pw-dow-grid');
+  grid.innerHTML = '';
+  DOW_LABELS.forEach((lbl, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'pw-dow-btn';
+    btn.textContent = lbl;
+    btn.dataset.dow = i;
+    btn.onclick = () => {
+      if (pwDowSelected.has(i)) { pwDowSelected.delete(i); btn.classList.remove('on'); }
+      else { pwDowSelected.add(i); btn.classList.add('on'); }
+      pwUpdatePreview();
+    };
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('pw-overwrite').checked = false;
+  pwUpdatePreview();
+  document.getElementById('modal-pattern').classList.add('visible');
+}
+
+function closePatternModal() {
+  document.getElementById('modal-pattern').classList.remove('visible');
+}
+
+function onPatternOverlayClick(e) {
+  if (e.target === document.getElementById('modal-pattern')) closePatternModal();
+}
+
+function pwSelectPattern(radio) {
+  document.querySelectorAll('.pw-radio-row').forEach(r => r.classList.remove('selected'));
+  radio.closest('.pw-radio-row').classList.add('selected');
+  document.getElementById('pw-dow-wrap').style.display =
+    radio.value === 'custom' ? 'block' : 'none';
+  pwUpdatePreview();
+}
+
+function pwMatchesPattern(dayNum, dowIndex, pattern) {
+  switch (pattern) {
+    case 'all':      return true;
+    case 'weekdays': return dowIndex <= 4;          // L-V (0-4)
+    case 'weekends': return dowIndex >= 5;          // S-D (5-6)
+    case 'even':     return dayNum % 2 === 0;
+    case 'odd':      return dayNum % 2 !== 0;
+    case 'custom':   return pwDowSelected.has(dowIndex);
+    default:         return false;
+  }
+}
+
+function pwGetMatchingDays() {
+  const pattern  = document.querySelector('input[name="pw-pattern"]:checked')?.value || 'all';
+  const daysInMonth = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  const matching = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    // getDay(): 0=Dom…6=Sáb → convertir a 0=Lun…6=Dom
+    const jsDay = new Date(fecha + 'T12:00:00').getDay();
+    const dowIndex = jsDay === 0 ? 6 : jsDay - 1;
+    if (pwMatchesPattern(d, dowIndex, pattern)) matching.push(fecha);
+  }
+  return matching;
+}
+
+function pwUpdatePreview() {
+  const days = pwGetMatchingDays();
+  const vId  = parseInt(document.getElementById('pw-vigilante').value) || null;
+  const pId  = document.getElementById('pw-puesto').value || null;
+  const tId  = document.getElementById('pw-turno').value || null;
+  const vNombre = vId ? (VIGILANTES.find(v => v.id === vId)?.nombre || '?') : '—';
+  const pNombre = pId ? (PUESTOS.find(p => p.id === pId)?.nombre   || '?') : 'todos los puestos';
+  const tNombre = tId ? (TURNOS.find(t => t.id === tId)?.label     || '?') : 'todos los turnos';
+  const slots = days.length * (pId ? 1 : PUESTOS.length) * (tId ? 1 : TURNOS.length);
+  document.getElementById('pw-preview').innerHTML =
+    `Se asignará <span>${vNombre}</span> a <span>${pNombre}</span> / <span>${tNombre}</span>
+     en <span>${days.length} días</span> del mes → <span>${slots} slots</span>`;
+}
+
+function applyPattern() {
+  const vId  = parseInt(document.getElementById('pw-vigilante').value) || null;
+  if (!vId) { alert('Selecciona un vigilante.'); return; }
+  const pId  = document.getElementById('pw-puesto').value || null;
+  const tId  = document.getElementById('pw-turno').value || null;
+  const overwrite = document.getElementById('pw-overwrite').checked;
+  const days = pwGetMatchingDays();
+
+  const targetPuestos = pId ? [PUESTOS.find(p => p.id === pId)].filter(Boolean) : PUESTOS;
+  const targetTurnos  = tId ? [TURNOS.find(t => t.id === tId)].filter(Boolean)  : TURNOS;
+
+  days.forEach(fecha => {
+    if (!assignments[fecha]) assignments[fecha] = {};
+    targetPuestos.forEach(puesto => {
+      if (!assignments[fecha][puesto.id]) {
+        assignments[fecha][puesto.id] = {};
+        TURNOS.forEach(t => { assignments[fecha][puesto.id][t.id] = null; });
+      }
+      targetTurnos.forEach(turno => {
+        if (overwrite || assignments[fecha][puesto.id][turno.id] === null) {
+          assignments[fecha][puesto.id][turno.id] = vId;
+        }
+      });
+    });
+  });
+
+  saveData();
+  closePatternModal();
+  renderMonthlyGrid();
+}
+
+/* ── Popup asignación grilla mensual (D3) ───────────── */
+let _apFecha = null, _apPuestoId = null, _apTurnoId = null;
+
+function openAssignPopup(event, fecha, puestoId, turnoId) {
+  event.stopPropagation();
+  _apFecha = fecha; _apPuestoId = puestoId; _apTurnoId = turnoId;
+
+  const puesto  = PUESTOS.find(p => p.id === puestoId);
+  const turno   = TURNOS.find(t => t.id === turnoId);
+  const current = assignments[fecha]?.[puestoId]?.[turnoId] ?? null;
+
+  // Header
+  const d = new Date(fecha + 'T12:00:00');
+  const dayStr = `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
+  document.getElementById('ap-header').innerHTML =
+    `<strong>${puesto ? puesto.nombre : puestoId}</strong><br>
+     ${turno ? turno.label : turnoId} · ${dayStr}`;
+
+  // Lista de vigilantes
+  let html = '';
+  VIGILANTES.forEach(v => {
+    const isCurrent = current === v.id;
+    html += `<div class="ap-row${isCurrent ? ' ap-row-selected' : ''}"
+               onclick="assignFromPopup(${v.id})">
+               <span class="ap-dot" style="background:${v.color}"></span>
+               ${v.nombre}${isCurrent ? ' ✓' : ''}
+             </div>`;
+  });
+  if (current !== null) {
+    html += `<div class="ap-row ap-unassign" onclick="assignFromPopup(null)">
+               ✕ Quitar asignación
+             </div>`;
+  }
+  document.getElementById('ap-list').innerHTML = html;
+
+  // Posicionamiento: evitar desbordamiento de pantalla
+  const popup = document.getElementById('assign-popup');
+  popup.style.left = '0'; popup.style.top = '0';
+  popup.classList.add('visible');
+  const pw = popup.offsetWidth, ph = popup.offsetHeight;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let x = event.clientX + 6, y = event.clientY + 6;
+  if (x + pw > vw - 8) x = event.clientX - pw - 6;
+  if (y + ph > vh - 8) y = event.clientY - ph - 6;
+  popup.style.left = x + 'px';
+  popup.style.top  = y + 'px';
+}
+
+function assignFromPopup(vid) {
+  if (!assignments[_apFecha]) assignments[_apFecha] = {};
+  if (!assignments[_apFecha][_apPuestoId]) {
+    assignments[_apFecha][_apPuestoId] = {};
+    TURNOS.forEach(t => { assignments[_apFecha][_apPuestoId][t.id] = null; });
+  }
+  assignments[_apFecha][_apPuestoId][_apTurnoId] = vid;
+  saveData();
+  closeAssignPopup();
+  renderMonthlyGrid();
+}
+
+function closeAssignPopup() {
+  document.getElementById('assign-popup').classList.remove('visible');
+  _apFecha = null; _apPuestoId = null; _apTurnoId = null;
+}
+
+// Cierre al hacer click fuera del popup
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('assign-popup');
+  if (popup && popup.classList.contains('visible') && !popup.contains(e.target)) {
+    closeAssignPopup();
+  }
+});
 
 function renderDateNav() {
   const d = new Date(currentDate + 'T12:00:00');
