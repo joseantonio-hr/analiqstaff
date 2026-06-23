@@ -2190,29 +2190,120 @@
       font-family: var(--mono); font-size: 13px; font-weight: 500;
       color: var(--t1); min-width: 140px; text-align: center;
     }
-    .cuad-catalog-strip {
+    /* ── Servicios Grid (Fase 3) ─────────────────────────── */
+    .servicios-grid-section {
       flex-shrink: 0;
-      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-      padding: 7px 18px;
+      padding: 14px 18px 12px;
       border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,0.08);
-      min-height: 40px;
+      background: rgba(0,0,0,0.06);
+      overflow-y: auto;
+      max-height: 260px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--t3) transparent;
     }
-    .catalog-label {
+    .servicios-grid-section::-webkit-scrollbar { width: 5px; }
+    .servicios-grid-section::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 3px; }
+    .servicios-grid-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .servicios-grid-label {
       font-size: 9px; color: var(--t3);
-      text-transform: uppercase; letter-spacing: 0.7px; white-space: nowrap;
+      text-transform: uppercase; letter-spacing: 1px;
+      font-family: var(--mono);
     }
-    .catalog-tag {
-      display: flex; align-items: center; gap: 5px;
-      padding: 3px 10px;
-      background: var(--glass); border: 1px solid var(--border); border-radius: 20px;
-      font-size: 10.5px; color: var(--t1); white-space: nowrap;
+    .servicios-grid-count {
+      font-size: 9px; color: var(--t3);
+      font-family: var(--mono);
     }
-    .catalog-tag .ct-remove {
-      font-size: 9px; color: var(--t3); cursor: pointer;
-      margin-left: 2px; transition: color 0.15s;
+    .servicios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 10px;
     }
-    .catalog-tag .ct-remove:hover { color: var(--red); }
+    .servicio-card {
+      position: relative;
+      padding: 14px 14px 12px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      overflow: hidden;
+      cursor: default;
+    }
+    .servicio-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 90% 55% at 50% -15%, var(--sc-accent-dim, rgba(0,212,255,0.07)), transparent 70%);
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .servicio-card:hover {
+      border-color: var(--sc-accent-color, var(--cyan));
+      background: rgba(255,255,255,0.055);
+      box-shadow:
+        0 0 22px -4px var(--sc-accent-glow, rgba(0,212,255,0.35)),
+        0 0 6px  -2px var(--sc-accent-glow, rgba(0,212,255,0.2)),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+    }
+    .servicio-card:hover::before { opacity: 2; }
+    .sc-emoji {
+      font-size: 34px; line-height: 1;
+      display: block; margin-bottom: 10px;
+      filter: drop-shadow(0 0 6px var(--sc-accent-glow, rgba(0,212,255,0.35)));
+      transition: filter 0.3s;
+    }
+    .servicio-card:hover .sc-emoji {
+      filter: drop-shadow(0 0 12px var(--sc-accent-glow, rgba(0,212,255,0.6)));
+    }
+    .sc-nombre {
+      font-size: 12px; font-weight: 600; color: var(--t1);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .sc-lugar {
+      font-size: 9.5px; color: var(--t3);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 10px;
+    }
+    .sc-badges-row {
+      display: flex; gap: 4px; flex-wrap: wrap;
+    }
+    .sc-badge-tip  { font-size: 8.5px; padding: 2px 7px; border-radius: 10px; background: rgba(77,142,255,0.12); border: 1px solid rgba(77,142,255,0.25); color: var(--blue); }
+    .sc-badge-arma { font-size: 8.5px; padding: 2px 7px; border-radius: 10px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); color: var(--amber); }
+    .sc-badge-aero { font-size: 8.5px; padding: 2px 7px; border-radius: 10px; background: rgba(0,212,255,0.1);  border: 1px solid rgba(0,212,255,0.25);  color: var(--cyan); }
+    .sc-cobertura {
+      position: absolute; top: 11px; right: 11px;
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 3px 8px; border-radius: 20px;
+      font-family: var(--mono); font-size: 9.5px; font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .sc-cobertura.ok {
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.28);
+      color: var(--cyan);
+    }
+    .sc-cobertura.warn {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: var(--amber);
+    }
+    .sc-cobertura.empty {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--t3);
+    }
+    .servicio-card-empty {
+      grid-column: 1 / -1;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; padding: 24px;
+      color: var(--t3); font-size: 12px; font-family: var(--mono);
+    }
+    .servicio-card-empty span { font-size: 28px; }
     .cuad-body {
       flex: 1; overflow: auto; padding: 14px;
       scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
@@ -2843,10 +2934,15 @@
     </button>
   </div>
 
-  <!-- Catálogo de servicios activos -->
-  <div class="cuad-catalog-strip" id="cuad-catalog-strip">
-    <span class="catalog-label">Catálogo:</span>
-    <!-- Poblado por JS -->
+  <!-- Catálogo de servicios: grid luminoso (Fase 3) -->
+  <div class="servicios-grid-section" id="servicios-grid-section">
+    <div class="servicios-grid-hdr">
+      <span class="servicios-grid-label">Catálogo de servicios</span>
+      <span class="servicios-grid-count" id="servicios-grid-count"></span>
+    </div>
+    <div class="servicios-grid" id="servicios-grid">
+      <!-- Poblado por renderServiciosGrid() -->
+    </div>
   </div>
 
   <!-- Grilla mensual -->
@@ -3971,6 +4067,7 @@ function saveNewPuesto() {
 
   saveToStorage();
   closeModal();
+  renderServiciosGrid();   // redibuja catálogo inmediatamente (Fase 3)
   renderScheduler();
   updateKPI();
   renderFinancialPanel();
@@ -4769,19 +4866,82 @@ function renderCuadMonthDisplay() {
 }
 
 function renderCuadCatalogStrip() {
-  const strip = document.getElementById('cuad-catalog-strip');
-  if (!strip) return;
-  strip.innerHTML = '<span class="catalog-label">Catálogo:</span>';
+  // Delegamos al nuevo grid luminoso
+  renderServiciosGrid();
+}
+
+/** Calcula % de cobertura de un puesto para el mes/año actuales */
+function calcCoberturaPuesto(puestoId) {
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  const total = diasEnMes * TURNOS.length;
+  if (total === 0) return 0;
+  let filled = 0;
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    const da = (assignments[fecha] && assignments[fecha][puestoId]) || {};
+    TURNOS.forEach(t => { if (da[t.id]) filled++; });
+  }
+  return Math.round((filled / total) * 100);
+}
+
+/** Devuelve { color, glow, dim } para cada tipo de puesto */
+function accentForPuesto(p) {
+  if (p.tipo === 'armado')     return { color: 'var(--amber)', glow: 'rgba(245,158,11,0.38)', dim: 'rgba(245,158,11,0.07)' };
+  if (p.tipo === 'aeropuerto') return { color: 'var(--cyan)',  glow: 'rgba(0,212,255,0.38)',  dim: 'rgba(0,212,255,0.07)'  };
+  return                              { color: 'var(--blue)',  glow: 'rgba(77,142,255,0.38)', dim: 'rgba(77,142,255,0.07)' };
+}
+
+/** Renderiza el catálogo de servicios como grid de tarjetas glassmorphism */
+function renderServiciosGrid() {
+  const grid  = document.getElementById('servicios-grid');
+  const count = document.getElementById('servicios-grid-count');
+  if (!grid) return;
+
+  if (count) count.textContent = PUESTOS.length
+    ? `${PUESTOS.length} servicio${PUESTOS.length !== 1 ? 's' : ''}`
+    : '';
+
   if (PUESTOS.length === 0) {
-    strip.innerHTML += '<span style="font-size:10px;color:var(--t3)">Sin servicios — usa "Registrar Servicio"</span>';
+    grid.innerHTML = `<div class="servicio-card-empty">
+      <span>🏢</span>
+      Sin servicios registrados — pulsa <strong style="color:var(--t2)">"Registrar Servicio"</strong> para añadir uno.
+    </div>`;
     return;
   }
-  PUESTOS.forEach(p => {
-    const tag = document.createElement('div');
-    tag.className = 'catalog-tag';
-    tag.innerHTML = `<span>${p.emoji} ${p.nombre}</span>`;
-    strip.appendChild(tag);
-  });
+
+  grid.innerHTML = PUESTOS.map(p => {
+    const acc  = accentForPuesto(p);
+    const pct  = calcCoberturaPuesto(p.id);
+    const hasCov = new Date(cuadYear, cuadMonth + 1, 0).getDate() > 0;
+
+    let covCls, covTxt;
+    if (!hasCov || VIGILANTES.length === 0) {
+      covCls = 'empty'; covTxt = '— %';
+    } else if (pct >= 80) {
+      covCls = 'ok';   covTxt = `${pct}% Cubierto`;
+    } else if (pct > 0) {
+      covCls = 'warn';  covTxt = `${pct}% ⚠ Revisar`;
+    } else {
+      covCls = 'warn';  covTxt = `Sin cubrir`;
+    }
+
+    const badgesHtml = [
+      p.requiere?.includes('tip')         ? '<span class="sc-badge-tip">TIP</span>'        : '',
+      p.requiere?.includes('armas')       ? '<span class="sc-badge-arma">⚑ Armas</span>'  : '',
+      p.requiere?.includes('aeropuertos') ? '<span class="sc-badge-aero">✈ Aero</span>'   : '',
+      p.armado                             ? '<span class="sc-badge-arma">🔫 Armado</span>': '',
+    ].join('');
+
+    return `
+    <div class="servicio-card"
+         style="--sc-accent-color:${acc.color};--sc-accent-glow:${acc.glow};--sc-accent-dim:${acc.dim}">
+      <span class="sc-cobertura ${covCls}">${covTxt}</span>
+      <span class="sc-emoji">${p.emoji || '🔒'}</span>
+      <div class="sc-nombre">${p.nombre}</div>
+      <div class="sc-lugar">📍 ${p.lugar}</div>
+      ${badgesHtml ? `<div class="sc-badges-row">${badgesHtml}</div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function cuadPrevMonth() {
