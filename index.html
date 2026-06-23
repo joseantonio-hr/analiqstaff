@@ -264,7 +264,7 @@
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: 43% 57%;
+      grid-template-columns: 40% 60%;
       overflow: hidden;
     }
 
@@ -574,8 +574,342 @@
     }
 
     /* ========================================================
-       PANEL DERECHO: SCHEDULER
+       PANEL DERECHO: DETAIL PANEL (Stats + Expediente)
     ======================================================== */
+
+    /* Contenedor principal del panel derecho */
+    .detail-panel {
+      position: relative;
+    }
+
+    /* Sub-vistas del panel derecho */
+    .detail-subview {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      opacity: 1;
+      transition: opacity 0.22s ease;
+    }
+    .detail-subview.hidden {
+      display: none;
+    }
+
+    /* ── Estadísticas Globales ─────────────────────────── */
+    .stats-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--t3) transparent;
+    }
+    .stats-body::-webkit-scrollbar { width: 4px; }
+    .stats-body::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+
+    /* Intro hero */
+    .stats-hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(77,142,255,0.04));
+      border: 1px solid rgba(0,212,255,0.14);
+      border-radius: var(--r-xl);
+    }
+    .stats-hero-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .stats-hero-title {
+      font-family: var(--serif);
+      font-size: 19px;
+      color: var(--t1);
+      line-height: 1.15;
+    }
+    .stats-hero-sub {
+      font-size: 10.5px;
+      color: var(--t2);
+      margin-top: 3px;
+    }
+
+    /* KPI grid 2x2 */
+    .stats-kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stats-kpi-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .stats-kpi-card:hover {
+      background: var(--glass-hover);
+      border-color: var(--border-strong);
+    }
+    .stats-kpi-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stats-kpi-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .stats-kpi-label {
+      font-size: 9.5px;
+      color: var(--t2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .stats-kpi-value {
+      font-family: var(--mono);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1;
+      margin: 4px 0 2px;
+    }
+    .stats-kpi-sub {
+      font-size: 9.5px;
+      color: var(--t3);
+    }
+
+    /* Sección de habilitaciones con barras */
+    .stats-section-title {
+      font-size: 8.5px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--t3);
+      font-family: var(--mono);
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .stats-hab-list {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .stats-hab-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .stats-hab-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stats-hab-name {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      color: var(--t1);
+    }
+    .stats-hab-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--t2);
+    }
+    .stats-progress-track {
+      height: 5px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .stats-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* Agentes con color por fiabilidad */
+    .stats-roster-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stats-agent-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 12px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .stats-agent-row:hover {
+      background: var(--glass-hover);
+      border-color: var(--border-strong);
+      transform: translateX(3px);
+    }
+    .stats-agent-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .stats-agent-info { flex: 1; min-width: 0; }
+    .stats-agent-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stats-agent-cargo {
+      font-size: 9.5px;
+      color: var(--t2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stats-agent-score {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .stats-score-bar {
+      width: 44px;
+      height: 3px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .stats-score-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .stats-score-val {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      min-width: 26px;
+      text-align: right;
+    }
+
+    /* ── Expediente Digital Ampliado ──────────────────── */
+    .employee-panel-hdr {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.015);
+    }
+    .btn-back-metrics {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--t2);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-back-metrics:hover {
+      background: rgba(0,212,255,0.07);
+      border-color: rgba(0,212,255,0.25);
+      color: var(--cyan);
+    }
+    .employee-panel-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .employee-panel-info { flex: 1; min-width: 0; }
+    .employee-panel-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--t1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .employee-panel-cargo {
+      font-size: 10px;
+      color: var(--t2);
+    }
+
+    /* Pestañas del expediente */
+    .employee-tabs {
+      flex-shrink: 0;
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.15);
+    }
+    .employee-tab {
+      flex: 1;
+      padding: 10px 0;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--t3);
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.18s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .employee-tab:hover { color: var(--t2); }
+    .employee-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+    /* Cuerpo del expediente */
+    .employee-tab-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--t3) transparent;
+    }
+    .employee-tab-body::-webkit-scrollbar { width: 4px; }
+    .employee-tab-body::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+
+    /* ── PANEL SCHEDULER (oculto en dashboard, mantenido para futuro) ── */
     .scheduler-panel .panel-body {
       display: flex;
       flex-direction: column;
@@ -2214,33 +2548,45 @@
     </div>
   </section>
 
-  <!-- COLUMNA DERECHA: CUADRANTE -->
-  <section class="panel scheduler-panel">
-    <div class="panel-hdr">
-      <div>
-        <div class="panel-title">Cuadrante del Día</div>
-        <div class="panel-sub">Simulador de asignación de turnos</div>
-      </div>
-      <button class="btn-hdr primary" onclick="openModal()" style="margin-left:auto;font-size:11px">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nuevo Puesto
-      </button>
-      <div class="date-nav">
-        <button class="date-nav-btn" onclick="prevDay()" title="Día anterior">‹</button>
-        <div class="date-badge">
-          <div class="db-day" id="hdr-day"></div>
-          <div>
-            <div class="db-month" id="hdr-month"></div>
-            <div class="db-year"  id="hdr-year"></div>
-          </div>
+  <!-- COLUMNA DERECHA: PANEL DE DETALLE (Stats globales / Expediente) -->
+  <section class="panel detail-panel">
+
+    <!-- VISTA A: Estadísticas Globales (estado por defecto) -->
+    <div class="detail-subview" id="subview-stats">
+      <div class="panel-hdr">
+        <div>
+          <div class="panel-title">Estadísticas de la Plantilla</div>
+          <div class="panel-sub">Vista global del equipo · haz clic en un vigilante para su expediente</div>
         </div>
-        <button class="date-nav-btn" onclick="nextDay()" title="Día siguiente">›</button>
-        <button class="date-today-btn" onclick="goToday()">Hoy</button>
+      </div>
+      <div class="stats-body" id="stats-body">
+        <!-- Renderizado por renderGlobalStats() -->
       </div>
     </div>
-    <div class="panel-body" id="scheduler-body">
-      <!-- Renderizado por JS -->
+
+    <!-- VISTA B: Expediente Digital Ampliado (al seleccionar un vigilante) -->
+    <div class="detail-subview hidden" id="subview-employee">
+      <div class="employee-panel-hdr">
+        <button class="btn-back-metrics" onclick="deselectEmployee()" title="Volver a estadísticas globales">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="15 18 9 12 15 6"/></svg>
+          Ver métricas del equipo
+        </button>
+        <div class="employee-panel-avatar" id="ep-avatar"></div>
+        <div class="employee-panel-info">
+          <div class="employee-panel-name" id="ep-nombre"></div>
+          <div class="employee-panel-cargo" id="ep-cargo"></div>
+        </div>
+        <button class="cromo-star-btn" id="ep-star-btn" title="Activar modo asignación" style="position:static;width:28px;height:28px;font-size:13px;filter:none;opacity:0.7;flex-shrink:0" onclick="onToggleSelectFromPanel()">⭐</button>
+      </div>
+      <div class="employee-tabs" id="ep-tabs">
+        <div class="employee-tab active" data-tab="detalles" onclick="switchEmployeeTab('detalles')">📋 Detalles</div>
+        <div class="employee-tab" data-tab="nomina" onclick="switchEmployeeTab('nomina')">💰 Nómina</div>
+      </div>
+      <div class="employee-tab-body" id="ep-content">
+        <!-- Renderizado por renderEmployeePanel() -->
+      </div>
     </div>
+
   </section>
 
 </main>
@@ -3050,8 +3396,8 @@ function renderRoster() {
           e.stopPropagation();
           onToggleSelect(v.id);
         });
-        /* Cuerpo → abrir drawer de expediente */
-        card.addEventListener('click', () => openDrawer(v.id));
+        /* Cuerpo → mostrar expediente en panel derecho */
+        card.addEventListener('click', () => selectEmployee(v.id));
         grid.appendChild(card);
       });
     }
@@ -3068,6 +3414,7 @@ function renderRoster() {
 ====================================================== */
 function renderScheduler() {
   const body = document.getElementById('scheduler-body');
+  if (!body) return; // el panel del cuadrante no está activo en esta vista
   body.innerHTML = '';
 
   PUESTOS.forEach(puesto => {
@@ -3393,6 +3740,229 @@ function onToggleSelect(id) {
   renderRoster();
   renderScheduler();
   updateHint();
+  // Sincronizar botón estrella del panel de detalle si está visible
+  if (activeEmployeeId) _syncEpStarBtn();
+}
+
+/* ======================================================
+   PANEL DERECHO: ESTADÍSTICAS GLOBALES + EXPEDIENTE
+====================================================== */
+let activeEmployeeId  = null;
+let employeeTab       = 'detalles';
+
+/** Muestra el expediente de un vigilante en el panel derecho */
+function selectEmployee(id) {
+  activeEmployeeId = id;
+  employeeTab = 'detalles';
+
+  const v   = getV(id);
+  if (!v) return;
+  const rgb = hexRgb(v.color);
+
+  // Avatar + nombre en la cabecera
+  const av = document.getElementById('ep-avatar');
+  av.textContent = v.iniciales;
+  av.style.cssText = `background:rgba(${rgb},0.18);border:2px solid rgba(${rgb},0.4);color:${v.color}`;
+  document.getElementById('ep-nombre').textContent = v.nombre;
+  document.getElementById('ep-cargo').textContent  = v.cargo;
+
+  // Botón estrella refleja estado
+  _syncEpStarBtn();
+
+  // Resetear pestañas
+  document.querySelectorAll('.employee-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === employeeTab)
+  );
+  document.getElementById('ep-content').innerHTML = _htmlDetalles(v);
+
+  // Transición entre sub-vistas
+  document.getElementById('subview-stats').classList.add('hidden');
+  document.getElementById('subview-employee').classList.remove('hidden');
+
+  // Sincronizar cromos (resaltado de selección)
+  renderRoster();
+}
+
+/** Vuelve a la vista de Estadísticas Globales */
+function deselectEmployee() {
+  activeEmployeeId = null;
+  document.getElementById('subview-employee').classList.add('hidden');
+  document.getElementById('subview-stats').classList.remove('hidden');
+  renderGlobalStats();
+  renderRoster();
+}
+
+/** Cambia pestaña dentro del expediente */
+function switchEmployeeTab(tab) {
+  employeeTab = tab;
+  document.querySelectorAll('.employee-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === tab)
+  );
+  const v = getV(activeEmployeeId);
+  document.getElementById('ep-content').innerHTML =
+    tab === 'nomina' ? _htmlNomina(v) : _htmlDetalles(v);
+}
+
+/** Toggle de estrella desde el panel de detalle */
+function onToggleSelectFromPanel() {
+  if (!activeEmployeeId) return;
+  onToggleSelect(activeEmployeeId);
+  _syncEpStarBtn();
+}
+
+function _syncEpStarBtn() {
+  const btn = document.getElementById('ep-star-btn');
+  if (!btn) return;
+  const isActive = (selectedId === activeEmployeeId);
+  btn.style.filter      = isActive ? 'none' : 'grayscale(0.7)';
+  btn.style.opacity     = isActive ? '1' : '0.65';
+  btn.style.background  = isActive ? 'rgba(0,212,255,0.2)' : 'rgba(0,0,0,0.45)';
+  btn.style.borderColor = isActive ? 'var(--cyan)' : 'rgba(255,255,255,0.1)';
+  btn.style.boxShadow   = isActive ? '0 0 10px rgba(0,212,255,0.5)' : 'none';
+  btn.title = isActive ? 'Quitar modo asignación' : 'Activar modo asignación';
+}
+
+/** Renderiza las Estadísticas Globales de la Plantilla */
+function renderGlobalStats() {
+  const body = document.getElementById('stats-body');
+  if (!body) return;
+
+  const total    = VIGILANTES.length;
+  const avgFiab  = total > 0
+    ? (VIGILANTES.reduce((s, v) => s + v.fiabilidad, 0) / total).toFixed(1)
+    : '—';
+  const conTip   = VIGILANTES.filter(v => v.hab.includes('tip')).length;
+  const conArmas = VIGILANTES.filter(v => v.hab.includes('armas')).length;
+  const conAero  = VIGILANTES.filter(v => v.hab.includes('aeropuertos')).length;
+  const pctTip   = total > 0 ? Math.round((conTip  / total) * 100) : 0;
+  const pctArmas = total > 0 ? Math.round((conArmas / total) * 100) : 0;
+  const pctAero  = total > 0 ? Math.round((conAero  / total) * 100) : 0;
+  const avgExp   = total > 0
+    ? (VIGILANTES.reduce((s, v) => s + v.experiencia, 0) / total).toFixed(1)
+    : '—';
+
+  // Fiabilidad media: color dinámico
+  const fiabColor = parseFloat(avgFiab) >= 9 ? 'var(--green)'
+                  : parseFloat(avgFiab) >= 8 ? 'var(--cyan)'
+                  : 'var(--amber)';
+
+  // Agentes en la lista
+  const agentRowsHTML = VIGILANTES.map(v => {
+    const rgb = hexRgb(v.color);
+    const pct = Math.round((v.fiabilidad / 10) * 100);
+    return `
+      <div class="stats-agent-row" onclick="selectEmployee(${v.id})">
+        <div class="stats-agent-avatar" style="background:rgba(${rgb},0.18);border:1.5px solid rgba(${rgb},0.4);color:${v.color}">
+          ${v.iniciales}
+        </div>
+        <div class="stats-agent-info">
+          <div class="stats-agent-name">${v.nombre}</div>
+          <div class="stats-agent-cargo">${v.cargo}</div>
+        </div>
+        <div class="stats-agent-score">
+          <div class="stats-score-bar">
+            <div class="stats-score-fill" style="width:${pct}%;background:${v.color}"></div>
+          </div>
+          <div class="stats-score-val" style="color:${v.color}">${v.fiabilidad}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  body.innerHTML = `
+    <!-- Hero introductorio -->
+    <div class="stats-hero">
+      <div class="stats-hero-icon">📊</div>
+      <div>
+        <div class="stats-hero-title">Visión Global de Operaciones</div>
+        <div class="stats-hero-sub">Métricas en tiempo real · ${total} agente${total !== 1 ? 's' : ''} en plantilla · Convenio Seguridad Privada 2026</div>
+      </div>
+    </div>
+
+    <!-- KPIs principales 2x2 -->
+    <div class="stats-kpi-grid">
+      <div class="stats-kpi-card">
+        <div class="stats-kpi-header">
+          <div class="stats-kpi-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan)"></div>
+          <span class="stats-kpi-label">Fiabilidad media</span>
+        </div>
+        <div class="stats-kpi-value" style="color:${fiabColor}">${avgFiab}<span style="font-size:14px;color:var(--t3)">/10</span></div>
+        <div class="stats-kpi-sub">Índice ponderado de la plantilla</div>
+      </div>
+      <div class="stats-kpi-card">
+        <div class="stats-kpi-header">
+          <div class="stats-kpi-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></div>
+          <span class="stats-kpi-label">Total en plantilla</span>
+        </div>
+        <div class="stats-kpi-value" style="color:var(--blue)">${total}</div>
+        <div class="stats-kpi-sub">Vigilantes activos registrados</div>
+      </div>
+      <div class="stats-kpi-card">
+        <div class="stats-kpi-header">
+          <div class="stats-kpi-dot" style="background:var(--green);box-shadow:0 0 5px var(--green)"></div>
+          <span class="stats-kpi-label">TIPs renovadas</span>
+        </div>
+        <div class="stats-kpi-value" style="color:var(--green)">${pctTip}<span style="font-size:14px;color:var(--t3)">%</span></div>
+        <div class="stats-kpi-sub">${conTip} de ${total} con TIP activa</div>
+      </div>
+      <div class="stats-kpi-card">
+        <div class="stats-kpi-header">
+          <div class="stats-kpi-dot" style="background:var(--amber);box-shadow:0 0 5px var(--amber)"></div>
+          <span class="stats-kpi-label">Exp. media</span>
+        </div>
+        <div class="stats-kpi-value" style="color:var(--amber)">${avgExp}<span style="font-size:14px;color:var(--t3)"> años</span></div>
+        <div class="stats-kpi-sub">Promedio de experiencia en el sector</div>
+      </div>
+    </div>
+
+    <!-- Barras de habilitaciones -->
+    <div>
+      <div class="stats-section-title">Distribución de Habilitaciones</div>
+      <div class="stats-hab-list">
+        <div class="stats-hab-row">
+          <div class="stats-hab-top">
+            <span class="stats-hab-name">
+              <span class="badge tip" style="font-size:9px">✓ TIP Activa</span>
+            </span>
+            <span class="stats-hab-count">${conTip} / ${total} · ${pctTip}%</span>
+          </div>
+          <div class="stats-progress-track">
+            <div class="stats-progress-fill" style="width:${pctTip}%;background:var(--green);box-shadow:0 0 5px rgba(16,185,129,0.5)"></div>
+          </div>
+        </div>
+        <div class="stats-hab-row">
+          <div class="stats-hab-top">
+            <span class="stats-hab-name">
+              <span class="badge armas" style="font-size:9px">⚑ Lic. Armas</span>
+            </span>
+            <span class="stats-hab-count">${conArmas} / ${total} · ${pctArmas}%</span>
+          </div>
+          <div class="stats-progress-track">
+            <div class="stats-progress-fill" style="width:${pctArmas}%;background:var(--red);box-shadow:0 0 5px rgba(239,68,68,0.5)"></div>
+          </div>
+        </div>
+        <div class="stats-hab-row">
+          <div class="stats-hab-top">
+            <span class="stats-hab-name">
+              <span class="badge aeropuertos" style="font-size:9px">✈ Aeropuertos</span>
+            </span>
+            <span class="stats-hab-count">${conAero} / ${total} · ${pctAero}%</span>
+          </div>
+          <div class="stats-progress-track">
+            <div class="stats-progress-fill" style="width:${pctAero}%;background:var(--purple);box-shadow:0 0 5px rgba(168,85,247,0.5)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista agentes con fiabilidad -->
+    <div>
+      <div class="stats-section-title">Agentes · Índice de Fiabilidad</div>
+      <div class="stats-roster-grid">
+        ${agentRowsHTML}
+      </div>
+    </div>
+  `;
 }
 
 /* ======================================================
@@ -3680,8 +4250,14 @@ function clearAll() {
   syncFilterPills();
   closeDrawer();
   drawerVid = null;
+  activeEmployeeId = null;
+  // Volver al panel de estadísticas globales
+  const subStats = document.getElementById('subview-stats');
+  const subEmp   = document.getElementById('subview-employee');
+  if (subStats) subStats.classList.remove('hidden');
+  if (subEmp)   subEmp.classList.add('hidden');
   renderRoster();
-  renderScheduler();
+  renderGlobalStats();
   renderFinancialPanel();
   updateKPI();
   updateHint();
@@ -4837,9 +5413,11 @@ function init() {
   renderDateNav();
   loadFromStorage();
   renderRoster();
-  renderScheduler();
+  renderGlobalStats();  // Panel derecho: estadísticas globales por defecto
   updateKPI();
   syncFilterPills();
+  renderCuadMonthDisplay();
+  renderCuadCatalogStrip();
 }
 
 init();
