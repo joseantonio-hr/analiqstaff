@@ -1942,6 +1942,76 @@
       padding: 8px 0;
     }
 
+    /* ── Buscador de empleados ─────────────────────────── */
+    .nom-search-wrap {
+      position: relative; flex: 1; max-width: 260px;
+    }
+    .nom-search-input {
+      width: 100%; padding: 7px 12px 7px 30px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary); font-size: 12px;
+      outline: none; transition: border-color 0.15s; box-sizing: border-box;
+    }
+    .nom-search-input::placeholder { color: var(--text-muted); }
+    .nom-search-input:focus { border-color: var(--accent); }
+    .nom-search-icon {
+      position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+      font-size: 12px; color: var(--text-muted); pointer-events: none;
+    }
+
+    /* ── Layout BOE: dos columnas devengos/deducciones ─── */
+    .ndoc-boe-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1px solid #cbd5e1; margin: 8px 0 0;
+    }
+    .ndoc-boe-col:first-child { border-right: 1px solid #cbd5e1; }
+    .ndoc-boe-col-title {
+      background: #f1f5f9; padding: 6px 10px;
+      font-size: 9.5px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.8px; color: #334155;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .ndoc-boe-subsection {
+      padding: 3px 10px 1px;
+      font-size: 8.5px; font-weight: 700; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: 0.6px;
+      border-bottom: 1px solid #f1f5f9; background: #fafafa;
+    }
+    .ndoc-boe-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 10px; font-size: 11px; color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .ndoc-boe-row:last-child { border-bottom: none; }
+    .ndoc-boe-row.subtotal {
+      font-weight: 800; background: #f1f5f9;
+      border-top: 2px solid #cbd5e1; border-bottom: none;
+    }
+    .ndoc-boe-row.subtotal .val { color: #1e293b; }
+    .ndoc-boe-row .lbl { color: #475569; flex: 1; padding-right: 6px; }
+    .ndoc-boe-row .val { font-family: monospace; font-weight: 600; white-space: nowrap; }
+    .ndoc-boe-row .val.red { color: #dc2626; }
+    .ndoc-boe-neto {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #1e293b; color: #fff;
+      padding: 12px 14px; border: 1px solid #cbd5e1; border-top: none;
+    }
+    .ndoc-boe-neto .lbl { font-size: 13px; font-weight: 800; letter-spacing: 0.3px; }
+    .ndoc-boe-neto .val { font-family: monospace; font-size: 20px; font-weight: 900; color: #a5f3fc; }
+    .ndoc-bases-block {
+      border: 1px solid #cbd5e1; border-top: none;
+      padding: 8px 12px; background: #f8fafc;
+    }
+    .ndoc-bases-title {
+      font-size: 8.5px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.8px; color: #64748b; margin-bottom: 6px;
+    }
+    .ndoc-bases-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 12px;
+    }
+    .ndoc-base-lbl { font-size: 8.5px; color: #94a3b8; }
+    .ndoc-base-val { font-size: 11px; font-weight: 700; color: #334155; font-family: monospace; }
+
     /* ── Nómina Preview Modal (E4) ─────────────────────── */
     #modal-nomina-preview {
       position: fixed; inset: 0; z-index: 9000;
@@ -2208,6 +2278,14 @@
     <button class="btn-hdr" onclick="openPatternModal()" style="font-size:11px">
       🔄 Aplicar Patrón
     </button>
+
+    <button class="btn-hdr primary" onclick="autoCompletarMes()" style="font-size:11px" title="Rellena todos los turnos vacíos respetando el Convenio de Seguridad Privada">
+      ⚡ Auto-completar Mes
+    </button>
+
+    <button class="btn-hdr" onclick="limpiarCuadranteMes()" style="font-size:11px;color:var(--red);border-color:rgba(239,68,68,0.3)" title="Elimina todas las asignaciones del mes actual">
+      🗑 Limpiar mes
+    </button>
   </div>
 
   <!-- Catálogo de servicios activos -->
@@ -2233,12 +2311,17 @@
 <div id="view-nominas" class="app-view hidden">
   <div class="nom-layout">
 
-    <!-- Controles: navegación de mes + botón exportar todo -->
+    <!-- Controles: navegación de mes + buscador + botón exportar -->
     <div class="nom-controls">
       <div class="nom-month-nav">
         <button class="nom-month-btn" onclick="nomPrevMonth()">‹</button>
         <div class="nom-month-display" id="nom-month-display">— — —</div>
         <button class="nom-month-btn" onclick="nomNextMonth()">›</button>
+      </div>
+      <div class="nom-search-wrap">
+        <span class="nom-search-icon">🔍</span>
+        <input class="nom-search-input" id="nom-search" type="text"
+               placeholder="Buscar empleado…" oninput="filterNominas()">
       </div>
       <button class="btn-hdr" onclick="nomExportAll()" style="font-size:11px">
         📄 Exportar todas las nóminas
@@ -2279,10 +2362,12 @@
             <th class="right">Turnos M</th>
             <th class="right">Turnos T</th>
             <th class="right">Turnos N</th>
+            <th class="right">Horas</th>
             <th class="right">Sueldo base</th>
             <th class="right">Nocturnidad</th>
-            <th class="right">Plus doble</th>
+            <th class="right">H.Extra / FDS</th>
             <th class="right">Total bruto</th>
+            <th class="right">Neto</th>
             <th></th>
           </tr>
         </thead>
@@ -2588,38 +2673,132 @@ let filterHabs   = new Set();
 let filterEstado = 'todos';
 
 /* ======================================================
-   LOCALSTORAGE
+   LOCALSTORAGE — Fase 4: persistencia optimizada
+   · Claves por mes: analiqstaff_assign_YYYY-MM
+   · Formato sparse (sin null, sin claves vacías)
+   · Migración automática desde clave legacy v2
+   · Purga automática de meses > 24 meses
+   · Manejo explícito de QuotaExceededError
 ====================================================== */
-const LS_PUESTOS = 'analiqstaff_puestos_v1';
-const LS_ASSIGN  = 'analiqstaff_assignments_v2'; // nueva estructura multifecha
+const LS_PUESTOS    = 'analiqstaff_puestos_v1';
+const LS_ASSIGN     = 'analiqstaff_assignments_v2'; // clave legacy (solo para migración)
+const LS_ASSIGN_PFX = 'analiqstaff_assign_';        // prefijo por mes: + 'YYYY-MM'
 
+/** Guarda PUESTOS + todos los meses activos en memoria */
 function saveToStorage() {
   try {
     localStorage.setItem(LS_PUESTOS, JSON.stringify(PUESTOS));
-    localStorage.setItem(LS_ASSIGN,  JSON.stringify(assignments));
-  } catch(e) { /* quota exceeded — silencioso */ }
+    _saveAllMonthsInMemory();
+  } catch(e) {
+    if (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014) {
+      _showAutoToast(
+        '⚠ Almacenamiento lleno',
+        'No se pudo guardar. Usa "Limpiar mes" en meses anteriores para liberar espacio.'
+      );
+    }
+  }
+}
+
+/** Serializa cada mes presente en `assignments` a su clave propia */
+function _saveAllMonthsInMemory() {
+  // Agrupar fechas por prefijo 'YYYY-MM'
+  const byMonth = {};
+  for (const fecha in assignments) {
+    const mKey = fecha.slice(0, 7);
+    if (!byMonth[mKey]) byMonth[mKey] = {};
+    byMonth[mKey][fecha] = assignments[fecha];
+  }
+
+  for (const mKey in byMonth) {
+    const lsKey = LS_ASSIGN_PFX + mKey;
+    const sparse = _sparsify(byMonth[mKey]);
+    if (Object.keys(sparse).length > 0) {
+      localStorage.setItem(lsKey, JSON.stringify(sparse));
+    } else {
+      localStorage.removeItem(lsKey);
+    }
+  }
+}
+
+/**
+ * Elimina claves null y objetos vacíos antes de guardar.
+ * { '2026-06-01': { p1: { manana: null, tarde: 2 } } }
+ * → { '2026-06-01': { p1: { tarde: 2 } } }
+ */
+function _sparsify(monthData) {
+  const out = {};
+  for (const fecha in monthData) {
+    const dayOut = {};
+    const dayData = monthData[fecha];
+    for (const pId in dayData) {
+      const pOut = {};
+      const pData = dayData[pId];
+      for (const tId in pData) {
+        const val = pData[tId];
+        if (val !== null && val !== undefined) pOut[tId] = val;
+      }
+      if (Object.keys(pOut).length > 0) dayOut[pId] = pOut;
+    }
+    if (Object.keys(dayOut).length > 0) out[fecha] = dayOut;
+  }
+  return out;
 }
 
 function loadFromStorage() {
+  // ── 1. Puestos ──────────────────────────────────────────
   try {
     const p = localStorage.getItem(LS_PUESTOS);
-    const a = localStorage.getItem(LS_ASSIGN);
+    PUESTOS = p ? JSON.parse(p) : null;
+    if (!PUESTOS || !PUESTOS.length) initPuestos();
+  } catch(e) { initPuestos(); }
 
-    if (p) {
-      PUESTOS = JSON.parse(p);
-    } else {
-      initPuestos();
+  // ── 2. Asignaciones: leer todas las claves por mes ──────
+  assignments = {};
+  try {
+    const monthKeys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(LS_ASSIGN_PFX)) monthKeys.push(k);
+    }
+    monthKeys.forEach(k => {
+      try {
+        const data = JSON.parse(localStorage.getItem(k));
+        if (data) Object.assign(assignments, data);
+      } catch(e) { /* mes corrupto, se ignora */ }
+    });
+
+    // ── 3. Migración desde clave legacy v2 ────────────────
+    const legacy = localStorage.getItem(LS_ASSIGN);
+    if (legacy) {
+      try {
+        const legacyData = JSON.parse(legacy);
+        // Fusionar sin sobreescribir datos ya migrados
+        for (const fecha in legacyData) {
+          if (!assignments[fecha]) assignments[fecha] = legacyData[fecha];
+        }
+        _saveAllMonthsInMemory(); // persistir en nuevo formato
+        localStorage.removeItem(LS_ASSIGN);
+      } catch(e) { localStorage.removeItem(LS_ASSIGN); }
     }
 
-    if (a) {
-      assignments = JSON.parse(a);
-    } else {
-      assignments = {};
-    }
-  } catch(e) {
-    initPuestos();
-    assignments = {};
+    // ── 4. Purgar meses > 24 meses de antigüedad ──────────
+    _purgeOldMonths(24);
+
+  } catch(e) { assignments = {}; }
+}
+
+/** Elimina del localStorage los meses más antiguos que `keepMonths` */
+function _purgeOldMonths(keepMonths) {
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - keepMonths);
+  const toDelete = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith(LS_ASSIGN_PFX)) continue;
+    const monthStr = k.slice(LS_ASSIGN_PFX.length); // 'YYYY-MM'
+    if (new Date(monthStr + '-01') < cutoff) toDelete.push(k);
   }
+  toDelete.forEach(k => localStorage.removeItem(k));
 }
 
 function initPuestos() {
@@ -2633,13 +2812,13 @@ function initAssignments() {
 
 /** Devuelve las asignaciones del día activo (currentDate),
  *  inicializando la estructura si aún no existe para esa fecha. */
+/** Devuelve las asignaciones del día activo.
+ *  Solo inicializa la estructura vacía — no pre-rellena con null
+ *  (formato sparse: solo existen las claves con valor real). */
 function dayAssign() {
   if (!assignments[currentDate]) assignments[currentDate] = {};
   PUESTOS.forEach(p => {
-    if (!assignments[currentDate][p.id]) {
-      assignments[currentDate][p.id] = {};
-      TURNOS.forEach(t => { assignments[currentDate][p.id][t.id] = null; });
-    }
+    if (!assignments[currentDate][p.id]) assignments[currentDate][p.id] = {};
   });
   return assignments[currentDate];
 }
@@ -3482,7 +3661,14 @@ function onUnassign(puestoId, turnoId) {
 
 function clearAll() {
   localStorage.removeItem(LS_PUESTOS);
-  localStorage.removeItem(LS_ASSIGN);
+  localStorage.removeItem(LS_ASSIGN); // legacy
+  // Eliminar también todas las claves por mes del nuevo formato
+  const toDelete = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(LS_ASSIGN_PFX)) toDelete.push(k);
+  }
+  toDelete.forEach(k => localStorage.removeItem(k));
   initPuestos();
   initAssignments();
   selectedId   = null;
@@ -3619,7 +3805,7 @@ function renderNominasTab() {
 
   // ── Filas de la tabla ─────────────────────────────────
   if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="nom-td" style="text-align:center;color:var(--text-muted);padding:30px">
+    tbody.innerHTML = `<tr><td colspan="12" class="nom-td" style="text-align:center;color:var(--text-muted);padding:30px">
       No hay vigilantes registrados.</td></tr>`;
     return;
   }
@@ -3629,15 +3815,17 @@ function renderNominasTab() {
     const bgAvatar = `rgba(${rgb},0.18)`;
     const sinTurnos = nom.diasTrabajados === 0;
 
-    // Badges extra (dobles, peligrosidad)
+    // Badges extra
     let badges = '';
-    if (nom.diasArmado > 0)
-      badges += `<span class="nom-badge warn" title="Días en puesto armado">⚑ ${nom.diasArmado}d</span> `;
-    if (nom.diasDoble > 0)
-      badges += `<span class="nom-badge" title="Días con turno doble">×2 ${nom.diasDoble}d</span>`;
+    if (nom.horasArmado > 0)
+      badges += `<span class="nom-badge warn" title="${nom.horasArmado}h en puesto armado">⚑ ${nom.horasArmado}h</span> `;
+    if (nom.horasExtra > 0)
+      badges += `<span class="nom-badge" title="Horas extra sobre convenio">HE ${nom.horasExtra}h</span>`;
+
+    const plusVarios = nom.plusHextra + nom.plusFDS;
 
     return `
-    <tr>
+    <tr data-nombre="${v.nombre.toLowerCase()}">
       <td class="nom-td">
         <div class="nom-agente-cell">
           <div class="nom-avatar" style="background:${bgAvatar};color:${v.color}">${v.iniciales}</div>
@@ -3648,14 +3836,18 @@ function renderNominasTab() {
           </div>
         </div>
       </td>
-      <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.diasTrabajados}<span style="color:var(--text-muted);font-size:9px"> /${nom.diasEnMes}</span></td>
+      <td class="nom-td right ${sinTurnos ? 'muted' : ''}">
+        ${sinTurnos ? '–' : `${nom.totalHoras}<span style="color:var(--text-muted);font-size:9px">h</span>`}
+        ${nom.horasExtra > 0 ? `<span style="color:var(--red);font-size:9px;display:block">+${nom.horasExtra}HE</span>` : ''}
+      </td>
       <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosM || '–'}</td>
       <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosT || '–'}</td>
       <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosN || '–'}</td>
       <td class="nom-td right">${fmtEur(nom.sueldoProporcional)}</td>
       <td class="nom-td right ${nom.nocturnidad > 0 ? '' : 'muted'}">${nom.nocturnidad > 0 ? fmtEur(nom.nocturnidad) : '–'}</td>
-      <td class="nom-td right ${nom.plusDoble > 0 ? '' : 'muted'}">${nom.plusDoble > 0 ? fmtEur(nom.plusDoble) : '–'}</td>
+      <td class="nom-td right ${plusVarios > 0 ? '' : 'muted'}">${plusVarios > 0 ? fmtEur(plusVarios) : '–'}</td>
       <td class="nom-td right nom-td-total">${sinTurnos ? '<span style="color:var(--text-muted)">–</span>' : fmtEur(nom.totalBruto)}</td>
+      <td class="nom-td right" style="color:var(--green);font-weight:600">${sinTurnos ? '<span style="color:var(--text-muted)">–</span>' : fmtEur(nom.neto)}</td>
       <td class="nom-td">
         <button class="btn-nom-print" onclick="openNominaPreview(${v.id})"
           ${sinTurnos ? 'disabled style="opacity:0.35;cursor:default"' : ''}>
@@ -3664,6 +3856,17 @@ function renderNominasTab() {
       </td>
     </tr>`;
   }).join('');
+
+  // Reaplicar filtro de búsqueda si ya había texto
+  filterNominas();
+}
+
+/** Filtra las filas de nóminas por nombre del agente */
+function filterNominas() {
+  const q = (document.getElementById('nom-search')?.value || '').toLowerCase().trim();
+  document.querySelectorAll('#nom-tbody tr[data-nombre]').forEach(tr => {
+    tr.style.display = (!q || tr.dataset.nombre.includes(q)) ? '' : 'none';
+  });
 }
 
 /** Formatea número como euros: 1.234,56 € */
@@ -3671,116 +3874,175 @@ function fmtEur(n) {
   return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
 
-/* ── Nómina Preview / Impresión (E4) ───────────────── */
+/* ── Nómina Preview / Impresión — Formato BOE (E4) ─── */
 function openNominaPreview(vid) {
   const v = VIGILANTES.find(x => x.id === vid);
   if (!v) return;
   const nom = calcNominaMensual(v, nomMonth, nomYear);
   const mesLabel = `${MONTHS_FULL[nomMonth]} ${nomYear}`;
 
-  // Tabla de conceptos devengados
-  const conceptos = [
-    { desc: 'Salario base proporcional',
-      detalle: `${nom.diasTrabajados} días / ${nom.diasEnMes} días en el mes`,
-      importe: nom.sueldoProporcional },
-    { desc: `Trienios (${v.trienios} × ${(NOM_CONFIG.trienio_pct*100).toFixed(0)}%)`,
-      detalle: 'Sobre salario proporcional',
-      importe: nom.trienios },
-    { desc: 'Plus nocturnidad',
-      detalle: `${nom.turnosN} turno(s) nocturno(s) × ${fmtEur(NOM_CONFIG.nocturnidad_turno)}`,
-      importe: nom.nocturnidad },
-    { desc: 'Plus peligrosidad / toxicidad',
-      detalle: `${nom.diasArmado} día(s) en puesto armado × ${fmtEur(NOM_CONFIG.peligrosidad_dia)}`,
-      importe: nom.peligrosidad },
-    { desc: 'Plus turno doble',
-      detalle: `${nom.diasDoble} día(s) con 2+ turnos × ${fmtEur(NOM_CONFIG.plus_doble_dia)}`,
-      importe: nom.plusDoble },
-  ].filter(c => c.importe > 0);
+  const tarifaH    = nom.tarifaHoraBase.toFixed(4);
+  const hoy        = new Date().toLocaleDateString('es-ES');
+  const desemLabel = nom.esFijoD ? '1,60%' : '1,55%';
+  const irpfPctStr = `${(nom.irpfPct * 100).toFixed(1)}%`;
 
-  const filasTurnos = [
-    ['Turno mañana (06:00–14:00)', nom.turnosM],
-    ['Turno tarde (14:00–22:00)',  nom.turnosT],
-    ['Turno noche (22:00–06:00)',  nom.turnosN],
-  ].filter(([,n]) => n > 0);
-
-  const hoy = new Date().toLocaleDateString('es-ES');
+  // Filas BOE devengos — solo conceptos con importe > 0
+  function boeRow(lbl, val, detail) {
+    if (!val) return '';
+    return `<div class="ndoc-boe-row">
+      <span class="lbl">${lbl}${detail ? `<br><span style="font-size:9px;color:#94a3b8">${detail}</span>` : ''}</span>
+      <span class="val">${fmtEur(val)}</span>
+    </div>`;
+  }
 
   document.getElementById('nom-doc').innerHTML = `
-    <div class="ndoc-header">
+
+    <!-- ── CABECERA EMPRESA (estilo BOE) ── -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;
+                border:1px solid #cbd5e1;padding:10px 14px;background:#f8fafc;margin-bottom:0">
       <div>
-        <div class="ndoc-company-name">AnalIQ<span style="color:#6366f1">staff</span></div>
-        <div class="ndoc-company-sub">Gestión de Seguridad Privada</div>
+        <div style="font-size:15px;font-weight:900;color:#1e293b;letter-spacing:-0.3px">
+          AnalIQ<span style="color:#6366f1">staff</span>
+          <span style="font-size:9px;font-weight:400;color:#64748b;margin-left:8px">Gestión de Seguridad Privada</span>
+        </div>
+        <div style="font-size:9.5px;color:#475569;margin-top:3px">
+          CIF: B-00000000 &nbsp;·&nbsp; C/ Ejemplo 1, 28001 Madrid
+          &nbsp;·&nbsp; CCC SS: 28/1234567890 &nbsp;·&nbsp; CNAE: 8010
+        </div>
       </div>
-      <div class="ndoc-periodo">
-        <strong>${mesLabel}</strong>
-        Documento generado: ${hoy}
+      <div style="text-align:right;font-size:9.5px;color:#475569">
+        <div style="font-size:11px;font-weight:700;color:#1e293b">RECIBO DE SALARIOS</div>
+        <div>Período: <strong>${mesLabel}</strong></div>
+        <div>Emisión: ${hoy}</div>
       </div>
     </div>
-    <hr class="ndoc-divider">
 
-    <div class="ndoc-worker">
-      <div class="ndoc-field">
-        <span class="ndoc-field-lbl">Nombre</span>
+    <!-- ── DATOS DEL TRABAJADOR ── -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+                border:1px solid #cbd5e1;border-top:none;padding:8px 14px;background:#fff">
+      <div class="ndoc-field" style="padding-right:12px">
+        <span class="ndoc-field-lbl">Trabajador</span>
         <span class="ndoc-field-val">${v.nombre}</span>
       </div>
       <div class="ndoc-field">
-        <span class="ndoc-field-lbl">Categoría</span>
+        <span class="ndoc-field-lbl">Categoría profesional</span>
         <span class="ndoc-field-val">${v.cargo}</span>
       </div>
       <div class="ndoc-field">
+        <span class="ndoc-field-lbl">Grupo de cotización</span>
+        <span class="ndoc-field-val">Grupo 5 – Vigilantes</span>
+      </div>
+      <div class="ndoc-field" style="margin-top:6px;padding-right:12px">
         <span class="ndoc-field-lbl">Tipo de contrato</span>
-        <span class="ndoc-field-val">${v.tipoContrato}</span>
+        <span class="ndoc-field-val" style="font-size:11px">${v.tipoContrato}</span>
       </div>
-      <div class="ndoc-field">
-        <span class="ndoc-field-lbl">Referencia contrato</span>
-        <span class="ndoc-field-val">${v.contratoRef}</span>
+      <div class="ndoc-field" style="margin-top:6px">
+        <span class="ndoc-field-lbl">Ref. contrato / Alta</span>
+        <span class="ndoc-field-val">${v.contratoRef || '—'} &nbsp;·&nbsp; ${v.alta || '—'}</span>
       </div>
-      <div class="ndoc-field">
-        <span class="ndoc-field-lbl">Alta empresa</span>
-        <span class="ndoc-field-val">${v.alta}</span>
-      </div>
-      <div class="ndoc-field">
-        <span class="ndoc-field-lbl">Jornada</span>
-        <span class="ndoc-field-val">${v.jornada}</span>
+      <div class="ndoc-field" style="margin-top:6px">
+        <span class="ndoc-field-lbl">Nº afiliación SS</span>
+        <span class="ndoc-field-val">28 / ${String(vid).padStart(9,'0')} / 00</span>
       </div>
     </div>
 
-    <div class="ndoc-section-title">Actividad del mes</div>
-    <table class="ndoc-table">
-      <thead><tr>
-        <th>Concepto</th><th class="right">Cantidad</th>
-      </tr></thead>
-      <tbody>
-        <tr><td>Días trabajados</td><td class="right">${nom.diasTrabajados} de ${nom.diasEnMes}</td></tr>
-        ${filasTurnos.map(([lbl,n]) => `<tr><td>${lbl}</td><td class="right">${n}</td></tr>`).join('')}
-        ${nom.diasArmado > 0 ? `<tr><td>Días en puesto armado</td><td class="right">${nom.diasArmado}</td></tr>` : ''}
-        ${nom.diasDoble  > 0 ? `<tr><td>Días con turno doble</td><td class="right">${nom.diasDoble}</td></tr>`  : ''}
-      </tbody>
-    </table>
+    <!-- ── JORNADA ── -->
+    <div style="border:1px solid #cbd5e1;border-top:none;padding:5px 14px;background:#f8fafc;
+                font-size:9.5px;color:#475569;display:flex;gap:20px">
+      <span>Días trabajados: <strong>${nom.diasTrabajados}/${nom.diasEnMes}</strong></span>
+      <span>Horas: <strong>${nom.totalHoras} h</strong>
+        (ord. ${nom.horasOrd}h${nom.horasExtra > 0 ? ` + <span style="color:#dc2626">${nom.horasExtra}h extra</span>` : ''})</span>
+      ${nom.horasFDS    > 0 ? `<span>Fin de semana: <strong>${nom.horasFDS}h</strong></span>` : ''}
+      ${nom.horasNocturnas > 0 ? `<span>Nocturnas: <strong>${nom.horasNocturnas}h</strong></span>` : ''}
+      ${nom.horasArmado > 0 ? `<span>Puesto armado: <strong>${nom.horasArmado}h</strong></span>` : ''}
+    </div>
 
-    <div class="ndoc-section-title">Devengos</div>
-    <table class="ndoc-table">
-      <thead><tr>
-        <th>Concepto</th><th>Detalle</th><th class="right">Importe</th>
-      </tr></thead>
-      <tbody>
-        ${conceptos.map(c => `
-          <tr>
-            <td>${c.desc}</td>
-            <td style="color:#64748b;font-size:10.5px">${c.detalle}</td>
-            <td class="right">${fmtEur(c.importe)}</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>
+    <!-- ── CUERPO: DEVENGOS | DEDUCCIONES ── -->
+    <div class="ndoc-boe-grid">
 
-    <div class="ndoc-total-row">
-      <span class="ndoc-total-label">TOTAL BRUTO A PERCIBIR</span>
-      <span class="ndoc-total-value">${fmtEur(nom.totalBruto)}</span>
+      <!-- columna izquierda: devengos -->
+      <div class="ndoc-boe-col">
+        <div class="ndoc-boe-col-title">I. Devengos</div>
+        <div class="ndoc-boe-subsection">Percepciones salariales</div>
+        ${boeRow('Salario base proporcional', nom.sueldoProporcional, `${nom.horasOrd}h × ${tarifaH} €/h`)}
+        ${boeRow(`Antigüedad – Trienios (${v.trienios} × 4%)`, nom.trienios, 'Sobre salario proporcional')}
+        ${boeRow('Horas extraordinarias (+30%)', nom.plusHextra, `${nom.horasExtra}h × ${tarifaH} €/h × 1,30`)}
+        <div class="ndoc-boe-subsection">Complementos</div>
+        ${boeRow('Plus de Nocturnidad', nom.nocturnidad, `${nom.horasNocturnas}h × ${NOM_CONFIG.nocturnidad_hora} €/h`)}
+        ${boeRow('Plus de Fin de Semana', nom.plusFDS, `${nom.horasFDS}h (sáb/dom) × ${NOM_CONFIG.plus_fds_hora} €/h`)}
+        ${boeRow('Plus de Peligrosidad / Toxicidad', nom.peligrosidad, `${nom.horasArmado}h armado × ${NOM_CONFIG.peligrosidad_hora} €/h`)}
+        <div class="ndoc-boe-row subtotal">
+          <span class="lbl">TOTAL DEVENGADO</span>
+          <span class="val">${fmtEur(nom.totalBruto)}</span>
+        </div>
+      </div>
+
+      <!-- columna derecha: deducciones -->
+      <div class="ndoc-boe-col">
+        <div class="ndoc-boe-col-title">II. Deducciones</div>
+        <div class="ndoc-boe-subsection">Aportación trabajador a la SS</div>
+        <div class="ndoc-boe-row">
+          <span class="lbl">Contingencias Comunes<br><span style="font-size:9px;color:#94a3b8">${fmtEur(nom.totalBruto)} × 4,70%</span></span>
+          <span class="val red">-${fmtEur(nom.ssCC)}</span>
+        </div>
+        <div class="ndoc-boe-row">
+          <span class="lbl">Desempleo<br><span style="font-size:9px;color:#94a3b8">${fmtEur(nom.totalBruto)} × ${desemLabel}</span></span>
+          <span class="val red">-${fmtEur(nom.ssDesem)}</span>
+        </div>
+        <div class="ndoc-boe-row">
+          <span class="lbl">Formación Profesional<br><span style="font-size:9px;color:#94a3b8">${fmtEur(nom.totalBruto)} × 0,10%</span></span>
+          <span class="val red">-${fmtEur(nom.ssFP)}</span>
+        </div>
+        <div class="ndoc-boe-subsection">Retención fiscal</div>
+        <div class="ndoc-boe-row">
+          <span class="lbl">IRPF (${irpfPctStr})<br><span style="font-size:9px;color:#94a3b8">${nom.esFijoD ? 'Fijo-discontinuo/temporal' : nom.totalBruto < 1400 ? 'Indefinido · base &lt; 1.400 €' : 'Indefinido · base ≥ 1.400 €'}</span></span>
+          <span class="val red">-${fmtEur(nom.irpf)}</span>
+        </div>
+        <!-- espacio para alinear con devengos -->
+        <div style="flex:1"></div>
+        <div class="ndoc-boe-row subtotal">
+          <span class="lbl">TOTAL DEDUCCIONES</span>
+          <span class="val red">-${fmtEur(nom.totalDed)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LÍQUIDO A PERCIBIR ── -->
+    <div class="ndoc-boe-neto">
+      <span class="lbl">LÍQUIDO A PERCIBIR (NETO)</span>
+      <span class="val">${fmtEur(nom.neto)}</span>
+    </div>
+
+    <!-- ── BASES DE COTIZACIÓN ── -->
+    <div class="ndoc-bases-block">
+      <div class="ndoc-bases-title">Bases de cotización</div>
+      <div class="ndoc-bases-grid">
+        <div>
+          <div class="ndoc-base-lbl">Base contingencias comunes</div>
+          <div class="ndoc-base-val">${fmtEur(nom.totalBruto)}</div>
+        </div>
+        <div>
+          <div class="ndoc-base-lbl">Base cont. profesionales / AT</div>
+          <div class="ndoc-base-val">${fmtEur(nom.totalBruto)}</div>
+        </div>
+        <div>
+          <div class="ndoc-base-lbl">Base IRPF sujeta (${irpfPctStr})</div>
+          <div class="ndoc-base-val">${fmtEur(nom.totalBruto)}</div>
+        </div>
+        <div style="margin-top:4px">
+          <div class="ndoc-base-lbl">Cuota SS empresa est. (~33%)</div>
+          <div class="ndoc-base-val">${fmtEur(nom.totalBruto * 0.33)}</div>
+        </div>
+        <div style="margin-top:4px">
+          <div class="ndoc-base-lbl">Coste total empresa est.</div>
+          <div class="ndoc-base-val">${fmtEur(nom.totalBruto * 1.33)}</div>
+        </div>
+      </div>
     </div>
 
     <div class="ndoc-foot">
-      Documento generado automáticamente por AnalIQstaff. Importes orientativos según
-      Convenio Colectivo de Empresas de Seguridad Privada. No tiene valor legal sin firma autorizada.
+      Documento generado por AnalIQstaff · Importes orientativos según Convenio Colectivo
+      de Empresas de Seguridad Privada (BOE-A-2024). No tiene validez legal sin firma autorizada.
     </div>`;
 
   document.getElementById('nom-preview-title').textContent =
@@ -3883,48 +4145,47 @@ function nomExportAll() {
 /* ======================================================
    CÁLCULO NÓMINA MENSUAL — E2
    Convenio Colectivo de Empresas de Seguridad Privada
-   (valores orientativos, editables en NOM_CONFIG)
+   (valores basados en tablas salariales 2024-2026)
 ====================================================== */
 const NOM_CONFIG = {
-  trienio_pct:        0.04,   // 4 % del proporcional por trienio
-  nocturnidad_turno:  9.50,   // € por turno nocturno (22:00–06:00)
-  peligrosidad_dia:   3.20,   // € por día en puesto armado
-  plus_doble_dia:    16.00,   // € por día con 2+ turnos cubiertos
+  trienio_pct:         0.04,  // 4% del proporcional por trienio
+  nocturnidad_hora:    1.52,  // €/h en turno nocturno (22:00–06:00)
+  peligrosidad_hora:   0.82,  // €/h en puesto armado (art. 135 convenio)
+  plus_fds_hora:       1.15,  // €/h en turno de sábado o domingo
+  horas_mes_convenio: 162,    // jornada ordinaria mensual (Convenio)
+  horas_turno:          8,    // horas por turno estándar
+  hextra_pct:          0.30,  // recargo horas extra sobre tarifa horaria base
 };
 
 /**
  * calcNominaMensual(v, mes, ano)
  *
- * Devuelve un objeto con todos los conceptos del mes:
- * {
- *   diasTrabajados,   // días con ≥1 slot asignado
- *   diasEnMes,
- *   turnosM, turnosT, turnosN,   // conteo por tipo
- *   diasArmado,       // días con algún slot en puesto armado
- *   diasDoble,        // días con ≥2 slots
- *   sueldoProporcional,
- *   trienios,
- *   nocturnidad,
- *   peligrosidad,
- *   plusDoble,
- *   totalBruto,
- * }
+ * Analiza el cuadrante real del mes y calcula todos los conceptos
+ * salariales y deducciones según el Convenio Colectivo de Seguridad Privada.
+ *
+ * Devengos: sueldoProporcional, trienios, plusHextra, nocturnidad, plusFDS, peligrosidad
+ * Deducciones: ssCC (4,70%), ssDesem (1,55%/1,60%), ssFP (0,10%), irpf (progresivo)
+ * Resultado: totalBruto, totalDed, neto
  */
 function calcNominaMensual(v, mes, ano) {
   const diasEnMes = new Date(ano, mes + 1, 0).getDate();
 
+  // Contadores
   let diasTrabajados = 0;
   let turnosM = 0, turnosT = 0, turnosN = 0;
-  let diasArmado = 0;
-  let diasDoble  = 0;
+  let horasNocturnas = 0;  // horas en turno noche
+  let horasFDS       = 0;  // horas en sábado o domingo
+  let horasArmado    = 0;  // horas en puesto armado
+  let diasDoble      = 0;
 
   for (let d = 1; d <= diasEnMes; d++) {
-    const fecha = isoFecha(ano, mes, d);
+    const fecha   = isoFecha(ano, mes, d);
+    const dow     = new Date(fecha + 'T12:00:00').getDay(); // 0=Dom, 6=Sáb
+    const esFDS   = dow === 0 || dow === 6;
     const diaData = assignments[fecha];
     if (!diaData) continue;
 
-    let slotsDia   = 0;
-    let armadoHoy  = false;
+    let slotsDia = 0;
 
     PUESTOS.forEach(p => {
       const pData = diaData[p.id];
@@ -3934,40 +4195,301 @@ function calcNominaMensual(v, mes, ano) {
         slotsDia++;
         if (t.id === 'manana') turnosM++;
         else if (t.id === 'tarde') turnosT++;
-        else if (t.id === 'noche') turnosN++;
-        if (p.armado) armadoHoy = true;
+        else if (t.id === 'noche') {
+          turnosN++;
+          horasNocturnas += NOM_CONFIG.horas_turno;
+        }
+        if (p.armado) horasArmado += NOM_CONFIG.horas_turno;
+        if (esFDS)    horasFDS    += NOM_CONFIG.horas_turno;
       });
     });
 
     if (slotsDia > 0) {
       diasTrabajados++;
-      if (armadoHoy)  diasArmado++;
       if (slotsDia >= 2) diasDoble++;
     }
   }
 
-  // Conceptos económicos
-  const sueldoProporcional = parseFloat(
-    (v.sueldoBase * (diasTrabajados / diasEnMes)).toFixed(2)
-  );
+  // ── Horas y jornada ─────────────────────────────────
+  const totalHoras  = (turnosM + turnosT + turnosN) * NOM_CONFIG.horas_turno;
+  const horasOrd    = Math.min(totalHoras, NOM_CONFIG.horas_mes_convenio);
+  const horasExtra  = Math.max(0, totalHoras - NOM_CONFIG.horas_mes_convenio);
+
+  // Tarifa horaria base del trabajador (sueldo / 162 h convenio)
+  const tarifaHoraBase = v.sueldoBase / NOM_CONFIG.horas_mes_convenio;
+
+  // ── Devengos salariales ──────────────────────────────
+  // Sueldo proporcional a horas ordinarias reales
+  const sueldoProporcional = parseFloat((tarifaHoraBase * horasOrd).toFixed(2));
+
+  // Trienios (4% sobre sueldo proporcional por cada trienio)
   const trienios = parseFloat(
     (sueldoProporcional * (v.trienios || 0) * NOM_CONFIG.trienio_pct).toFixed(2)
   );
-  const nocturnidad  = parseFloat((turnosN    * NOM_CONFIG.nocturnidad_turno).toFixed(2));
-  const peligrosidad = parseFloat((diasArmado * NOM_CONFIG.peligrosidad_dia).toFixed(2));
-  const plusDoble    = parseFloat((diasDoble  * NOM_CONFIG.plus_doble_dia).toFixed(2));
-  const totalBruto   = parseFloat(
-    (sueldoProporcional + trienios + nocturnidad + peligrosidad + plusDoble).toFixed(2)
+
+  // Horas extraordinarias (tarifa base × 1,30)
+  const plusHextra = parseFloat(
+    (horasExtra * tarifaHoraBase * (1 + NOM_CONFIG.hextra_pct)).toFixed(2)
   );
 
+  // Plus nocturnidad (1,52 €/h × horas en turno noche)
+  const nocturnidad = parseFloat(
+    (horasNocturnas * NOM_CONFIG.nocturnidad_hora).toFixed(2)
+  );
+
+  // Plus fin de semana (1,15 €/h × horas en sáb/dom)
+  const plusFDS = parseFloat(
+    (horasFDS * NOM_CONFIG.plus_fds_hora).toFixed(2)
+  );
+
+  // Plus peligrosidad/toxicidad (0,82 €/h × horas en puesto armado)
+  const peligrosidad = parseFloat(
+    (horasArmado * NOM_CONFIG.peligrosidad_hora).toFixed(2)
+  );
+
+  // Total bruto (base de cotización)
+  const totalBruto = parseFloat(
+    (sueldoProporcional + trienios + plusHextra + nocturnidad + plusFDS + peligrosidad).toFixed(2)
+  );
+
+  // ── Deducciones (cuota obrera) ───────────────────────
+  const tipo    = v.tipoContrato || '';
+  const esFijoD = tipo.includes('Fijo Discontinuo') || tipo.includes('Temporal');
+
+  const ssCC    = parseFloat((totalBruto * 0.0470).toFixed(2));
+  const ssDesem = parseFloat((totalBruto * (esFijoD ? 0.0160 : 0.0155)).toFixed(2));
+  const ssFP    = parseFloat((totalBruto * 0.0010).toFixed(2));
+  const ssTotal = parseFloat((ssCC + ssDesem + ssFP).toFixed(2));
+
+  // IRPF: 2% fijo-discontinuo/temporal · 10% indefinido bruto<1400 · 12,5% resto
+  const irpfPct = esFijoD ? 0.020 : (totalBruto < 1400 ? 0.100 : 0.125);
+  const irpf    = parseFloat((totalBruto * irpfPct).toFixed(2));
+
+  const totalDed = parseFloat((ssTotal + irpf).toFixed(2));
+  const neto     = parseFloat((totalBruto - totalDed).toFixed(2));
+
   return {
+    // Jornada
     diasTrabajados, diasEnMes,
     turnosM, turnosT, turnosN,
-    diasArmado, diasDoble,
+    totalHoras, horasOrd, horasExtra,
+    horasNocturnas, horasFDS, horasArmado,
+    diasDoble,
+    tarifaHoraBase,
+    // Devengos
     sueldoProporcional, trienios,
-    nocturnidad, peligrosidad, plusDoble,
+    plusHextra, nocturnidad, plusFDS, peligrosidad,
     totalBruto,
+    // Deducciones
+    ssCC, ssDesem, ssFP, ssTotal,
+    irpfPct, irpf,
+    totalDed, neto,
+    esFijoD,
   };
+}
+
+/* ======================================================
+   AUTO-COMPLETAR CUADRANTE — Fase 3
+   Convenio Colectivo de Empresas de Seguridad Privada
+   Restricciones implementadas:
+     A) Filtro de habilitación (TIP/armas/aeropuertos)
+     B) Descanso 12h entre jornadas (noche→mañana)
+     C) Fin de semana libre por convenio (Art. 52)
+     D) Máximo 6 días consecutivos sin descanso
+     E) Equidad de horas (~162h convenio, tope 203h)
+====================================================== */
+function autoCompletarMes() {
+  if (PUESTOS.length === 0 || VIGILANTES.length === 0) {
+    alert('Necesitas al menos un puesto de servicio y un vigilante registrado.');
+    return;
+  }
+
+  const mesNombre = MONTHS_LONG[cuadMonth] + ' ' + cuadYear;
+  if (!confirm(
+    `⚡ Auto-completar cuadrante de ${mesNombre}\n\n` +
+    `• Se respetan las asignaciones ya existentes.\n` +
+    `• Solo se rellenan los turnos vacíos.\n` +
+    `• Se aplicarán las restricciones del Convenio.\n\n` +
+    `¿Continuar?`
+  )) return;
+
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+
+  /* ── 1. Localizar fines de semana del mes ─────────────── */
+  const weekends = []; // [{sat:'YYYY-MM-DD', sun:'YYYY-MM-DD'|null}]
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    if (new Date(fecha + 'T12:00:00').getDay() === 6) {
+      const dSun = d + 1;
+      weekends.push({
+        sat: fecha,
+        sun: dSun <= diasEnMes ? isoFecha(cuadYear, cuadMonth, dSun) : null
+      });
+    }
+  }
+
+  /* ── 2. Asignar 1 FDS libre por vigilante (rotativo) ──── */
+  // Cada vigilante tiene bloqueado un FDS diferente para garantizar
+  // el descanso de convenio. Rota por índice de vigilante.
+  const weekendLibre = {}; // vid → {sat, sun}
+  VIGILANTES.forEach((v, i) => {
+    weekendLibre[v.id] = weekends.length > 0
+      ? weekends[i % weekends.length]
+      : null;
+  });
+
+  /* ── 3. Estado de seguimiento ────────────────────────── */
+  const horasMes  = {}; // vid → horas acumuladas en el mes
+  const consec    = {}; // vid → días consecutivos trabajados hasta ayer
+  VIGILANTES.forEach(v => { horasMes[v.id] = 0; consec[v.id] = 0; });
+
+  /* ── 4. Bucle día a día ──────────────────────────────── */
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    const dow   = new Date(fecha + 'T12:00:00').getDay(); // 0=Dom 6=Sáb
+
+    if (!assignments[fecha]) assignments[fecha] = {};
+
+    // Conjunto de vigilantes que YA tienen algún turno HOY
+    // (pre-existentes o recién asignados en este día)
+    const trabajaHoy = new Set();
+
+    /* ── 4a. Registrar asignaciones pre-existentes del día ── */
+    PUESTOS.forEach(p => {
+      const pData = assignments[fecha][p.id];
+      if (!pData) return;
+      TURNOS.forEach(t => {
+        const vid = pData[t.id];
+        if (vid) {
+          trabajaHoy.add(vid);
+          horasMes[vid] = (horasMes[vid] || 0) + 8;
+        }
+      });
+    });
+
+    /* ── 4b. Rellenar slots vacíos ─────────────────────── */
+    PUESTOS.forEach(puesto => {
+      if (!assignments[fecha][puesto.id]) assignments[fecha][puesto.id] = {};
+      const req = puesto.requiere || []; // habilitaciones requeridas
+
+      TURNOS.forEach(turno => {
+        // Slot ya ocupado → saltar
+        if (assignments[fecha][puesto.id][turno.id]) return;
+
+        /* Filtrar candidatos según restricciones del convenio */
+        const candidatos = VIGILANTES.filter(v => {
+
+          // ── A) Habilitación profesional ─────────────────
+          if (req.length > 0 && !req.every(h => v.hab.includes(h))) return false;
+
+          // ── B) Fin de semana libre obligatorio (Art. 52) ─
+          const we = weekendLibre[v.id];
+          if (we) {
+            if (dow === 6 && we.sat === fecha) return false;
+            if (dow === 0 && we.sun === fecha) return false;
+          }
+
+          // ── C) Descanso 12h: noche(D-1) → no mañana(D) ──
+          if (turno.id === 'manana' && d > 1) {
+            const ayer = isoFecha(cuadYear, cuadMonth, d - 1);
+            const ayerData = assignments[ayer];
+            if (ayerData) {
+              for (const p2 of PUESTOS) {
+                if (ayerData[p2.id] && ayerData[p2.id]['noche'] === v.id) {
+                  return false; // descanso insuficiente
+                }
+              }
+            }
+          }
+
+          // ── D) Máximo 6 días consecutivos (art. 46 / 36h desc.) ──
+          // Si ya lleva 6 días seguidos y hoy NO trabajó aún → bloqueado
+          if (consec[v.id] >= 6 && !trabajaHoy.has(v.id)) return false;
+
+          // ── E) Tope de horas mensual razonable (162h × 1.25) ────
+          if (horasMes[v.id] >= 203) return false;
+
+          return true;
+        });
+
+        if (!candidatos.length) return; // sin candidato válido
+
+        /* Elegir el vigilante con menos horas acumuladas (equidad) */
+        candidatos.sort((a, b) => horasMes[a.id] - horasMes[b.id]);
+        const elegido = candidatos[0];
+
+        // Asignar
+        assignments[fecha][puesto.id][turno.id] = elegido.id;
+        horasMes[elegido.id] += 8;
+        trabajaHoy.add(elegido.id);
+      });
+    });
+
+    /* ── 4c. Actualizar contador de días consecutivos ─────
+       Al final del día: +1 si trabajó, reset a 0 si descansó */
+    VIGILANTES.forEach(v => {
+      consec[v.id] = trabajaHoy.has(v.id) ? consec[v.id] + 1 : 0;
+    });
+  }
+
+  /* ── 5. Persistir y re-renderizar ──────────────────────── */
+  saveToStorage();
+  renderMonthlyGrid();
+  renderNominasTab();
+
+  /* ── 6. Toast de resumen ─────────────────────────────── */
+  const resumenHoras = VIGILANTES.map(v =>
+    `${v.iniciales}: ${horasMes[v.id]}h`
+  ).join('  ·  ');
+
+  _showAutoToast(
+    `✅ Cuadrante completado — ${mesNombre}`,
+    `Horas asignadas → ${resumenHoras}`
+  );
+}
+
+/** Elimina todas las asignaciones del mes en curso */
+function limpiarCuadranteMes() {
+  const mesNombre = MONTHS_LONG[cuadMonth] + ' ' + cuadYear;
+  if (!confirm(`⚠ ¿Eliminar TODAS las asignaciones de ${mesNombre}?\n\nEsta acción no se puede deshacer.`)) return;
+
+  const diasEnMes = new Date(cuadYear, cuadMonth + 1, 0).getDate();
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fecha = isoFecha(cuadYear, cuadMonth, d);
+    delete assignments[fecha];
+  }
+
+  saveToStorage();
+  renderMonthlyGrid();
+  renderNominasTab();
+  _showAutoToast(`🗑 Cuadrante limpiado — ${mesNombre}`, 'Todas las asignaciones del mes han sido eliminadas.');
+}
+
+/** Toast de notificación no bloqueante */
+function _showAutoToast(titulo, detalle) {
+  const t = document.createElement('div');
+  t.style.cssText = `
+    position:fixed;bottom:24px;right:24px;z-index:99999;
+    background:#1e293b;border:1px solid rgba(99,102,241,0.4);
+    border-radius:10px;padding:12px 18px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    font-family:var(--sans);max-width:380px;
+    animation:slideInRight 0.25s ease;
+  `;
+  t.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:4px">${titulo}</div>
+    <div style="font-size:10.5px;color:#94a3b8;line-height:1.4">${detalle}</div>
+  `;
+  // Añadir keyframe si no existe
+  if (!document.getElementById('_autoToastStyle')) {
+    const s = document.createElement('style');
+    s.id = '_autoToastStyle';
+    s.textContent = `@keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}`;
+    document.head.appendChild(s);
+  }
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; }, 4000);
+  setTimeout(() => t.remove(), 4500);
 }
 
 function renderMonthlyGrid() {
