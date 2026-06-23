@@ -3612,7 +3612,7 @@ function renderNominasTab() {
   const kpiTurnos  = document.getElementById('nom-kpi-turnos');
   const kpiAgentes = document.getElementById('nom-kpi-agentes');
 
-  if (kpiMasa)    kpiMasa.textContent    = fmt€(masaSalarial);
+  if (kpiMasa)    kpiMasa.textContent    = fmtEur(masaSalarial);
   if (kpiDias)    kpiDias.textContent    = totalDias;
   if (kpiTurnos)  kpiTurnos.textContent  = totalTurnos;
   if (kpiAgentes) kpiAgentes.textContent = agentesActivos;
@@ -3652,10 +3652,10 @@ function renderNominasTab() {
       <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosM || '–'}</td>
       <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosT || '–'}</td>
       <td class="nom-td right ${sinTurnos ? 'muted' : ''}">${nom.turnosN || '–'}</td>
-      <td class="nom-td right">${fmt€(nom.sueldoProporcional)}</td>
-      <td class="nom-td right ${nom.nocturnidad > 0 ? '' : 'muted'}">${nom.nocturnidad > 0 ? fmt€(nom.nocturnidad) : '–'}</td>
-      <td class="nom-td right ${nom.plusDoble > 0 ? '' : 'muted'}">${nom.plusDoble > 0 ? fmt€(nom.plusDoble) : '–'}</td>
-      <td class="nom-td right nom-td-total">${sinTurnos ? '<span style="color:var(--text-muted)">–</span>' : fmt€(nom.totalBruto)}</td>
+      <td class="nom-td right">${fmtEur(nom.sueldoProporcional)}</td>
+      <td class="nom-td right ${nom.nocturnidad > 0 ? '' : 'muted'}">${nom.nocturnidad > 0 ? fmtEur(nom.nocturnidad) : '–'}</td>
+      <td class="nom-td right ${nom.plusDoble > 0 ? '' : 'muted'}">${nom.plusDoble > 0 ? fmtEur(nom.plusDoble) : '–'}</td>
+      <td class="nom-td right nom-td-total">${sinTurnos ? '<span style="color:var(--text-muted)">–</span>' : fmtEur(nom.totalBruto)}</td>
       <td class="nom-td">
         <button class="btn-nom-print" onclick="openNominaPreview(${v.id})"
           ${sinTurnos ? 'disabled style="opacity:0.35;cursor:default"' : ''}>
@@ -3667,7 +3667,7 @@ function renderNominasTab() {
 }
 
 /** Formatea número como euros: 1.234,56 € */
-function fmt€(n) {
+function fmtEur(n) {
   return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
 
@@ -3687,13 +3687,13 @@ function openNominaPreview(vid) {
       detalle: 'Sobre salario proporcional',
       importe: nom.trienios },
     { desc: 'Plus nocturnidad',
-      detalle: `${nom.turnosN} turno(s) nocturno(s) × ${fmt€(NOM_CONFIG.nocturnidad_turno)}`,
+      detalle: `${nom.turnosN} turno(s) nocturno(s) × ${fmtEur(NOM_CONFIG.nocturnidad_turno)}`,
       importe: nom.nocturnidad },
     { desc: 'Plus peligrosidad / toxicidad',
-      detalle: `${nom.diasArmado} día(s) en puesto armado × ${fmt€(NOM_CONFIG.peligrosidad_dia)}`,
+      detalle: `${nom.diasArmado} día(s) en puesto armado × ${fmtEur(NOM_CONFIG.peligrosidad_dia)}`,
       importe: nom.peligrosidad },
     { desc: 'Plus turno doble',
-      detalle: `${nom.diasDoble} día(s) con 2+ turnos × ${fmt€(NOM_CONFIG.plus_doble_dia)}`,
+      detalle: `${nom.diasDoble} día(s) con 2+ turnos × ${fmtEur(NOM_CONFIG.plus_doble_dia)}`,
       importe: nom.plusDoble },
   ].filter(c => c.importe > 0);
 
@@ -3768,14 +3768,14 @@ function openNominaPreview(vid) {
           <tr>
             <td>${c.desc}</td>
             <td style="color:#64748b;font-size:10.5px">${c.detalle}</td>
-            <td class="right">${fmt€(c.importe)}</td>
+            <td class="right">${fmtEur(c.importe)}</td>
           </tr>`).join('')}
       </tbody>
     </table>
 
     <div class="ndoc-total-row">
       <span class="ndoc-total-label">TOTAL BRUTO A PERCIBIR</span>
-      <span class="ndoc-total-value">${fmt€(nom.totalBruto)}</span>
+      <span class="ndoc-total-value">${fmtEur(nom.totalBruto)}</span>
     </div>
 
     <div class="ndoc-foot">
@@ -4094,7 +4094,7 @@ function assignFromPopup(vid) {
     TURNOS.forEach(t => { assignments[_apFecha][_apPuestoId][t.id] = null; });
   }
   assignments[_apFecha][_apPuestoId][_apTurnoId] = vid;
-  saveData();
+  saveToStorage();
   closeAssignPopup();
   renderMonthlyGrid();
 }
@@ -4245,7 +4245,7 @@ function applyPattern() {
     });
   });
 
-  saveData();
+  saveToStorage();
   closePatternModal();
   renderMonthlyGrid();
 }
