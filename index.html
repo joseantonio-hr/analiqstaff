@@ -1882,6 +1882,214 @@
     }
     .btn-import-cv:hover { background: rgba(168,85,247,0.16); border-color: rgba(168,85,247,0.4); }
 
+    /* ========================================================
+       SECCIÓN DOCUMENTACIÓN Y CLÁUSULAS IA
+    ======================================================== */
+    .doc-ia-section {
+      background: linear-gradient(135deg, rgba(77,142,255,0.05), rgba(168,85,247,0.04));
+      border: 1px solid rgba(77,142,255,0.18);
+      border-radius: var(--r-lg);
+      padding: 13px 14px 12px;
+      margin-top: 4px;
+    }
+    .doc-ia-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .doc-ia-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(77,142,255,0.12);
+      border: 1px solid rgba(77,142,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+    }
+    .doc-ia-title {
+      font-size: 8px; text-transform: uppercase; letter-spacing: 1.1px;
+      color: var(--t3); font-family: var(--mono); line-height: 1;
+    }
+    .doc-ia-subtitle {
+      font-size: 10.5px; font-weight: 600; color: var(--t1);
+      margin-top: 2px;
+    }
+    .doc-ia-actions {
+      display: flex; gap: 7px; margin-bottom: 10px;
+    }
+    .btn-doc-ia {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 11px;
+      border-radius: var(--r-sm);
+      font-family: var(--sans); font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; flex: 1;
+      justify-content: center;
+    }
+    .btn-doc-ia.adjuntar {
+      background: rgba(77,142,255,0.1);
+      border: 1px solid rgba(77,142,255,0.28);
+      color: var(--blue);
+    }
+    .btn-doc-ia.adjuntar:hover {
+      background: rgba(77,142,255,0.2);
+      border-color: rgba(77,142,255,0.5);
+    }
+    .btn-doc-ia.resumen {
+      background: rgba(168,85,247,0.1);
+      border: 1px solid rgba(168,85,247,0.28);
+      color: var(--purple);
+    }
+    .btn-doc-ia.resumen:hover {
+      background: rgba(168,85,247,0.2);
+      border-color: rgba(168,85,247,0.5);
+    }
+    .btn-doc-ia:disabled {
+      opacity: 0.35; cursor: not-allowed;
+    }
+    /* Estado del contrato adjunto */
+    .contract-status-box {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 9px 11px;
+      display: flex; gap: 9px; align-items: flex-start;
+    }
+    .contract-status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      margin-top: 4px; flex-shrink: 0;
+    }
+    .contract-status-dot.sin { background: var(--t3); }
+    .contract-status-dot.ok  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .contract-status-info { flex: 1; min-width: 0; }
+    .contract-status-label {
+      font-size: 10px; font-weight: 600; color: var(--t1); margin-bottom: 3px;
+    }
+    .contract-status-meta {
+      font-size: 9px; color: var(--t2); font-family: var(--mono);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .contract-clausulas-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 7px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 20px;
+      font-size: 8.5px; color: var(--green);
+      margin-top: 5px;
+    }
+
+    /* ========================================================
+       MODAL DE CLÁUSULAS IA
+    ======================================================== */
+    .clausulas-modal-overlay {
+      position: fixed; inset: 0; z-index: 9000;
+      background: rgba(6,7,16,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .clausulas-modal-overlay.visible {
+      opacity: 1; pointer-events: all;
+    }
+    .clausulas-modal {
+      width: min(640px, 94vw);
+      max-height: 82vh;
+      background: rgba(10,12,26,0.97);
+      border: 1px solid rgba(77,142,255,0.28);
+      border-radius: var(--r-xl);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(77,142,255,0.1);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transform: translateY(12px);
+      transition: transform 0.22s ease;
+    }
+    .clausulas-modal-overlay.visible .clausulas-modal {
+      transform: translateY(0);
+    }
+    .clausulas-modal-hdr {
+      padding: 18px 22px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 14px;
+      background: linear-gradient(135deg, rgba(77,142,255,0.07), rgba(168,85,247,0.04));
+      flex-shrink: 0;
+    }
+    .clausulas-modal-hdr-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(77,142,255,0.14);
+      border: 1px solid rgba(77,142,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .clausulas-modal-hdr-info { flex: 1; min-width: 0; }
+    .clausulas-modal-hdr-title {
+      font-family: var(--serif); font-size: 18px; color: var(--t1); line-height: 1.1;
+    }
+    .clausulas-modal-hdr-sub {
+      font-size: 10px; color: var(--t2); margin-top: 4px;
+      font-family: var(--mono);
+    }
+    .clausulas-modal-close {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--t2); font-size: 16px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s; flex-shrink: 0;
+    }
+    .clausulas-modal-close:hover {
+      background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); color: var(--red);
+    }
+    .clausulas-modal-body {
+      flex: 1; overflow-y: auto; padding: 20px 22px;
+      scrollbar-width: thin; scrollbar-color: var(--t3) transparent;
+    }
+    .clausulas-modal-body::-webkit-scrollbar { width: 4px; }
+    .clausulas-modal-body::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 2px; }
+    .clausulas-group { margin-bottom: 18px; }
+    .clausulas-group-title {
+      font-size: 8px; text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--blue); font-family: var(--mono);
+      padding-bottom: 7px; border-bottom: 1px solid rgba(77,142,255,0.15);
+      margin-bottom: 10px;
+    }
+    .clausulas-row {
+      display: flex; align-items: baseline; gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .clausulas-row:last-child { border-bottom: none; }
+    .clausulas-row-label {
+      font-size: 10px; color: var(--t2);
+      min-width: 150px; flex-shrink: 0;
+    }
+    .clausulas-row-val {
+      font-size: 11px; color: var(--t1); font-weight: 500; flex: 1;
+    }
+    .clausulas-row-val.accent-green { color: var(--green); }
+    .clausulas-row-val.accent-blue  { color: var(--blue);  }
+    .clausulas-row-val.accent-amber { color: var(--amber); }
+    .clausulas-row-val.accent-red   { color: var(--red);   }
+    .clausulas-modal-ftr {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn-clausulas-ok {
+      padding: 8px 20px;
+      background: rgba(77,142,255,0.12);
+      border: 1px solid rgba(77,142,255,0.3);
+      border-radius: var(--r-sm);
+      color: var(--blue); font-family: var(--sans); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-clausulas-ok:hover {
+      background: rgba(77,142,255,0.22); border-color: rgba(77,142,255,0.5);
+    }
+
     /* Garantizar que script/style nunca sean visibles como flex-items */
     script, style { display: none !important; visibility: hidden !important; }
 
@@ -2581,6 +2789,7 @@
       <div class="employee-tabs" id="ep-tabs">
         <div class="employee-tab active" data-tab="detalles" onclick="switchEmployeeTab('detalles')">📋 Detalles</div>
         <div class="employee-tab" data-tab="nomina" onclick="switchEmployeeTab('nomina')">💰 Nómina</div>
+        <div class="employee-tab" data-tab="docs" onclick="switchEmployeeTab('docs')">📄 Contrato IA</div>
       </div>
       <div class="employee-tab-body" id="ep-content">
         <!-- Renderizado por renderEmployeePanel() -->
@@ -2749,11 +2958,35 @@
   </div>
   <div class="drawer-body"><div id="drawer-content"></div></div>
 </div>
+<!-- Input oculto para adjuntar contrato por vigilante -->
+<input type="file" id="contract-input" accept=".pdf,.txt,.doc,.docx"
+  style="display:none" onchange="onContractAttached(this)">
+
+<!-- Modal de Cláusulas IA -->
+<div class="clausulas-modal-overlay" id="clausulas-modal-overlay" onclick="closeClausulasModal(event)">
+  <div class="clausulas-modal" id="clausulas-modal">
+    <div class="clausulas-modal-hdr">
+      <div class="clausulas-modal-hdr-icon">📄</div>
+      <div class="clausulas-modal-hdr-info">
+        <div class="clausulas-modal-hdr-title">Resumen de Cláusulas Contractuales</div>
+        <div class="clausulas-modal-hdr-sub" id="clausulas-modal-sub">— Análisis generado por AnalIQ-IA —</div>
+      </div>
+      <button class="clausulas-modal-close" onclick="closeClausulasModal()" title="Cerrar">✕</button>
+    </div>
+    <div class="clausulas-modal-body" id="clausulas-modal-body">
+      <!-- Rellenado dinámicamente -->
+    </div>
+    <div class="clausulas-modal-ftr">
+      <button class="btn-clausulas-ok" onclick="closeClausulasModal()">Cerrar informe</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-ia" id="toast-ia">
   <div class="toast-ia-dot"></div>
   <div>
-    <div class="toast-ia-text">Analizando CV mediante IA y extrayendo credenciales…</div>
-    <div class="toast-ia-sub">Procesando · Identificando habilitaciones</div>
+    <div class="toast-ia-text" id="toast-ia-text">Analizando CV mediante IA y extrayendo credenciales…</div>
+    <div class="toast-ia-sub" id="toast-ia-sub">Procesando · Identificando habilitaciones</div>
   </div>
 </div>
 
@@ -2934,9 +3167,9 @@
 ===================================================== -->
 <script>
 /* ======================================================
-   DATOS FIJOS — VIGILANTES
+   DATOS FIJOS — VIGILANTES (plantilla de fábrica)
 ====================================================== */
-const VIGILANTES = [
+const VIGILANTES_DEFAULT = [
   { id:1, nombre:'Carlos Medina',  cargo:'Inspector de Servicios',  iniciales:'CM', color:'#00d4ff',
     hab:['tip','armas','aeropuertos'], fiabilidad:9.4, experiencia:8,  trienios:2,
     sueldoBase:1520.00, contratoRef:'CNT-2018-883A', tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa', alta:'12/03/2018' },
@@ -2953,6 +3186,8 @@ const VIGILANTES = [
     hab:['tip','armas','aeropuertos'], fiabilidad:9.7, experiencia:12, trienios:4,
     sueldoBase:1520.00, contratoRef:'CNT-2014-445E', tipoContrato:'100 - Indefinido Ordinario', jornada:'Completa', alta:'03/11/2014' }
 ];
+// Array mutable: se sobrescribe desde localStorage (incluye contratos IA adjuntos)
+let VIGILANTES = VIGILANTES_DEFAULT.map(v => Object.assign({}, v));
 
 /* ======================================================
    PUESTOS POR DEFECTO
@@ -3027,12 +3262,14 @@ let filterEstado = 'todos';
    · Manejo explícito de QuotaExceededError
 ====================================================== */
 const LS_PUESTOS    = 'analiqstaff_puestos_v1';
+const LS_VIGILANTES = 'analiqstaff_vigilantes_v1';  // plantilla + contratos IA adjuntos
 const LS_ASSIGN     = 'analiqstaff_assignments_v2'; // clave legacy (solo para migración)
 const LS_ASSIGN_PFX = 'analiqstaff_assign_';        // prefijo por mes: + 'YYYY-MM'
 
-/** Guarda PUESTOS + todos los meses activos en memoria */
+/** Guarda VIGILANTES + PUESTOS + todos los meses activos en memoria */
 function saveToStorage() {
   try {
+    localStorage.setItem(LS_VIGILANTES, JSON.stringify(VIGILANTES));
     localStorage.setItem(LS_PUESTOS, JSON.stringify(PUESTOS));
     _saveAllMonthsInMemory();
   } catch(e) {
@@ -3091,6 +3328,15 @@ function _sparsify(monthData) {
 }
 
 function loadFromStorage() {
+  // ── 0. Vigilantes (plantilla + contratos IA) ────────────
+  try {
+    const vg = localStorage.getItem(LS_VIGILANTES);
+    if (vg) {
+      const parsed = JSON.parse(vg);
+      if (parsed && parsed.length) VIGILANTES = parsed;
+    }
+  } catch(e) { /* mantener valores por defecto */ }
+
   // ── 1. Puestos ──────────────────────────────────────────
   try {
     const p = localStorage.getItem(LS_PUESTOS);
@@ -3800,7 +4046,9 @@ function switchEmployeeTab(tab) {
   );
   const v = getV(activeEmployeeId);
   document.getElementById('ep-content').innerHTML =
-    tab === 'nomina' ? _htmlNomina(v) : _htmlDetalles(v);
+    tab === 'nomina' ? _htmlNomina(v)
+    : tab === 'docs' ? _htmlDocs(v)
+    : _htmlDetalles(v);
 }
 
 /** Toggle de estrella desde el panel de detalle */
@@ -3991,7 +4239,9 @@ function switchDrawerTab(tab) {
   );
   const v = getV(drawerVid);
   document.getElementById('drawer-content').innerHTML =
-    tab === 'nomina' ? _htmlNomina(v) : _htmlDetalles(v);
+    tab === 'nomina' ? _htmlNomina(v)
+    : tab === 'docs' ? _htmlDocs(v)
+    : _htmlDetalles(v);
 }
 
 function _syncDrawer() {
@@ -4007,7 +4257,9 @@ function _syncDrawer() {
     t.classList.toggle('active', t.dataset.tab === drawerTab)
   );
   document.getElementById('drawer-content').innerHTML =
-    drawerTab === 'nomina' ? _htmlNomina(v) : _htmlDetalles(v);
+    drawerTab === 'nomina' ? _htmlNomina(v)
+    : drawerTab === 'docs' ? _htmlDocs(v)
+    : _htmlDetalles(v);
 }
 
 /* Devuelve {armado, nocturno} del vigilante en el cuadrante de hoy */
@@ -4173,6 +4425,221 @@ function _htmlNomina(v) {
 }
 
 /* ======================================================
+   DOCUMENTACIÓN Y CLÁUSULAS IA — Fase 2
+====================================================== */
+
+/** ID del vigilante cuyo contrato está pendiente de adjuntar */
+let _pendingContractVid = null;
+
+/** Genera el HTML de la pestaña "Contrato IA" para un vigilante */
+function _htmlDocs(v) {
+  if (!v) return '';
+  const c = v.contratoIA;
+
+  /* ── Bloque de estado del contrato ── */
+  let statusBlock;
+  if (c) {
+    const vencColor = c.diasParaVencer < 60 ? 'var(--red)' : c.diasParaVencer < 180 ? 'var(--amber)' : 'var(--green)';
+    statusBlock = `
+      <div class="contract-status-box">
+        <div class="contract-status-dot ok"></div>
+        <div class="contract-status-info">
+          <div class="contract-status-label">📎 ${c.nombreArchivo}</div>
+          <div class="contract-status-meta">Analizado el ${c.fechaAnalisis} · ${c.tipoJornada}</div>
+          <div class="contract-status-meta" style="margin-top:3px;color:${vencColor}">
+            Vencimiento: ${c.fechaVencimiento} (${c.diasParaVencer} días)
+          </div>
+          <div class="contract-clausulas-pill">✓ ${c.numClausulas} cláusulas extraídas</div>
+        </div>
+      </div>`;
+  } else {
+    statusBlock = `
+      <div class="contract-status-box">
+        <div class="contract-status-dot sin"></div>
+        <div class="contract-status-info">
+          <div class="contract-status-label" style="color:var(--t2)">Sin contrato adjunto</div>
+          <div class="contract-status-meta">Adjunta un archivo para que AnalIQ-IA extraiga las cláusulas</div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="doc-ia-section">
+      <div class="doc-ia-header">
+        <div class="doc-ia-icon">🤖</div>
+        <div>
+          <div class="doc-ia-title">AnalIQ-IA · Motor de extracción contractual</div>
+          <div class="doc-ia-subtitle">Documentación y Cláusulas IA</div>
+        </div>
+      </div>
+      <div class="doc-ia-actions">
+        <button class="btn-doc-ia adjuntar" onclick="triggerContractInput(${v.id})">
+          📎 Adjuntar Contrato
+        </button>
+        <button class="btn-doc-ia resumen" onclick="openClausulasModal(${v.id})" ${!c ? 'disabled' : ''}>
+          📋 Ver Resumen Completo
+        </button>
+      </div>
+      ${statusBlock}
+    </div>
+    ${c ? `
+    <div class="detail-section" style="margin-top:12px">
+      <div class="detail-section-title">Jornada Pactada (extraída por IA)</div>
+      <div class="detail-row">
+        <span class="detail-lbl">Tipo de jornada</span>
+        <span class="detail-val" style="color:var(--cyan)">${c.tipoJornada}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-lbl">Horas mensuales</span>
+        <span class="detail-val" style="color:var(--blue);font-family:var(--mono)">${c.jornadaHoras}h/mes</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-lbl">Sueldo base pactado</span>
+        <span class="detail-val">${fmtEur(v.sueldoBase)}/mes</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-lbl">Tarifa horaria efectiva</span>
+        <span class="detail-val" style="color:var(--green);font-family:var(--mono)">
+          ${fmtEur(parseFloat((v.sueldoBase / c.jornadaHoras).toFixed(4)))}/h
+        </span>
+      </div>
+    </div>` : ''}
+  `;
+}
+
+/** Lanza el selector de archivo apuntando al vigilante correcto */
+function triggerContractInput(vid) {
+  _pendingContractVid = vid;
+  const inp = document.getElementById('contract-input');
+  inp.value = '';
+  inp.click();
+}
+
+/** Callback cuando el usuario selecciona un archivo de contrato */
+function onContractAttached(input) {
+  if (!input.files || !input.files[0] || !_pendingContractVid) return;
+  const file = input.files[0];
+  input.value = '';
+
+  /* Mostrar toast-ia con mensaje contextual */
+  const toastText = document.getElementById('toast-ia-text');
+  const toastSub  = document.getElementById('toast-ia-sub');
+  if (toastText) toastText.textContent = 'AnalIQ-IA: Extrayendo cláusulas de jornada…';
+  if (toastSub)  toastSub.textContent  = 'Identificando tipo de contrato · Analizando plazos';
+  document.getElementById('toast-ia').classList.add('visible');
+
+  const vid = _pendingContractVid;
+  _pendingContractVid = null;
+
+  setTimeout(() => {
+    document.getElementById('toast-ia').classList.remove('visible');
+
+    const v = VIGILANTES.find(x => x.id === vid);
+    if (!v) return;
+
+    /* Tipos de jornada realistas según Convenio Seguridad Privada */
+    const jornadas = [
+      { tipoJornada: 'Jornada Completa',  jornadaHoras: 162 },
+      { tipoJornada: 'Jornada Parcial',   jornadaHoras: 80  },
+      { tipoJornada: 'Jornada Temporal',  jornadaHoras: 120 },
+    ];
+    const jornadaElegida = jornadas[Math.floor(Math.random() * jornadas.length)];
+
+    /* Fecha de vencimiento aleatoria entre 6 meses y 3 años */
+    const hoy = new Date();
+    const mesesRandom = Math.floor(Math.random() * 31) + 6; // 6 a 36 meses
+    const venc = new Date(hoy);
+    venc.setMonth(venc.getMonth() + mesesRandom);
+    const diasParaVencer = Math.floor((venc - hoy) / 86400000);
+    const fmtDate = (d) => d.toLocaleDateString('es-ES', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+    /* Cláusulas extraídas simuladas */
+    const clausulas = [
+      { grupo: 'Identificación Contractual', items: [
+        { label: 'Referencia de contrato',    val: v.contratoRef || '—' },
+        { label: 'Modalidad contractual',     val: v.tipoContrato || '—' },
+        { label: 'Categoría profesional',     val: v.cargo },
+        { label: 'Fecha de alta',             val: v.alta || fmtDate(hoy), accent: '' },
+        { label: 'Fecha de vencimiento',      val: fmtDate(venc), accent: diasParaVencer < 60 ? 'accent-red' : diasParaVencer < 180 ? 'accent-amber' : 'accent-green' },
+      ]},
+      { grupo: 'Jornada y Condiciones', items: [
+        { label: 'Tipo de jornada',           val: jornadaElegida.tipoJornada, accent: 'accent-blue' },
+        { label: 'Horas ordinarias / mes',    val: `${jornadaElegida.jornadaHoras} h/mes (Convenio Seguridad Privada)`, accent: 'accent-blue' },
+        { label: 'Distribución de turnos',    val: 'Rotativo mañana / tarde / noche' },
+        { label: 'Descanso mínimo entre jornadas', val: '12 horas (Art. 34.3 ET)' },
+        { label: 'Plus de nocturnidad',       val: '1,52 €/hora (Art. 55 Convenio)' },
+        { label: 'Plus de peligrosidad',      val: '0,82 €/hora (Art. 135 Convenio)' },
+      ]},
+      { grupo: 'Retribución', items: [
+        { label: 'Sueldo base mensual',       val: fmtEur(v.sueldoBase), accent: 'accent-green' },
+        { label: 'Tarifa horaria efectiva',   val: `${fmtEur(parseFloat((v.sueldoBase / jornadaElegida.jornadaHoras).toFixed(4)))}/h`, accent: 'accent-green' },
+        { label: 'Antigüedad acumulada',      val: `${v.trienios} trienio${v.trienios !== 1 ? 's' : ''} (${v.experiencia} años)` },
+        { label: 'Pagas extraordinarias',     val: '2 pagas (junio y diciembre) — prorrateable' },
+      ]},
+      { grupo: 'Cláusulas Adicionales', items: [
+        { label: 'Período de prueba',         val: v.tipoContrato?.includes('Temporal') ? '1 mes' : '6 meses (Art. 14 ET)' },
+        { label: 'Cláusula de exclusividad',  val: 'Parcial — compatible con otras actividades no competidoras' },
+        { label: 'Formación y habilitaciones', val: v.hab.join(', ').toUpperCase() || '—' },
+        { label: 'Ley aplicable',             val: 'ET + Convenio Colectivo Estatal Seguridad Privada 2023-2026' },
+      ]},
+    ];
+
+    /* Guardar en el objeto del vigilante */
+    v.contratoIA = {
+      nombreArchivo: file.name,
+      fechaAnalisis: fmtDate(hoy),
+      fechaVencimiento: fmtDate(venc),
+      diasParaVencer,
+      tipoJornada: jornadaElegida.tipoJornada,
+      jornadaHoras: jornadaElegida.jornadaHoras,
+      numClausulas: clausulas.reduce((s, g) => s + g.items.length, 0),
+      clausulas,
+    };
+
+    saveToStorage();
+
+    /* Re-renderizar la pestaña docs si el empleado activo es este */
+    if (activeEmployeeId === vid) {
+      document.getElementById('ep-content').innerHTML = _htmlDocs(v);
+    }
+    if (drawerVid === vid) {
+      document.getElementById('drawer-content').innerHTML = _htmlDocs(v);
+    }
+  }, 1500);
+}
+
+/** Abre el modal con el resumen completo de cláusulas del vigilante */
+function openClausulasModal(vid) {
+  const v = VIGILANTES.find(x => x.id === vid);
+  if (!v || !v.contratoIA) return;
+  const c = v.contratoIA;
+
+  const sub = document.getElementById('clausulas-modal-sub');
+  if (sub) sub.textContent = `${v.nombre} · Analizado el ${c.fechaAnalisis} · ${c.numClausulas} cláusulas`;
+
+  const body = document.getElementById('clausulas-modal-body');
+  body.innerHTML = c.clausulas.map(grupo => `
+    <div class="clausulas-group">
+      <div class="clausulas-group-title">${grupo.grupo}</div>
+      ${grupo.items.map(item => `
+        <div class="clausulas-row">
+          <div class="clausulas-row-label">${item.label}</div>
+          <div class="clausulas-row-val ${item.accent || ''}">${item.val}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  document.getElementById('clausulas-modal-overlay').classList.add('visible');
+}
+
+/** Cierra el modal de cláusulas */
+function closeClausulasModal(e) {
+  if (e && e.target !== document.getElementById('clausulas-modal-overlay')) return;
+  document.getElementById('clausulas-modal-overlay').classList.remove('visible');
+}
+
+/* ======================================================
    IMPORTACIÓN DE CV POR IA
 ====================================================== */
 const CV_CANDIDATES = [
@@ -4189,6 +4656,11 @@ function importCV() {
 function onCVSelected(input) {
   if (!input.files || !input.files[0]) return;
   input.value = '';
+  // Restaurar texto del toast para importación de CV
+  const _tt = document.getElementById('toast-ia-text');
+  const _ts = document.getElementById('toast-ia-sub');
+  if (_tt) _tt.textContent = 'Analizando CV mediante IA y extrayendo credenciales…';
+  if (_ts) _ts.textContent  = 'Procesando · Identificando habilitaciones';
   document.getElementById('toast-ia').classList.add('visible');
   setTimeout(() => {
     document.getElementById('toast-ia').classList.remove('visible');
@@ -4200,6 +4672,7 @@ function onCVSelected(input) {
       alta:        new Date().toLocaleDateString('es-ES')
     });
     VIGILANTES.push(newV);
+    saveToStorage(); // persistir nuevo vigilante importado
     renderRoster();
     document.getElementById('roster-count').textContent = `${VIGILANTES.length} activos`;
   }, 1500);
@@ -4230,6 +4703,7 @@ function onUnassign(puestoId, turnoId) {
 }
 
 function clearAll() {
+  localStorage.removeItem(LS_VIGILANTES);
   localStorage.removeItem(LS_PUESTOS);
   localStorage.removeItem(LS_ASSIGN); // legacy
   // Eliminar también todas las claves por mes del nuevo formato
@@ -4239,6 +4713,8 @@ function clearAll() {
     if (k && k.startsWith(LS_ASSIGN_PFX)) toDelete.push(k);
   }
   toDelete.forEach(k => localStorage.removeItem(k));
+  // Restaurar VIGILANTES a los datos de fábrica (sin contratos IA)
+  VIGILANTES = VIGILANTES_DEFAULT.map(v => Object.assign({}, v));
   initPuestos();
   initAssignments();
   selectedId   = null;
@@ -4787,12 +5263,17 @@ function calcNominaMensual(v, mes, ano) {
   }
 
   // ── Horas y jornada ─────────────────────────────────
-  const totalHoras  = (turnosM + turnosT + turnosN) * NOM_CONFIG.horas_turno;
-  const horasOrd    = Math.min(totalHoras, NOM_CONFIG.horas_mes_convenio);
-  const horasExtra  = Math.max(0, totalHoras - NOM_CONFIG.horas_mes_convenio);
+  // Si el vigilante tiene contrato IA adjunto, usar su jornada pactada; si no, convenio (162h)
+  const jornadaPactada = (v.contratoIA && v.contratoIA.jornadaHoras)
+    ? v.contratoIA.jornadaHoras
+    : NOM_CONFIG.horas_mes_convenio;
 
-  // Tarifa horaria base del trabajador (sueldo / 162 h convenio)
-  const tarifaHoraBase = v.sueldoBase / NOM_CONFIG.horas_mes_convenio;
+  const totalHoras  = (turnosM + turnosT + turnosN) * NOM_CONFIG.horas_turno;
+  const horasOrd    = Math.min(totalHoras, jornadaPactada);
+  const horasExtra  = Math.max(0, totalHoras - jornadaPactada);
+
+  // Tarifa horaria base: sueldo pactado dividido entre la jornada pactada del contrato IA
+  const tarifaHoraBase = v.sueldoBase / jornadaPactada;
 
   // ── Devengos salariales ──────────────────────────────
   // Sueldo proporcional a horas ordinarias reales
@@ -4884,7 +5365,6 @@ function autoCompletarMes() {
   if (!confirm(
     `⚡ Auto-completar cuadrante de ${mesNombre}\n\n` +
     `• Se respetan las asignaciones ya existentes.\n` +
-    `• Solo se rellenan los turnos vacíos.\n` +
     `• Se aplicarán las restricciones del Convenio.\n\n` +
     `¿Continuar?`
   )) return;
