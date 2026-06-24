@@ -6871,12 +6871,19 @@ function printCuadranteFocused() {
   <div class="pt-page" id="pt-page">
     <div class="pt-header">
       <div class="pt-header-left">
-        <div class="pt-company-name">EMPRESA DE SEGURIDAD PRIVADA</div>
-        <div class="pt-company-sub">Cuadrante Mensual de Servicios</div>
+        <div class="pt-logo-placeholder" title="Sustituir por logotipo corporativo">
+          <span class="pt-logo-icon">🔒</span>
+          <span class="pt-logo-text">LOGOTIPO<br>EMPRESA</span>
+        </div>
+        <div>
+          <div class="pt-company-name">EMPRESA DE SEGURIDAD PRIVADA</div>
+          <div class="pt-company-sub">Cuadrante Mensual de Servicios · Convenio Colectivo Vigente</div>
+        </div>
       </div>
       <div class="pt-header-right">
         <div class="pt-doc-label">DOCUMENTO OFICIAL</div>
         <div class="pt-doc-ref">Ref. AnalIQstaff · ${mesLabel}</div>
+        <div class="pt-doc-nif" style="font-size:9px;color:#94a3b8;margin-top:4px">CIF: ___________________</div>
       </div>
     </div>
     <div class="pt-meta">
@@ -6902,7 +6909,7 @@ function printCuadranteFocused() {
         <div class="pt-sig-stamp-area"></div>
       </div>
       <div class="pt-sig-box">
-        <div class="pt-sig-title">Conformidad del Cliente</div>
+        <div class="pt-sig-title">Conformidad del Cliente / RLT</div>
         <div class="pt-sig-line"></div>
         <div class="pt-sig-name">Nombre y Firma</div>
         <div class="pt-sig-date">Fecha: _______________</div>
@@ -7107,6 +7114,19 @@ function focusQuitarAsignacion() {
   cursor: pointer; transition: all 0.18s;
 }
 .btn-focus-print:hover { background: rgba(16,185,129,0.16); }
+
+/* Botón "Ir a Ficha Operativa" desde el cuadrante focalizado */
+.btn-focus-svc {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 14px;
+  background: rgba(168,85,247,0.08);
+  border: 1px solid rgba(168,85,247,0.28);
+  border-radius: var(--r-sm);
+  color: var(--purple);
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+}
+.btn-focus-svc:hover { background: rgba(168,85,247,0.18); transform: translateY(-1px); }
 
 /* ── Hint de selección ───────────────────────────────── */
 .focus-assign-hint {
@@ -7423,6 +7443,15 @@ function focusQuitarAsignacion() {
   padding-bottom: 14px; margin-bottom: 14px;
   border-bottom: 3px solid #0f172a;
 }
+.pt-header-left { display: flex; align-items: center; gap: 14px; }
+.pt-logo-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 64px; height: 64px; border: 2px dashed #94a3b8; border-radius: 8px;
+  background: #f1f5f9; flex-shrink: 0; cursor: default;
+  color: #94a3b8; text-align: center;
+}
+.pt-logo-icon { font-size: 20px; line-height: 1; }
+.pt-logo-text { font-size: 6px; font-weight: 700; letter-spacing: 0.5px; line-height: 1.3; margin-top: 3px; text-transform: uppercase; }
 .pt-company-name { font-size: 18px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
 .pt-company-sub  { font-size: 11px; color: #475569; margin-top: 2px; }
 .pt-header-right { text-align: right; }
@@ -7600,11 +7629,14 @@ function switchView(name) {
       '</div>' +
     '</div>' +
     '<div class="focus-top-actions">' +
-      '<button class="btn-focus-auto" onclick="autoCompletarServicio()" title="Rellena turnos vacios solo de este servicio">' +
+      '<button class="btn-focus-svc" onclick="goToFichaFromFocus()" title="Ir a la ficha operativa de este servicio en el Centro de Mando">' +
+        '&#127970; Ir a Ficha Operativa' +
+      '</button>' +
+      '<button class="btn-focus-auto" onclick="autoCompletarServicio()" title="Rellena turnos vacios solo de este servicio respetando el Convenio">' +
         '&#9889; Auto-completar Mes' +
       '</button>' +
-      '<button class="btn-focus-print" onclick="printCuadranteFocused()" title="Genera version profesional para imprimir o PDF">' +
-        '&#128424; Imprimir / Exportar Cuadrante' +
+      '<button class="btn-focus-print" onclick="printCuadranteFocused()" title="Genera version profesional para imprimir o guardar en PDF">' +
+        '&#128424; Imprimir / Descargar Cuadrante' +
       '</button>' +
     '</div>';
   overlay.appendChild(topBar);
@@ -7785,6 +7817,15 @@ function closeFichaServicio() {
   if (statusEl) statusEl.classList.remove('visible');
 
   renderCatalogServicios();
+}
+
+/* ── Ir a ficha operativa desde el cuadrante focalizado ── */
+function goToFichaFromFocus() {
+  const pId = focusedPuestoId; // captura antes de salir del foco
+  switchView('servicios');
+  if (pId && typeof openFichaServicio === 'function') {
+    setTimeout(function() { openFichaServicio(pId); }, 150);
+  }
 }
 
 /* ── Ir a planificación mensual ───────────────────────── */
