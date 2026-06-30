@@ -2278,7 +2278,15 @@
     .ficha-check-item:hover { background: rgba(255,255,255,0.07); border-color: var(--border-strong); }
     .ficha-check-item input[type=checkbox] { width: 12px; height: 12px; accent-color: var(--cyan); cursor: pointer; }
     .ficha-inline { flex-direction: row; align-items: center; justify-content: space-between; }
-    .ficha-save-row { padding: 0 14px 14px; display: flex; justify-content: flex-end; }
+    .ficha-save-row { padding: 0 14px 14px; display: flex; justify-content: space-between; align-items: center; }
+    .btn-ficha-delete {
+      padding: 6px 15px;
+      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+      border-radius: var(--r-sm); color: #ef4444;
+      font-family: var(--sans); font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ficha-delete:hover { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.55); }
     .btn-ficha-save {
       padding: 6px 15px;
       background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
@@ -3412,6 +3420,7 @@
               </div>
             </div>
             <div class="ficha-save-row">
+              <button class="btn-ficha-delete" onclick="deleteServicio()">🗑 Eliminar Servicio</button>
               <button class="btn-ficha-save" id="btn-ficha-save" onclick="saveFichaEdits()">✓ Guardado</button>
             </div>
           </div>
@@ -3756,7 +3765,7 @@ let VIGILANTES = VIGILANTES_DEFAULT.map(v => Object.assign({}, v));
 const PUESTOS_DEFAULT = [
   {
     id: 'p1',
-    nombre: 'Control de Accesos',
+    nombre: 'Control de Accesos · Zona de Embarque',
     lugar: 'Aeropuerto AENA · Terminal 2',
     emoji: '✈',
     tipo: 'aeropuerto',
@@ -3765,12 +3774,21 @@ const PUESTOS_DEFAULT = [
   },
   {
     id: 'p2',
-    nombre: 'Patrulla Armada',
-    lugar: 'Centro Comercial · Planta Principal',
-    emoji: '🛡',
+    nombre: 'Vigilancia Armada · Perímetro',
+    lugar: 'Planta Industrial · Polígono Norte',
+    emoji: '🔫',
     tipo: 'armado',
     requiere: ['tip', 'armas'],
     armado: true
+  },
+  {
+    id: 'p3',
+    nombre: 'Control de Accesos · Recepción',
+    lugar: 'Edificio Corporativo Torre Europa',
+    emoji: '🏢',
+    tipo: 'generico',
+    requiere: ['tip'],
+    armado: false
   }
 ];
 
@@ -7817,6 +7835,30 @@ function closeFichaServicio() {
   if (statusEl) statusEl.classList.remove('visible');
 
   renderCatalogServicios();
+}
+
+/* ── Elimina el servicio activo ───────────────────────── */
+function deleteServicio() {
+  if (!fichaCurrentPuestoId) return;
+  const p = PUESTOS.find(x => x.id === fichaCurrentPuestoId);
+  const nombre = p ? p.nombre : 'este servicio';
+  const ok = confirm('¿Estás seguro de que deseas eliminar "' + nombre + '" y todas sus asignaciones?\n\nEsta acción no se puede deshacer.');
+  if (!ok) return;
+
+  // Eliminar del array de puestos
+  PUESTOS = PUESTOS.filter(x => x.id !== fichaCurrentPuestoId);
+
+  // Limpiar asignaciones del puesto en todos los días
+  const pid = fichaCurrentPuestoId;
+  for (const fecha in assignments) {
+    if (assignments[fecha][pid]) {
+      delete assignments[fecha][pid];
+      if (Object.keys(assignments[fecha]).length === 0) delete assignments[fecha];
+    }
+  }
+
+  saveToStorage();
+  closeFichaServicio(); // cierra la ficha y actualiza el catálogo
 }
 
 /* ── Ir a ficha operativa desde el cuadrante focalizado ── */
