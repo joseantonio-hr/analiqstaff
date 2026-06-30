@@ -331,22 +331,6 @@
     }
 
     /* ========================================================
-       HINT DE SELECCIÓN
-    ======================================================== */
-    .selection-hint {
-      flex-shrink: 0;
-      padding: 9px 18px;
-      background: rgba(0,212,255,0.06);
-      border-top: 1px solid rgba(0,212,255,0.18);
-      font-size: 11px;
-      color: var(--cyan);
-      text-align: center;
-      display: none;
-      animation: fade-in 0.2s ease;
-    }
-    .selection-hint.visible { display: block; }
-
-    /* ========================================================
        GRILLA DE CROMOS
     ======================================================== */
     .cromo-grid {
@@ -405,23 +389,10 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     }
 
-    .cromo.selected {
-      border-color: var(--cyan);
-      box-shadow:
-        0 0 0 1px var(--cyan),
-        0 0 24px rgba(0,212,255,0.2),
-        0 8px 30px rgba(0,0,0,0.4);
-      transform: translateY(-2px);
-    }
-
     .cromo-accent-bar {
       height: 3px;
       background: var(--c-accent, var(--cyan));
       transition: opacity 0.3s;
-    }
-    .cromo.selected .cromo-accent-bar {
-      background: linear-gradient(90deg, var(--cyan), var(--blue));
-      box-shadow: 0 0 8px rgba(0,212,255,0.6);
     }
 
     .cromo-num {
@@ -461,25 +432,6 @@
       position: relative;
       transition: box-shadow 0.3s;
     }
-
-    .cromo.selected .cromo-avatar {
-      box-shadow: var(--c-avatar-glow), 0 0 20px rgba(0,212,255,0.35);
-    }
-
-    .cromo-sel-dot {
-      display: none;
-      position: absolute;
-      top: -3px;
-      right: -3px;
-      width: 14px;
-      height: 14px;
-      background: var(--cyan);
-      border-radius: 50%;
-      border: 2px solid var(--bg-void);
-      box-shadow: 0 0 8px var(--cyan);
-      animation: pulse-glow 1s ease-in-out infinite;
-    }
-    .cromo.selected .cromo-sel-dot { display: block; }
 
     .cromo-name {
       text-align: center;
@@ -1702,34 +1654,6 @@
       border: 1px solid rgba(77,142,255,0.2);
     }
 
-
-    /* ========================================================
-       BOTÓN ESTRELLA (toggle selección cuadrante)
-    ======================================================== */
-    .cromo-star-btn {
-      position: absolute;
-      top: 8px; left: 8px;
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.1);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; cursor: pointer; z-index: 5;
-      transition: all 0.18s; padding: 0;
-      filter: grayscale(1); opacity: 0.55;
-    }
-    .cromo-star-btn:hover {
-      filter: grayscale(0); opacity: 1;
-      border-color: rgba(0,212,255,0.5);
-      background: rgba(0,212,255,0.15);
-      box-shadow: 0 0 8px rgba(0,212,255,0.3);
-    }
-    .cromo.selected .cromo-star-btn {
-      filter: grayscale(0); opacity: 1;
-      background: rgba(0,212,255,0.2);
-      border-color: var(--cyan);
-      box-shadow: 0 0 10px rgba(0,212,255,0.5);
-    }
 
     /* ========================================================
        DRAWER LATERAL
@@ -3158,9 +3082,6 @@
         <!-- Renderizado por JS -->
       </div>
     </div>
-    <div class="selection-hint" id="selection-hint">
-      ↗ Ahora haz clic en un <strong>turno vacío</strong> del cuadrante para asignar
-    </div>
   </section>
 
   <!-- COLUMNA DERECHA: PANEL DE DETALLE (Stats globales / Expediente) -->
@@ -3191,7 +3112,6 @@
           <div class="employee-panel-name" id="ep-nombre"></div>
           <div class="employee-panel-cargo" id="ep-cargo"></div>
         </div>
-        <button class="cromo-star-btn" id="ep-star-btn" title="Activar modo asignación" style="position:static;width:28px;height:28px;font-size:13px;filter:none;opacity:0.7;flex-shrink:0" onclick="onToggleSelectFromPanel()">⭐</button>
       </div>
       <div class="employee-tabs" id="ep-tabs">
         <div class="employee-tab active" data-tab="detalles" onclick="switchEmployeeTab('detalles')">📋 Detalles</div>
@@ -3822,7 +3742,6 @@ const DIAS_MES         = 30;
 /* ======================================================
    ESTADO
 ====================================================== */
-let selectedId  = null;
 let PUESTOS     = [];
 let assignments = {}; // { [fechaISO]: { [puestoId]: { [turnoId]: vigilanteId } } }
 let currentDate = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
@@ -4153,7 +4072,6 @@ function renderRoster() {
     } else {
       filtered.forEach((v, i) => {
         const rgb       = hexRgb(v.color);
-        const sel       = v.id === selectedId;
         const count     = counts[v.id] || 0;
         const isOver    = count >= 2;
         const isBusy    = count === 1;
@@ -4168,7 +4086,6 @@ function renderRoster() {
 
         const card = document.createElement('div');
         card.className = 'cromo'
-          + (sel    ? ' selected'         : '')
           + (isOver ? ' cromo-overloaded' : '');
         card.dataset.id = v.id;
         card.style.cssText = `
@@ -4186,13 +4103,11 @@ function renderRoster() {
         card.innerHTML = `
           <div class="cromo-accent-bar"></div>
           <div class="cromo-num">#${String(i + 1).padStart(2, '0')}</div>
-          <button class="cromo-star-btn" title="${sel ? 'Quitar modo asignación' : 'Activar modo asignación'}">⭐</button>
           ${occupancyHTML}
           <div class="cromo-body">
             <div class="cromo-avatar-wrap">
               <div class="cromo-avatar">
                 ${v.iniciales}
-                <div class="cromo-sel-dot"></div>
               </div>
             </div>
             <div class="cromo-name">${v.nombre}</div>
@@ -4216,11 +4131,6 @@ function renderRoster() {
           </div>
         `;
 
-        /* Estrella → toggle selección para cuadrante */
-        card.querySelector('.cromo-star-btn').addEventListener('click', e => {
-          e.stopPropagation();
-          onToggleSelect(v.id);
-        });
         /* Cuerpo → mostrar expediente en panel derecho */
         card.addEventListener('click', () => selectEmployee(v.id));
         grid.appendChild(card);
@@ -4324,18 +4234,7 @@ function buildSlot(puesto, turno) {
     });
 
   } else {
-    let classes = 'turno-slot empty';
-    if (selectedId !== null) {
-      const sv      = getV(selectedId);
-      const missing = getMissingHabs(sv, puesto);
-      if (missing.length === 0) {
-        classes += ' slot-compatible';
-        slot.style.setProperty('--hl-rgb', hexRgb(sv.color));
-      } else {
-        classes += ' slot-available';
-      }
-    }
-    slot.className = classes;
+    slot.className = 'turno-slot empty';
     slot.innerHTML = `
       ${slotHdr}
       <div class="slot-empty-state">
@@ -4343,7 +4242,6 @@ function buildSlot(puesto, turno) {
         <div class="slot-empty-txt">Vacío</div>
       </div>
     `;
-    slot.addEventListener('click', () => onSlotClick(puesto.id, turno.id));
   }
   return slot;
 }
@@ -4560,16 +4458,6 @@ function saveNewPuesto() {
    MANEJADORES DE EVENTOS
 ====================================================== */
 
-/* Estrella: activa/desactiva modo asignación al cuadrante */
-function onToggleSelect(id) {
-  selectedId = (selectedId === id) ? null : id;
-  renderRoster();
-  renderScheduler();
-  updateHint();
-  // Sincronizar botón estrella del panel de detalle si está visible
-  if (activeEmployeeId) _syncEpStarBtn();
-}
-
 /* ======================================================
    PANEL DERECHO: ESTADÍSTICAS GLOBALES + EXPEDIENTE
 ====================================================== */
@@ -4591,9 +4479,6 @@ function selectEmployee(id) {
   av.style.cssText = `background:rgba(${rgb},0.18);border:2px solid rgba(${rgb},0.4);color:${v.color}`;
   document.getElementById('ep-nombre').textContent = v.nombre;
   document.getElementById('ep-cargo').textContent  = v.cargo;
-
-  // Botón estrella refleja estado
-  _syncEpStarBtn();
 
   // Resetear pestañas
   document.querySelectorAll('.employee-tab').forEach(t =>
@@ -4629,25 +4514,6 @@ function switchEmployeeTab(tab) {
     tab === 'nomina' ? _htmlNomina(v)
     : tab === 'docs' ? _htmlDocs(v)
     : _htmlDetalles(v);
-}
-
-/** Toggle de estrella desde el panel de detalle */
-function onToggleSelectFromPanel() {
-  if (!activeEmployeeId) return;
-  onToggleSelect(activeEmployeeId);
-  _syncEpStarBtn();
-}
-
-function _syncEpStarBtn() {
-  const btn = document.getElementById('ep-star-btn');
-  if (!btn) return;
-  const isActive = (selectedId === activeEmployeeId);
-  btn.style.filter      = isActive ? 'none' : 'grayscale(0.7)';
-  btn.style.opacity     = isActive ? '1' : '0.65';
-  btn.style.background  = isActive ? 'rgba(0,212,255,0.2)' : 'rgba(0,0,0,0.45)';
-  btn.style.borderColor = isActive ? 'var(--cyan)' : 'rgba(255,255,255,0.1)';
-  btn.style.boxShadow   = isActive ? '0 0 10px rgba(0,212,255,0.5)' : 'none';
-  btn.title = isActive ? 'Quitar modo asignación' : 'Activar modo asignación';
 }
 
 /** Renderiza las Estadísticas Globales de la Plantilla */
@@ -4867,19 +4733,12 @@ function _htmlDetalles(v) {
     : armado   ? `<span style="color:var(--red)">🛡 Puesto armado hoy</span>`
     : nocturno ? `<span style="color:var(--purple)">🌙 Turno nocturno hoy</span>`
     :            `<span style="color:var(--t3)">Sin asignación hoy</span>`;
-  const esActivo = v.id === selectedId;
   return `
     <div class="detail-section">
       <div class="detail-section-title">Estado en el Cuadrante</div>
       <div class="detail-row">
         <span class="detail-lbl">Turno hoy</span>
         <span class="detail-val">${turnoHoy}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-lbl">Modo asignación ⭐</span>
-        <span class="detail-val" style="color:${esActivo ? 'var(--cyan)' : 'var(--t3)'}">
-          ${esActivo ? 'Activo' : 'Inactivo'}
-        </span>
       </div>
       <div class="detail-row" style="align-items:flex-start">
         <span class="detail-lbl">Habilitaciones</span>
@@ -5258,20 +5117,6 @@ function onCVSelected(input) {
   }, 1500);
 }
 
-function onSlotClick(puestoId, turnoId) {
-  if (!selectedId) return;
-  dayAssign()[puestoId][turnoId] = selectedId;
-  selectedId = null;
-
-  saveToStorage();
-  renderRoster();
-  renderScheduler();
-  renderFinancialPanel();
-  updateKPI();
-  updateHint();
-  if (drawerVid !== null) _syncDrawer();
-}
-
 function onUnassign(puestoId, turnoId) {
   dayAssign()[puestoId][turnoId] = null;
   saveToStorage();
@@ -5297,7 +5142,6 @@ function clearAll() {
   VIGILANTES = VIGILANTES_DEFAULT.map(v => Object.assign({}, v));
   initPuestos();
   initAssignments();
-  selectedId   = null;
   filterText   = '';
   filterHabs   = new Set();
   filterEstado = 'todos';
@@ -5316,18 +5160,6 @@ function clearAll() {
   renderGlobalStats();
   renderFinancialPanel();
   updateKPI();
-  updateHint();
-}
-
-function updateHint() {
-  const hint = document.getElementById('selection-hint');
-  if (selectedId) {
-    const v = getV(selectedId);
-    hint.innerHTML = `↗ <strong>${v.nombre}</strong> seleccionado/a · Slots <span style="color:${v.color}">■ compatibles</span> resaltados en su color · haz clic para asignar`;
-    hint.classList.add('visible');
-  } else {
-    hint.classList.remove('visible');
-  }
 }
 
 /* ======================================================
@@ -7010,7 +6842,6 @@ function focusQuitarAsignacion() {
   renderGlobalStats();
   renderFinancialPanel();
   updateKPI();
-  updateHint();
   syncFilterPills();
 
   // 3. Inicializar displays de mes en Cuadrantes y Nóminas
